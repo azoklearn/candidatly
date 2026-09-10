@@ -130,7 +130,7 @@ docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RU
 - Toute opération sur les crédits passe par une fonction Postgres transactionnelle et idempotente (index uniques partiels sur `credit_transactions`). Les `event.id` Stripe traités sont stockés dans `stripe_events`.
 - `offers.external_id` = `<partner_label>:<partner_job_id>` (source `api_alternance`).
 - Un profil et un solde de crédits sont créés par trigger à l'inscription (`handle_new_user`).
-- Migrations dans `supabase/migrations`. Sans Docker, elles sont rejouées sur PGlite avec une simulation d'auth et de storage Supabase (46 contrôles de RLS et de contraintes) ; le script est hors dépôt en attendant l'accord B9. `lib/supabase/database.types.ts` est généré depuis ce schéma migré, à régénérer par `npm run db:types` dès que Supabase tourne.
+- Migrations dans `supabase/migrations`. Sans Docker, elles sont rejouées sur PGlite avec une simulation d'auth et de storage Supabase (46 contrôles de RLS et de contraintes) ; le script est hors dépôt en attendant l'accord B9. `lib/supabase/database.types.ts` est généré par la CLI officielle depuis le projet lié (`npm run db:types`).
 
 ### Jobs Trigger.dev (phase 2)
 - Un fichier par job dans `/trigger`, `import { task, schedules } from "@trigger.dev/sdk"`, `schemaTask` avec Zod pour les payloads.
@@ -160,7 +160,8 @@ npm test             # Vitest
 npm run format       # Prettier
 npm run db:start     # Supabase local (Docker requis)
 npm run db:reset     # rejoue migrations + seed.sql
-npm run db:types     # régénère lib/supabase/database.types.ts depuis la base locale
+npm run db:types     # régénère lib/supabase/database.types.ts depuis le projet Supabase lié
+npm run db:push      # applique les nouvelles migrations au projet lié (SUPABASE_DB_PASSWORD dans .env.local)
 npx shadcn@latest add <composant>
 npx trigger.dev@latest dev                               # à partir de la phase 2
 stripe listen --forward-to localhost:3000/api/stripe/webhook   # phase 4
@@ -195,3 +196,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-10 : l'owner décide que l'envoi des candidatures sera une fonctionnalité d'un abonnement premium, par un email ouvert dans la boîte de l'étudiant. Les mesures sur données réelles montrent qu'aucune source autorisée ne fournit l'adresse du recruteur : questions A3 à A5.
 - 2026-09-10 : l'owner décide de ne pas contacter le support de l'API Alternance. A1 est close, le risque est accepté.
 - 2026-09-10 : phase 0 validée (« go »), hypothèses par défaut de la section B appliquées. Phase 1 : pas de Docker sur le poste, migrations vérifiées sur PGlite et types générés depuis le schéma migré ; TypeScript épinglé en 6.0 ; shadcn/ui avec Base UI ; auth email + mot de passe et Google, confirmation par `token_hash` (`/auth/confirm`) ou code PKCE (`/auth/callback`) ; le fournisseur API Alternance couvre recherche et détail, pas l'envoi (pas d'habilitation). Schéma : ajouts C42 à C47 appliqués, statut d'abonnement prévu en attendant A5.
+- 2026-09-10 : projet Supabase cloud de développement « candidatly » créé par l'owner (région Paris, ref `ylupsjydkbmryctfrfte`) et lié à la CLI. Les six migrations y sont appliquées ; les types viennent désormais de la CLI officielle. Vérifié sur la base réelle : création du profil et du solde à l'inscription, RLS (profil, crédits, historique, tables de service), stockage privé par dossier et types de fichiers.
