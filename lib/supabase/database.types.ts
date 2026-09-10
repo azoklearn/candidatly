@@ -1,8 +1,3 @@
-// Supabase database types for the public schema.
-// Generated from supabase/migrations by introspecting a migrated PGlite database,
-// in the `supabase gen types typescript` format, because Docker is not available yet.
-// Regenerate with `npm run db:types` once the local Supabase stack runs.
-
 export type Json =
   | string
   | number
@@ -12,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
       applications: {
@@ -87,13 +87,6 @@ export type Database = {
             referencedRelation: "offers"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "applications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       companies: {
@@ -111,9 +104,9 @@ export type Database = {
           headcount_range: string | null
           id: string
           legal_name: string | null
-          naf25_code: string | null
           naf_code: string | null
           naf_label: string | null
+          naf25_code: string | null
           postal_code: string | null
           raw: Json | null
           siren: string
@@ -138,9 +131,9 @@ export type Database = {
           headcount_range?: string | null
           id?: string
           legal_name?: string | null
-          naf25_code?: string | null
           naf_code?: string | null
           naf_label?: string | null
+          naf25_code?: string | null
           postal_code?: string | null
           raw?: Json | null
           siren: string
@@ -165,9 +158,9 @@ export type Database = {
           headcount_range?: string | null
           id?: string
           legal_name?: string | null
-          naf25_code?: string | null
           naf_code?: string | null
           naf_label?: string | null
+          naf25_code?: string | null
           postal_code?: string | null
           raw?: Json | null
           siren?: string
@@ -222,13 +215,6 @@ export type Database = {
             referencedRelation: "applications"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "credit_transactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       credits: {
@@ -253,15 +239,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "credits_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       documents: {
         Row: {
@@ -303,15 +281,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "documents_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       events: {
         Row: {
@@ -338,15 +308,7 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "events_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       matches: {
         Row: {
@@ -385,13 +347,6 @@ export type Database = {
             columns: ["offer_id"]
             isOneToOne: false
             referencedRelation: "offers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "matches_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -527,7 +482,9 @@ export type Database = {
           availability_date: string | null
           created_at: string
           degree_label: string | null
-          diploma_level: Database["public"]["Enums"]["profiles_diploma_level"] | null
+          diploma_level:
+            | Database["public"]["Enums"]["profiles_diploma_level"]
+            | null
           domain_free_text: string | null
           email: string | null
           first_name: string | null
@@ -551,7 +508,9 @@ export type Database = {
           availability_date?: string | null
           created_at?: string
           degree_label?: string | null
-          diploma_level?: Database["public"]["Enums"]["profiles_diploma_level"] | null
+          diploma_level?:
+            | Database["public"]["Enums"]["profiles_diploma_level"]
+            | null
           domain_free_text?: string | null
           email?: string | null
           first_name?: string | null
@@ -575,7 +534,9 @@ export type Database = {
           availability_date?: string | null
           created_at?: string
           degree_label?: string | null
-          diploma_level?: Database["public"]["Enums"]["profiles_diploma_level"] | null
+          diploma_level?:
+            | Database["public"]["Enums"]["profiles_diploma_level"]
+            | null
           domain_free_text?: string | null
           email?: string | null
           first_name?: string | null
@@ -595,15 +556,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       rome_appellations: {
         Row: {
@@ -887,15 +840,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "subscriptions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
@@ -925,32 +870,12 @@ export type Database = {
         | "application_sent"
         | "refund"
         | "signup_bonus"
-      documents_kind:
-        | "cv"
-        | "cover_letter_base"
-      matches_status:
-        | "new"
-        | "saved"
-        | "dismissed"
-        | "applied"
-      offers_apply_channel:
-        | "api_alternance"
-        | "email"
-        | "external_url"
-      offers_source:
-        | "api_alternance"
-        | "adzuna"
-        | "france_travail"
-      profiles_diploma_level:
-        | "bac"
-        | "bac+2"
-        | "bac+3"
-        | "bac+4"
-        | "bac+5"
-      profiles_target_contract:
-        | "alternance"
-        | "stage"
-        | "both"
+      documents_kind: "cv" | "cover_letter_base"
+      matches_status: "new" | "saved" | "dismissed" | "applied"
+      offers_apply_channel: "api_alternance" | "email" | "external_url"
+      offers_source: "api_alternance" | "adzuna" | "france_travail"
+      profiles_diploma_level: "bac" | "bac+2" | "bac+3" | "bac+4" | "bac+5"
+      profiles_target_contract: "alternance" | "stage" | "both"
       subscriptions_status:
         | "incomplete"
         | "incomplete_expired"
@@ -967,81 +892,165 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
-  TableName extends DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends { Row: infer R }
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends { Row: infer R }
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
       ? R
       : never
     : never
 
 export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"] | { schema: keyof Database },
-  TableName extends DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends { Insert: infer I }
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends { Insert: infer I }
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
       ? I
       : never
     : never
 
 export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"] | { schema: keyof Database },
-  TableName extends DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends { Update: infer U }
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends { Update: infer U }
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
       ? U
       : never
     : never
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"] | { schema: keyof Database },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
   public: {
     Enums: {
-      applications_sent_via: ["api_alternance", "widget", "partner_site", "mail_client", "gmail"],
-      applications_status: ["draft", "ready", "sent", "viewed", "replied_positive", "replied_negative", "no_answer", "unknown"],
-      credit_transactions_reason: ["purchase", "application_sent", "refund", "signup_bonus"],
+      applications_sent_via: [
+        "api_alternance",
+        "widget",
+        "partner_site",
+        "mail_client",
+        "gmail",
+      ],
+      applications_status: [
+        "draft",
+        "ready",
+        "sent",
+        "viewed",
+        "replied_positive",
+        "replied_negative",
+        "no_answer",
+        "unknown",
+      ],
+      credit_transactions_reason: [
+        "purchase",
+        "application_sent",
+        "refund",
+        "signup_bonus",
+      ],
       documents_kind: ["cv", "cover_letter_base"],
       matches_status: ["new", "saved", "dismissed", "applied"],
       offers_apply_channel: ["api_alternance", "email", "external_url"],
       offers_source: ["api_alternance", "adzuna", "france_travail"],
       profiles_diploma_level: ["bac", "bac+2", "bac+3", "bac+4", "bac+5"],
       profiles_target_contract: ["alternance", "stage", "both"],
-      subscriptions_status: ["incomplete", "incomplete_expired", "trialing", "active", "past_due", "canceled", "unpaid", "paused"],
+      subscriptions_status: [
+        "incomplete",
+        "incomplete_expired",
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "unpaid",
+        "paused",
+      ],
     },
   },
 } as const
