@@ -1,0 +1,97 @@
+{
+  "identifier": {
+    "id": "6a551ab78bfdaae34d664cec",
+    "partner_label": "offres_emploi_lba",
+    "partner_job_id": "6a551ab78bfdaae34d664cec"
+  },
+  "workplace": {
+    "siret": "53208806900010",
+    "brand": null,
+    "legal_name": "AUREIS FORMATION",
+    "website": null,
+    "name": "AUREIS FORMATION",
+    "description": null,
+    "size": "100 à 199 salariés",
+    "location": {
+      "address": "322 RUE DES PYRENEES 75020 PARIS",
+      "geopoint": {
+        "coordinates": [2.339939, 48.851573],
+        "type": "Point"
+      }
+    },
+    "domain": {
+      "idcc": null,
+      "opco": "inconnu",
+      "naf": {
+        "code": "96.02B",
+        "label": "Soins de beauté"
+      }
+    }
+  },
+  "apply": {
+    "url": "https://labonnealternance.apprentissage.beta.gouv.fr/emploi/offres_emploi_lba/6a551ab78bfdaae34d664cec/assistant-assistante-à-la-direction-marketing",
+    "phone": "0100000000",
+    "recipient_id": "partners_6a551ab78bfdaae34d664cec"
+  },
+  "contract": {
+    "start": "2026-09-01T00:00:00.000Z",
+    "duration": 12,
+    "type": ["Apprentissage"],
+    "remote": null
+  },
+  "offer": {
+    "title": "Assistant / Assistante à la direction marketing",
+    "rome_codes": ["M1705"],
+    "description": "Définit et met en oeuvre la stratégie marketing (tarifs, promotion, communication, gammes de produits, supports techniques, ...) pour l'ensemble des produits de l'entreprise. Peut diriger un service ou coordonner l'activité d'une équipe. [...]",
+    "target_diploma": {
+      "european": "5",
+      "label": "BTS, DEUST (Bac+2)"
+    },
+    "desired_skills": [
+      "Etre force de proposition",
+      "Etre à l'écoute, faire preuve d'empathie",
+      "Faire preuve de créativité, d'inventivité"
+    ],
+    "to_be_acquired_skills": [
+      "Management\tAnimer, coordonner une équipe",
+      "Gestion des Ressources Humaines\tConcevoir et piloter une politique de gestion des ressources humaines",
+      "Gestion des Ressources Humaines\tGérer les ressources humaines",
+      "Communication, Multimédia\tConcevoir des supports de communication et d'image",
+      "Gestion administrative et comptable\tRédiger un rapport, un compte rendu d'activité",
+      "Pilotage et maîtrise des coûts\tAssurer la gestion administrative d'une activité",
+      "Gestion et contrôle\tDéfinir la stratégie financière d'une structure",
+      "Gestion et contrôle\tElaborer, suivre et piloter un budget",
+      "Gestion et contrôle\tRéaliser des opérations comptables",
+      "Relation client\tAssister les collaborateurs au niveau commercial et technique",
+      "Développement commercial\tAnalyser les tendances de consommation des clients",
+      "Développement commercial\tConcevoir des modèles de détection des insights consommateurs",
+      "Développement commercial\tDévelopper l'image et la notoriété d'une entreprise",
+      "Développement commercial\tElaborer un plan marketing, une stratégie de marque et de communication",
+      "Développement commercial\tElaborer une stratégie de marketing digital",
+      "Développement commercial\tMener une campagne d'e-mailing",
+      "Développement commercial\tMettre en oeuvre des actions commerciales et promotionnelles",
+      "Développement commercial\tParticiper aux phases créatives d'un projet marketing",
+      "Développement commercial\tRéaliser une étude marketing",
+      "Stratégie de développement\tConcevoir et gérer un projet",
+      "Stratégie de développement\tDéfinir les cibles grands donateurs",
+      "Stratégie de développement\tDéfinir une stratégie de développement d'une activité ou de produits",
+      "Stratégie de développement\tMesurer le retour sur investissement d'une action marketing",
+      "Stratégie de développement\tMettre en place des solutions d'amélioration de la performance",
+      "Stratégie de développement\tOptimiser le référencement naturel (SEO) des sites web",
+      "Stratégie de développement\tParticiper à la définition d'une stratégie de développement de produits",
+      "Stratégie de développement\tQualifier le potentiel des grands donateurs",
+      "Communication\tPréparer et animer une réunion, un groupe de travail, un atelier",
+      "Organisation\tUtiliser les outils numériques"
+    ],
+    "access_conditions": [
+      "Ce métier est accessible à partir d'un Master (M1, Master professionnel, diplôme d'école de commerce, ...) dans un secteur technique ou commercial, complété par une expérience professionnelle en tant que chef de produit ou chef de groupe. La pratique d'une langue étrangère, en particulier l'anglais, est exigée."
+    ],
+    "publication": {
+      "creation": "2026-07-13T17:04:55.339Z",
+      "expiration": "2026-09-13T00:00:00.000Z"
+    },
+    "opening_count": 2,
+    "status": "Active"
+  },
+  "is_delegated": true
+}

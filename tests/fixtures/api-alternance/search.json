@@ -1,0 +1,254 @@
+{
+  "jobs": [
+    {
+      "identifier": {
+        "id": "6a551ab78bfdaae34d664cec",
+        "partner_label": "offres_emploi_lba",
+        "partner_job_id": "6a551ab78bfdaae34d664cec"
+      },
+      "workplace": {
+        "siret": "53208806900010",
+        "brand": null,
+        "legal_name": "AUREIS FORMATION",
+        "website": null,
+        "name": "AUREIS FORMATION",
+        "description": null,
+        "size": "100 à 199 salariés",
+        "location": {
+          "address": "322 RUE DES PYRENEES 75020 PARIS",
+          "geopoint": {
+            "coordinates": [2.339939, 48.851573],
+            "type": "Point"
+          }
+        },
+        "domain": {
+          "idcc": null,
+          "opco": "inconnu",
+          "naf": {
+            "code": "96.02B",
+            "label": "Soins de beauté"
+          }
+        }
+      },
+      "apply": {
+        "url": "https://labonnealternance.apprentissage.beta.gouv.fr/emploi/offres_emploi_lba/6a551ab78bfdaae34d664cec/assistant-assistante-à-la-direction-marketing",
+        "phone": "0100000000",
+        "recipient_id": "partners_6a551ab78bfdaae34d664cec"
+      },
+      "contract": {
+        "start": "2026-09-01T00:00:00.000Z",
+        "duration": 12,
+        "type": ["Apprentissage"],
+        "remote": null
+      },
+      "offer": {
+        "title": "Assistant / Assistante à la direction marketing",
+        "rome_codes": ["M1705"],
+        "description": "Définit et met en oeuvre la stratégie marketing (tarifs, promotion, communication, gammes de produits, supports techniques, ...) pour l'ensemble des produits de l'entreprise. Peut diriger un service ou coordonner l'activité d'une équipe. [...]",
+        "target_diploma": {
+          "european": "5",
+          "label": "BTS, DEUST (Bac+2)"
+        },
+        "desired_skills": [
+          "Etre force de proposition",
+          "Etre à l'écoute, faire preuve d'empathie",
+          "Faire preuve de créativité, d'inventivité"
+        ],
+        "to_be_acquired_skills": [
+          "Management\tAnimer, coordonner une équipe",
+          "Gestion des Ressources Humaines\tConcevoir et piloter une politique de gestion des ressources humaines",
+          "Gestion des Ressources Humaines\tGérer les ressources humaines",
+          "Communication, Multimédia\tConcevoir des supports de communication et d'image",
+          "Gestion administrative et comptable\tRédiger un rapport, un compte rendu d'activité",
+          "Pilotage et maîtrise des coûts\tAssurer la gestion administrative d'une activité",
+          "Gestion et contrôle\tDéfinir la stratégie financière d'une structure",
+          "Gestion et contrôle\tElaborer, suivre et piloter un budget",
+          "Gestion et contrôle\tRéaliser des opérations comptables",
+          "Relation client\tAssister les collaborateurs au niveau commercial et technique",
+          "Développement commercial\tAnalyser les tendances de consommation des clients",
+          "Développement commercial\tConcevoir des modèles de détection des insights consommateurs",
+          "Développement commercial\tDévelopper l'image et la notoriété d'une entreprise",
+          "Développement commercial\tElaborer un plan marketing, une stratégie de marque et de communication",
+          "Développement commercial\tElaborer une stratégie de marketing digital",
+          "Développement commercial\tMener une campagne d'e-mailing",
+          "Développement commercial\tMettre en oeuvre des actions commerciales et promotionnelles",
+          "Développement commercial\tParticiper aux phases créatives d'un projet marketing",
+          "Développement commercial\tRéaliser une étude marketing",
+          "Stratégie de développement\tConcevoir et gérer un projet",
+          "Stratégie de développement\tDéfinir les cibles grands donateurs",
+          "Stratégie de développement\tDéfinir une stratégie de développement d'une activité ou de produits",
+          "Stratégie de développement\tMesurer le retour sur investissement d'une action marketing",
+          "Stratégie de développement\tMettre en place des solutions d'amélioration de la performance",
+          "Stratégie de développement\tOptimiser le référencement naturel (SEO) des sites web",
+          "Stratégie de développement\tParticiper à la définition d'une stratégie de développement de produits",
+          "Stratégie de développement\tQualifier le potentiel des grands donateurs",
+          "Communication\tPréparer et animer une réunion, un groupe de travail, un atelier",
+          "Organisation\tUtiliser les outils numériques"
+        ],
+        "access_conditions": [
+          "Ce métier est accessible à partir d'un Master (M1, Master professionnel, diplôme d'école de commerce, ...) dans un secteur technique ou commercial, complété par une expérience professionnelle en tant que chef de produit ou chef de groupe. La pratique d'une langue étrangère, en particulier l'anglais, est exigée."
+        ],
+        "publication": {
+          "creation": "2026-07-13T17:04:55.339Z",
+          "expiration": "2026-09-13T00:00:00.000Z"
+        },
+        "opening_count": 2,
+        "status": "Active"
+      },
+      "is_delegated": true
+    },
+    {
+      "identifier": {
+        "id": "6a98a1cde09d67ec4f631759",
+        "partner_label": "France Travail",
+        "partner_job_id": "6531757"
+      },
+      "workplace": {
+        "siret": "91150085800012",
+        "brand": "HOLIS",
+        "legal_name": "HOLIS",
+        "website": null,
+        "name": "HOLIS",
+        "description": null,
+        "size": "6 à 9 salariés",
+        "location": {
+          "address": "75001 Paris",
+          "geopoint": {
+            "coordinates": [2.347, 48.859],
+            "type": "Point"
+          }
+        },
+        "domain": {
+          "idcc": 1486,
+          "opco": "ATLAS",
+          "naf": {
+            "code": "70.22Z",
+            "label": "Conseil pour les affaires et autres conseils de gestion"
+          }
+        }
+      },
+      "apply": {
+        "url": "https://jobs.makesense.org/fr/jobs/holis-full-stack-developer-apprentice-startup-a-impact-MV48jDZr9fsRmqHmyG79?source=france_travail",
+        "phone": null,
+        "recipient_id": null
+      },
+      "contract": {
+        "start": null,
+        "duration": 12,
+        "type": ["Apprentissage"],
+        "remote": null
+      },
+      "offer": {
+        "title": "Full Stack Developer Apprentice - Startup à Impact  (H/F)",
+        "rome_codes": ["M1855"],
+        "description": "Démocratiser l'ACV auprès des entreprises\n\nHolis permet à toute entreprise de quantifier, d'améliorer et de communiquer les performances socio-environnementales de l'ensemble de ses produits \n\nEn facilitant la réalisation d'analyses du cycle de vie (ACV), notre plateforme SaaS permet d'évaluer en qu [...]",
+        "target_diploma": null,
+        "desired_skills": [],
+        "to_be_acquired_skills": [],
+        "access_conditions": [],
+        "publication": {
+          "creation": "2026-09-02T18:31:44.295Z",
+          "expiration": "2026-11-02T18:31:44.295Z"
+        },
+        "opening_count": 1,
+        "status": "Active"
+      },
+      "is_delegated": false
+    },
+    {
+      "identifier": {
+        "id": "6a989c87a9158ed26975900d",
+        "partner_label": "PASS",
+        "partner_job_id": "A-2026-234075"
+      },
+      "workplace": {
+        "siret": null,
+        "brand": null,
+        "legal_name": null,
+        "website": null,
+        "name": "DGFIP",
+        "description": null,
+        "size": null,
+        "location": {
+          "address": "94120 Fontenay-sous-Bois",
+          "geopoint": {
+            "coordinates": [2.473494, 48.850004],
+            "type": "Point"
+          }
+        },
+        "domain": {
+          "idcc": null,
+          "opco": null,
+          "naf": null
+        }
+      },
+      "apply": {
+        "url": "https://www.pass.fonction-publique.gouv.fr/offre/developpeur-full-stack-vue-node-webbuilder-nocodelowcode-collaboratif",
+        "phone": "0100000000",
+        "recipient_id": "partners_6a989c87a9158ed26975900d"
+      },
+      "contract": {
+        "start": "2026-09-14T22:00:00.000Z",
+        "duration": 24,
+        "type": ["Apprentissage"],
+        "remote": null
+      },
+      "offer": {
+        "title": "Developpeur Full stack Vue / Node – WebBuilder nocode/lowcode - collaboratif",
+        "rome_codes": ["M1855"],
+        "description": "<p>Au sein de l’équipe accessibilité et outillage du pôle expérience utilisateur, vous évoluerez au sein dune équipe composée de développeurs, testeurs, Product Owner et Product Manager. </p><p>Vous participerez à la construction d'un Web builder NoCode/Lowcode/Code.</p><p>Vous collaborerez avec les [...]",
+        "target_diploma": {
+          "european": "6",
+          "label": "Licence, BUT, Licence Pro (Bac+3)"
+        },
+        "desired_skills": [],
+        "to_be_acquired_skills": [],
+        "access_conditions": [],
+        "publication": {
+          "creation": "2026-09-02T09:41:14.000Z",
+          "expiration": "2026-11-14T22:00:00.000Z"
+        },
+        "opening_count": 1,
+        "status": "Active"
+      },
+      "is_delegated": false
+    }
+  ],
+  "recruiters": [
+    {
+      "identifier": {
+        "id": "6a003c399a6be614e48abba9"
+      },
+      "workplace": {
+        "siret": "82846965000075",
+        "brand": "WETRADELOCAL",
+        "legal_name": "WETRADELOCAL",
+        "website": null,
+        "name": "WETRADELOCAL",
+        "description": null,
+        "size": "0-0",
+        "location": {
+          "address": "3 avenue Victoria 75004 PARIS",
+          "geopoint": {
+            "coordinates": [2.3503879999999997, 48.85684199998633],
+            "type": "Point"
+          }
+        },
+        "domain": {
+          "idcc": 1978,
+          "opco": "Opco entreprises de proximité",
+          "naf": {
+            "code": "62.01Z",
+            "label": "Programmation informatique"
+          }
+        }
+      },
+      "apply": {
+        "url": "https://labonnealternance.apprentissage.beta.gouv.fr/emploi/recruteurs_lba/82846965000075/wetradelocal",
+        "phone": null,
+        "recipient_id": null
+      }
+    }
+  ],
+  "warnings": []
+}
