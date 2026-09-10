@@ -42,6 +42,17 @@ describe("extractKeywords", () => {
       extractKeywords("React React TypeScript et le SQL de la base React TypeScript").slice(0, 3),
     ).toEqual(["react", "typescript", "base"]);
   });
+
+  it("drops CV section words, diplomas and the student's name", () => {
+    expect(
+      extractKeywords(
+        "Camille Martin\nEtudiante en BUT Informatique\nCompetences : TypeScript, React",
+        {
+          exclude: ["Camille", "Martin"],
+        },
+      ),
+    ).toEqual(["informatique", "react", "typescript"]);
+  });
 });
 
 describe("scoreMatch", () => {

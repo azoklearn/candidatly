@@ -65,13 +65,32 @@ export function haversineKm(
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
-/** Most frequent meaningful words of a CV, used to spot them in offers. */
-export function extractKeywords(cvText: string, max = 40): string[] {
+/** Words found in any CV that say nothing about a skill: sections, diplomas, months. */
+const CV_NOISE = new Set(
+  "competence competences experience experiences professionnelle professionnelles formation formations diplome diplomes etudiant etudiante etudes stage stages projet projets langue langues loisirs interets centres profil contact telephone email mail adresse permis references niveau but bts dut licence master bachelor iut universite ecole lycee bac janvier fevrier mars avril mai juin juillet aout septembre octobre novembre decembre".split(
+    " ",
+  ),
+);
+
+/**
+ * Most frequent meaningful words of a CV, used to spot them in offers. The student's
+ * name and generic CV words are left out: they would "match" offers for no reason.
+ */
+export function extractKeywords(
+  cvText: string,
+  options: { max?: number; exclude?: string[] } = {},
+): string[] {
+  const excluded = new Set([
+    ...CV_NOISE,
+    ...(options.exclude ?? []).flatMap((value) => tokenize(value, 2)),
+  ]);
   const counts = new Map<string, number>();
-  for (const word of tokenize(cvText, 3)) counts.set(word, (counts.get(word) ?? 0) + 1);
+  for (const word of tokenize(cvText, 3)) {
+    if (!excluded.has(word)) counts.set(word, (counts.get(word) ?? 0) + 1);
+  }
   return [...counts.entries()]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .slice(0, max)
+    .slice(0, options.max ?? 40)
     .map(([word]) => word);
 }
 

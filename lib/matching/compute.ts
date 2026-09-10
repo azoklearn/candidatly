@@ -72,7 +72,9 @@ export async function computeMatchesForUser(options: {
 
   const profile = await db
     .from("profiles")
-    .select("rome_codes, location_lat, location_lng, search_radius_km, diploma_level")
+    .select(
+      "rome_codes, location_lat, location_lng, search_radius_km, diploma_level, first_name, last_name",
+    )
     .eq("user_id", userId)
     .maybeSingle();
   if (profile.error) throw new DatabaseError("profiles.select", profile.error);
@@ -110,7 +112,9 @@ export async function computeMatchesForUser(options: {
       lng: p.location_lng,
       radiusKm: p.search_radius_km,
       diplomaLevel: p.diploma_level,
-      cvKeywords: extractKeywords(cv.data?.extracted_text ?? ""),
+      cvKeywords: extractKeywords(cv.data?.extracted_text ?? "", {
+        exclude: [p.first_name ?? "", p.last_name ?? ""],
+      }),
     },
     offers.data,
     now,
