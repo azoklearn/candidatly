@@ -1,0 +1,93 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.062821,
+          49.031624
+        ]
+      },
+      "properties": {
+        "label": "8 Boulevard du Port 95000 Cergy",
+        "score": 0.4924265550239234,
+        "housenumber": "8",
+        "id": "95127_1448_00008",
+        "banId": "8e6b04d7-f6fd-48a1-80be-4ec984a286e8",
+        "name": "8 Boulevard du Port",
+        "postcode": "95000",
+        "citycode": "95127",
+        "x": 631468.28,
+        "y": 6881710.34,
+        "city": "Cergy",
+        "context": "95, Val-d'Oise, Île-de-France",
+        "type": "housenumber",
+        "importance": 0.67985,
+        "depcode": "95",
+        "street": "Boulevard du Port",
+        "_type": "address"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.290084,
+          49.897442
+        ]
+      },
+      "properties": {
+        "label": "8 Boulevard du Port 80000 Amiens",
+        "score": 0.4922511004784689,
+        "housenumber": "8",
+        "id": "80021_6590_00008",
+        "banId": "f2633629-5541-4233-aa54-3c2eb58aa8b9",
+        "name": "8 Boulevard du Port",
+        "postcode": "80000",
+        "citycode": "80021",
+        "x": 648952.58,
+        "y": 6977867.14,
+        "city": "Amiens",
+        "context": "80, Somme, Hauts-de-France",
+        "type": "housenumber",
+        "importance": 0.67792,
+        "depcode": "80",
+        "street": "Boulevard du Port",
+        "_type": "address"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.605884,
+          43.425225
+        ]
+      },
+      "properties": {
+        "label": "8 Boulevard du Port 34140 Mèze",
+        "score": 0.4871038277511961,
+        "housenumber": "8",
+        "id": "34157_0770_00008",
+        "banId": "51e3370b-b791-41e1-89fc-11a2c2ea9519",
+        "name": "8 Boulevard du Port",
+        "postcode": "34140",
+        "citycode": "34157",
+        "x": 749085.29,
+        "y": 6258645.39,
+        "city": "Mèze",
+        "context": "34, Hérault, Occitanie",
+        "type": "housenumber",
+        "importance": 0.6213,
+        "depcode": "34",
+        "street": "Boulevard du Port",
+        "_type": "address"
+      }
+    }
+  ],
+  "query": "8 bd du port"
+}
