@@ -3,6 +3,7 @@
 Dernière mise à jour : 10 septembre 2026.
 
 Comment lire ce document :
+- **0. Décision du 10 septembre 2026** et mesures sur données réelles.
 - **A. Bloquant** : une réponse de l'owner est nécessaire avant de construire dessus. Pour chaque question : pourquoi elle bloque, les options, la recommandation.
 - **B. Accord requis** : écarts par rapport au brief ou librairies hors stack. Le brief impose une justification et un accord explicite ; l'hypothèse par défaut est indiquée et sera appliquée sans réponse contraire lors de la validation de la phase 0.
 - **C. Non bloquant** : hypothèse par défaut appliquée, à corriger si besoin.
@@ -12,53 +13,96 @@ Les faits cités proviennent de `docs/API_ALTERNANCE.md`, `docs/API_RECHERCHE_EN
 
 ---
 
+## 0. Décision de l'owner du 10 septembre 2026 et mesures sur données réelles
+
+**Décision.** L'envoi des candidatures devient une fonctionnalité d'un abonnement premium, plus cher. Il ne passe plus par la route de candidature de l'API Alternance : l'application récupère l'adresse email du recruteur et ouvre un email personnalisé dans la boîte mail de l'étudiant, qui l'envoie lui-même. « Récupération du mail » est comprise ici comme l'adresse email du recruteur. Cette décision modifie le brief sur deux points : il ne prévoyait pas d'abonnement, et l'envoi passait par l'API.
+
+**Mesures du 10 septembre 2026**, avec le jeton production, sur 12 recherches réelles : Paris, Lyon, Angers et Guéret, trois domaines, rayon de 30 km, soit 151 offres uniques. Détail dans `docs/API_ALTERNANCE.md`, section 0.
+
+| Constat | Mesure |
+|---|---|
+| Offres dont le texte contient une adresse email | 0 sur 151 |
+| Offres candidatables par la route de candidature de l'API (`recipient_id` renseigné) | 69 sur 151, soit 46 % : toutes les offres déposées sur La bonne alternance, aucune offre France Travail |
+| Offres avec un site web d'entreprise | 10 sur 151 |
+| Offres gérées par une école ou un CFA (`is_delegated`) | 57 sur 151 |
+| Entreprises qui recrutent sans offre publiée (`recruiters`) | 934, dont 293 candidatables par l'API, aucune avec site web |
+
+**Conséquence.** Avec les sources autorisées par le brief, l'adresse email du recruteur n'est disponible pour aucune offre. L'API la garde et ne la transmet qu'à travers sa route de candidature. Le modèle « email ouvert dans la boîte de l'étudiant » ne peut donc pas fonctionner tel quel : voir A3, puis A4 et A5.
+
+---
+
 ## A. Questions bloquantes
 
-### A1. Le modèle payant est-il compatible avec les conditions de l'API Alternance, et obtiendrons-nous l'habilitation de production ?
+### A1. Le modèle payant est-il compatible avec les conditions de l'API Alternance ?
 
-**Pourquoi c'est bloquant.** Le cœur du produit (offres via `GET /job/v1/search`, envoi via `POST /job/v1/apply`) dépend de conditions que nous ne contrôlons pas et qui, telles qu'elles sont publiées, interdisent le modèle du brief :
-1. Les pages officielles des routes de recherche et de détail d'offre (vérifiées dans le HTML servi par le portail le 9 septembre 2026) indiquent : « L'utilisation de cette API est gratuite et réservée à des usages non lucratifs. Notez que toute utilisation de ces données à des fins commerciales, telles que la revente ou la facturation de l'accès pour des tiers comme des candidats est interdite. » La page du détail d'offre ajoute « candidats, entreprises ou écoles ». Facturer à l'étudiant un crédit par candidature envoyée, ou réserver l'affichage des offres aux utilisateurs payants, tombe sous cette clause.
+**Pourquoi c'est bloquant.** Toutes les offres viennent de cette API, et ses conditions, telles qu'elles sont publiées, s'opposent à un service payant :
+1. Les pages officielles des routes de recherche et de détail d'offre (HTML servi par le portail, vérifié le 9 septembre 2026) : « L'utilisation de cette API est gratuite et réservée à des usages non lucratifs. Notez que toute utilisation de ces données à des fins commerciales, telles que la revente ou la facturation de l'accès pour des tiers comme des candidats est interdite. » La page du détail d'offre ajoute « candidats, entreprises ou écoles ».
 2. Les CGU du portail (v1.0, 31 mars 2025) : « Il s'engage à ne pas commercialiser les données reçues et à ne pas les communiquer à des tiers en dehors des cas prévus par la loi. »
-3. L'habilitation `applications:write` en production est accordée à la main par le support (`support_api@apprentissage.beta.gouv.fr`). La page de la route de candidature dit : « Cette API est réservée aux services traitant un volume important de candidatures. Les demandes d'habilitation pour un usage individuel ne seront pas accordées. »
-4. Seule nuance : la licence des données déclarée dans la spécification est Etalab 2.0 (réutilisation commerciale autorisée avec mention de la source). Elle couvre les données d'offres, pas le service de candidature, et ne l'emporte pas sur les conditions affichées par le portail.
+3. La route de candidature est, avec le widget `/postuler`, le seul moyen de joindre le recruteur des offres déposées sur La bonne alternance (section 0). Elle exige une habilitation accordée à la main par le support : « Cette API est réservée aux services traitant un volume important de candidatures. Les demandes d'habilitation pour un usage individuel ne seront pas accordées. » Le compte actuel n'est rattaché à aucune organisation, condition de l'habilitation.
+4. Nuance : la licence des données déclarée dans la spécification est Etalab 2.0, qui autorise la réutilisation commerciale avec mention de la source. Elle ne l'emporte pas sur les conditions affichées par le portail.
 
-Sans accord écrit du support, construire les phases 2 à 4 sur ce canal expose à la révocation de la clé (CGU art. 5.1) et à un produit inutilisable.
+Sans accord écrit du support, un abonnement donnant accès à ces offres expose à la révocation de la clé (CGU art. 5.1).
 
 **Options.**
-1. Demander maintenant au support un accord écrit et une clé de production avec `applications:write`, en décrivant le service honnêtement (brouillon ci-dessous). La phase 1 peut démarrer en attendant (elle n'utilise que des réponses simulées) ; en cas de refus, basculer sur l'option 2 ou 3.
-2. Rendre la consultation des offres et l'envoi gratuits, et ne facturer que nos services propres (adaptation de la lettre, fiche entreprise, suivi) : le crédit est débité à la validation de la lettre, pas à l'envoi. Cela respecte la lettre de la clause (aucune facturation de l'accès aux données ni à la candidature) mais reste à confirmer avec le support, le service dans son ensemble étant lucratif.
-3. Ne pas dépendre de l'API Alternance pour l'envoi : lettre adaptée + redirection vers `apply.url` + suivi manuel, et étudier en V2 des sources d'offres dont les conditions autorisent explicitement un usage commercial (à vérifier : API France Travail « Offres d'emploi », Adzuna).
-4. Widget officiel `/postuler` de La bonne alternance (iframe) pour les offres avec email de contact : l'étudiant candidate via le formulaire LBA depuis notre site, sans habilitation. La clause d'usage non lucratif s'applique cependant tout autant à l'affichage des offres.
+1. Demander maintenant un accord écrit au support, en décrivant le service honnêtement, ainsi que l'habilitation d'envoi (brouillon ci-dessous).
+2. Laisser gratuites la consultation des offres et la candidature, et ne faire payer que les services propres : lettre adaptée, fiche entreprise, suivi, envoi assisté. À confirmer aussi avec le support, le service restant lucratif dans son ensemble.
+3. Chercher en V2 des sources d'offres dont les conditions autorisent explicitement un usage commercial, à vérifier : API France Travail, Adzuna.
 
-**Recommandation.** Option 1 immédiatement (un email suffit), avec l'option 2 proposée explicitement dans l'email comme position de repli : c'est celle qui a le plus de chances d'être acceptée et qui change le moins le produit. Concevoir la phase 1 pour que le moment du débit de crédit (envoi ou validation de la lettre) et le canal d'envoi (`api_alternance`, `manual`, `widget`) soient des paramètres, pas des choix figés dans le schéma.
+**Recommandation.** Option 1 immédiatement, avec l'option 2 proposée dans l'email comme position de repli. Concevoir la phase 1 pour que la facturation (crédits ou abonnement) et le canal d'envoi soient des paramètres, pas des choix figés dans le schéma.
 
 **Ce que A1 bloque.** La phase 1 (fondations, schéma, authentification, client API testé sur des réponses simulées) n'en dépend pas et peut démarrer dès la validation de la phase 0. La phase 2 affiche à des utilisateurs d'un service payant des offres issues de l'API : elle ne devrait pas démarrer sans réponse du support, sauf décision explicite de l'owner d'avancer sans cette réponse.
 
-**Brouillon d'email au support (à envoyer par l'owner).**
+**Brouillon d'email au support**, à envoyer par l'owner depuis l'adresse de son compte sur le portail, à `support_api@apprentissage.beta.gouv.fr`. Il remplace la version précédente, qui parlait de crédits.
 
-> Objet : Demande d'habilitation pour l'envoi de candidature aux opportunités d'emploi en alternance
+> **Objet :** Usage de l'API La bonne alternance dans un service payant pour étudiants
 >
 > Bonjour,
 >
-> Je développe Candidatly, un service en ligne destiné aux étudiants (Bac+2 à Bac+5) à la recherche d'une alternance. Le service recherche les opportunités via `GET /job/v1/search` (codes ROME, géolocalisation, niveau), présente à l'étudiant une fiche de l'employeur (données publiques de l'API Recherche d'entreprises et site de l'entreprise) et l'aide à adapter sa propre lettre de motivation à l'offre. Chaque candidature est relue et validée explicitement par l'étudiant avant envoi ; aucune candidature n'est envoyée automatiquement. Nous souhaitons transmettre ces candidatures via `POST /job/v1/apply`, avec les coordonnées réelles de l'étudiant et son CV.
+> Je développe Candidatly, un service en ligne qui aide les étudiants de Bac+2 à Bac+5 à trouver une alternance. Il recherche les offres via votre API, présente une fiche de l'employeur construite à partir de données publiques, et aide l'étudiant, avec un outil d'IA, à adapter sa propre lettre de motivation à chaque offre. L'étudiant relit et valide chaque candidature : aucune n'est envoyée automatiquement.
 >
-> Vos pages indiquent que l'API est réservée à des usages non lucratifs et que la facturation de l'accès aux candidats est interdite. Notre service est payant pour l'étudiant sous forme de crédits (quelques euros pour un lot de candidatures, sans abonnement). Nous voulons donc vérifier avec vous ce qui est acceptable : (a) un modèle où le crédit correspond à une candidature envoyée via l'API ; ou, si ce modèle n'est pas compatible, (b) un modèle où la consultation des offres et l'envoi des candidatures restent gratuits et où seule l'aide à la rédaction (adaptation de la lettre, fiche entreprise) est payante. Dans les deux cas, les données de l'API ne sont ni revendues ni communiquées à des tiers, et la source « La bonne alternance » est mentionnée avec un lien vers l'offre.
+> Le service sera payant, par abonnement. Vos pages indiquent que l'API est réservée à des usages non lucratifs et que la facturation de l'accès aux candidats est interdite. Pouvez-vous nous indiquer si un tel service est compatible avec vos conditions, et sous quelles conditions ? Nous pouvons par exemple laisser gratuites la consultation des offres et la candidature, et ne faire payer que l'aide à la rédaction et au suivi. Les données ne sont ni revendues ni communiquées à des tiers, et la source « La bonne alternance » est affichée avec un lien vers chaque offre.
 >
-> Si l'un de ces modèles vous convient, nous demandons une clé de production avec l'habilitation `applications:write`. Volumes estimés au lancement : [X] candidatures par jour, [Y] étudiants actifs, montée en charge entre juin et novembre. Nous respecterons les limites de débit (10 candidatures par minute) et sommes preneurs de toute règle complémentaire (nombre de candidatures par entreprise et par jour, conservation des données).
+> Si c'est compatible, nous souhaitons aussi obtenir l'habilitation applications:write pour une clé de production, afin de transmettre à vos recruteurs les candidatures validées par l'étudiant. Mon compte n'est rattaché à aucune organisation : pouvez-vous me dire ce qu'il faut fournir ? Volumes estimés au lancement : [X] candidatures par jour pour [Y] étudiants actifs, avec un pic entre juin et novembre.
 >
 > Cordialement,
-> [Nom, société ou statut, site web]
+> [Prénom Nom, statut ou société, site web s'il existe]
 
 ### A2. Que fait-on des offres qui ne sont pas candidatables par l'API ?
 
-**Pourquoi c'est bloquant.** La spécification est explicite : « Si `apply.recipient_id` est null, la candidature n'est pas disponible pour cette offre » par l'API. Selon la spécification, les offres France Travail ont `recipient_id` nul (redirection vers `apply.url` uniquement) ; le code plus récent de La bonne alternance lit désormais ces offres depuis sa base et pourrait leur donner un identifiant et un email de contact, ce qui reste à mesurer. Pour les partenaires par flux (Hellowork, RH Alternance, Monster, etc.) cela dépend de la présence d'un email de contact dans le flux. La part exacte n'est mesurable qu'avec une clé (voir F). Selon les combinaisons ROME/zone, la majorité des offres pourrait être dans ce cas. Cela touche le modèle de données (déjà prévu par `apply_channel = external_url`), l'écran de préparation, le suivi, et surtout le modèle économique (que facture-t-on ?).
+Mesuré le 10 septembre 2026 : 54 % des offres n'ont pas de `recipient_id`, dont toutes les offres France Travail, Meteojob, RH Alternance et iquesta. Pour elles, la seule voie est le site du partenaire indiqué par `apply.url` (directemploi.com, candidat.francetravail.fr, meteojob.com, etc.). Cette question est désormais traitée avec A3. Recommandation inchangée : les afficher, préparer la lettre adaptée, laisser l'étudiant candidater sur le site du partenaire, puis lui faire confirmer l'envoi.
+
+### A3. D'où vient l'adresse email du recruteur ?
+
+**Pourquoi c'est bloquant.** Le canal d'envoi décidé le 10 septembre repose sur cette adresse, et aucune source autorisée ne la fournit (section 0). Le brief exclut les services d'enrichissement d'emails au MVP et le scraping des job boards.
 
 **Options.**
-1. Afficher toutes les offres. Pour celles sans `recipient_id`, la préparation génère la lettre adaptée, puis l'écran final propose « Candidater sur le site de l'offre » (ouverture de `apply.url`, lettre copiable, CV téléchargeable) et l'étudiant marque la candidature comme envoyée (`sent_via = manual`). Le crédit est débité au moment où l'étudiant confirme « J'ai envoyé ».
-2. Idem, mais aucun crédit débité pour un envoi manuel (seul l'envoi API est facturé).
-3. Masquer ces offres au MVP et ne montrer que les offres candidatables par l'API.
+1. Canal mixte, selon ce que permet chaque offre : route de candidature de l'API pour les offres qui ont un `recipient_id` (46 % mesurés, habilitation requise, voir A1), candidature sur le site du partenaire pour les autres, avec la lettre adaptée prête à coller. L'email ouvert dans la boîte de l'étudiant ne sert que lorsqu'une adresse est réellement connue, par exemple publiée sur le site de l'entreprise.
+2. Widget officiel `/postuler` de La bonne alternance pour les offres qui ont un `recipient_id` : l'étudiant candidate sur le formulaire de La bonne alternance intégré à Candidatly, sans habilitation. Les autres offres passent par le site du partenaire.
+3. Recherche d'adresses sur les sites des entreprises, page contact comprise, dans le respect de `robots.txt`. Couverture faible : le site n'est connu que pour 7 % des offres, et l'adresse trouvée sera souvent générique.
+4. Service tiers d'enrichissement d'emails : exclu par le brief au MVP, et fragile au regard du RGPD pour des adresses nominatives.
 
-**Recommandation.** Option 1 : la valeur (lettre adaptée + fiche employeur) est la même quel que soit le canal, l'étudiant choisit en connaissance de cause, et le catalogue reste complet. Le badge « Candidature directe » distingue les offres candidatables par l'API. L'option 3 rendrait le produit inutilisable dans les zones où France Travail domine.
+**Recommandation.** Option 1, en demandant l'habilitation dans l'email de A1 ; en attendant, l'option 2 couvre les mêmes offres. L'abonnement premium peut alors porter sur l'envoi assisté, quel que soit le canal. Si l'envoi par la route de l'API est facturé, c'est précisément ce que A1 doit faire valider. Piste à vérifier : l'API Offres d'emploi de France Travail exposerait parfois un contact recruteur. ⚠️ Non vérifié : il faut un compte francetravail.io pour le confirmer.
+
+### A4. Comment l'email s'ouvre-t-il dans la boîte de l'étudiant ?
+
+Question utile seulement quand une adresse est connue (A3).
+
+**Options.**
+1. Lien `mailto:` ou lien de rédaction Gmail ou Outlook pré-rempli : simple, sans autorisation, mais le CV ne peut pas être joint automatiquement, et certains navigateurs et clients mail limitent la longueur du texte pré-rempli.
+2. Brouillon créé dans la boîte de l'étudiant par l'API Gmail ou Microsoft Graph, CV joint : meilleure expérience, mais connexion OAuth à la messagerie. ⚠️ Non vérifié : le scope Gmail nécessaire est probablement soumis à une vérification de l'application par Google.
+
+**Recommandation.** Option 1 au lancement, option 2 quand le volume le justifie. Dans les deux cas, l'étudiant envoie lui-même, ce qui respecte le principe « jamais d'envoi silencieux ».
+
+### A5. Quel modèle de prix ?
+
+Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 septembre ajoute un abonnement premium pour l'envoi.
+
+**Options.**
+1. Crédits pour la préparation (lettre adaptée, fiche entreprise), abonnement premium pour l'envoi assisté.
+2. Tout par abonnement, avec deux paliers.
+3. Abonnement premium seul, avec une préparation gratuite et limitée.
+
+**Recommandation.** À trancher par l'owner avant la phase 4, qui construit la facturation. Hypothèse pour la phase 1 : le schéma accepte à la fois des crédits et un statut d'abonnement, pour ne rien figer. Les abonnements passent par Stripe Billing, dans la stack imposée.
 
 ---
 
@@ -85,8 +129,8 @@ Sans accord écrit du support, construire les phases 2 à 4 sur ce canal expose 
 |---|---|---|---|
 | C1 | Nom du produit et domaine | `candidatly` partout jusqu'à décision ; le nom est une constante unique (`lib/brand.ts`) | Renommage sans risque |
 | C2 | Prix TTC ou HT, TVA | Prix du brief affichés TTC ; Stripe Tax non activé au MVP ; mention « TTC » sur la page Crédits | Cible B2C en France |
-| C3 | Moment du débit du crédit | À l'envoi API réussi (202), ou à la confirmation « J'ai envoyé » pour un envoi manuel ; jamais à la génération | Conforme au brief ; paramétrable si A1 impose de facturer la préparation |
-| C4 | Valeurs de `applications.sent_via` | `api_alternance`, `manual`, `widget` (réserve), `gmail` (V2) | Couvre les options de A1 et A2 |
+| C3 | Moment du débit | Dépend du modèle de prix (A5). Par défaut : jamais à la génération, et à l'envoi confirmé, par l'API (202) ou par l'étudiant (« J'ai envoyé ») | Conforme au brief ; paramétrable |
+| C4 | Valeurs de `applications.sent_via` | `api_alternance`, `widget`, `partner_site` (candidature sur le site du partenaire), `mail_client` (email ouvert dans la boîte de l'étudiant), `gmail` (brouillon créé par l'API Gmail, V2) | Couvre les options de A3 et A4 |
 | C5 | Régénérations | 3 régénérations manuelles max par candidature, plus 1 régénération automatique en cas de sortie invalide, compteur stocké sur `applications` | Brief §5.4 + post-traitement §6.1 |
 | C6 | Sens et mapping de `profiles.diploma_level` | `diploma_level` désigne le niveau du diplôme **préparé pendant l'alternance** (niveau visé), pas le dernier diplôme obtenu, et la question d'onboarding est formulée ainsi. Mapping vers `target_diploma_level` : `bac` = 4, `bac+2` = 5, `bac+3` = 6, `bac+4` = 6, `bac+5` = 7 | L'API filtre sur le niveau visé en fin d'études ; enum `3` à `7`, sans niveau propre pour Bac+4 |
 | C7 | Filtre par niveau | Toujours passer `target_diploma_level` : l'API renvoie les offres du niveau demandé et celles sans niveau précisé | Comportement documenté |
@@ -144,7 +188,14 @@ Sans accord écrit du support, construire les phases 2 à 4 sur ce canal expose 
 | C44 | Colonnes manquantes de `companies` | Ajout de `date_creation` (demandée au §3.2, absente du §4), `confidence` (score maison de 0 à 1, seuil initial 0,8), `establishment_address`, `establishment_postal_code`, `establishment_city` (lieu de travail, distinct du siège), `naf25_code` (NAF 2025, référence au 1er janvier 2027), `source_updated_at` et `raw` ; `executives` limité à `{ nom, prenoms, qualite }` | `docs/API_RECHERCHE_ENTREPRISES.md` §15 |
 | C45 | Référentiel ROME | Tables `rome_versions`, `rome_grand_domaines`, `rome_domaines_professionnels`, `rome_codes`, `rome_appellations` (lecture seule pour les utilisateurs connectés), colonne `profiles.rome_version`, import par `scripts/import-rome.ts` depuis les CSV officiels copiés dans `docs/reference/rome/` | `docs/ROME.md` §11 |
 | C46 | Cible d'envoi des offres | `offers.apply_target` contient `apply.recipient_id` pour le canal `api_alternance`, sinon `apply.url` ; `apply.phone` et `identifier.id` restent dans `raw` | `docs/API_ALTERNANCE.md` §18 |
-| C47 | Autres ajouts | Valeur `unknown` de `applications.status` (C20), valeurs `manual` et `widget` de `sent_via` (C4), compteur de régénérations sur `applications` (C5), tables `offer_search_runs` (C29) et `stripe_events` (C36) | Regroupés ici pour la migration de la phase 1 |
+| C47 | Autres ajouts | Valeur `unknown` de `applications.status` (C20), valeurs de `sent_via` listées en C4, compteur de régénérations sur `applications` (C5), tables `offer_search_runs` (C29) et `stripe_events` (C36), statut d'abonnement selon A5 | Regroupés ici pour la migration de la phase 1 |
+
+### Risques mesurés (10 septembre 2026)
+
+| # | Question | Hypothèse par défaut | Raison |
+|---|---|---|---|
+| C48 | Volume d'offres publiées faible hors des grandes villes | Rayon par défaut de 30 km, modifiable jusqu'à 200 km ; élargissement automatique aux codes ROME voisins du même domaine professionnel quand une recherche renvoie moins de 10 offres ; mesure sur de vrais profils en phase 2, puis décision d'afficher ou non les entreprises qui recrutent sans offre publiée | Mesure F7 : aucune offre en développement à Lyon ni à Angers |
+| C49 | Fiche employeur pauvre | La fiche repose sur l'API Recherche d'entreprises ; le résumé du site n'est produit que si une URL est connue ; pour une offre gérée par une école, la fiche le signale et ne présente pas l'école comme l'employeur | Site web connu pour 7 % des offres, 38 % des offres gérées par une école |
 
 ---
 
@@ -152,7 +203,7 @@ Sans accord écrit du support, construire les phases 2 à 4 sur ce canal expose 
 
 Aucun n'est nécessaire pour démarrer la phase 1 (Supabase local + réponses mockées), mais tous le sont avant la phase 2.
 
-1. **API Alternance** : compte sur `https://api.apprentissage.beta.gouv.fr` (inscription gratuite par lien envoyé par email), puis deux jetons de 365 jours, non prolongeables. Un jeton **production** dans `API_ALTERNANCE_KEY` : la lecture des offres réelles ne demande aucune habilitation, alors qu'un jeton sandbox renvoie les offres de l'environnement de test, même en lecture. Un jeton **sandbox** dans `API_ALTERNANCE_SANDBOX_KEY` pour tester l'envoi de candidatures. Envoyer en parallèle l'email de A1 au support. Ne jamais partager un jeton (interdit par les CGU).
+1. **API Alternance** (jeton production créé le 10 septembre 2026, rangé dans `.env.local`, échéance dans `docs/RUNBOOK.md`) : compte sur `https://api.apprentissage.beta.gouv.fr` (inscription gratuite par lien envoyé par email), puis deux jetons de 365 jours, non prolongeables. Un jeton **production** dans `API_ALTERNANCE_KEY` : la lecture des offres réelles ne demande aucune habilitation, alors qu'un jeton sandbox renvoie les offres de l'environnement de test, même en lecture. Un jeton **sandbox** dans `API_ALTERNANCE_SANDBOX_KEY` pour tester l'envoi de candidatures. Envoyer en parallèle l'email de A1 au support. Ne jamais partager un jeton (interdit par les CGU).
 2. **Supabase** : projet cloud en région UE ; noter l'URL, la clé publishable et la clé secret.
 3. **Google Cloud** : client OAuth 2.0 (type Web), URI de redirection `https://<project-ref>.supabase.co/auth/v1/callback`, écran de consentement ; client ID et secret à saisir dans Supabase Auth.
 4. **Anthropic** : clé API dans `ANTHROPIC_API_KEY`, limite de dépense mensuelle configurée.
@@ -178,15 +229,23 @@ Vérifiées le 9 septembre 2026 (`npm view <pkg> version` et documentation offic
 
 ---
 
-## F. À vérifier dès que les jetons existent (phase 1, avant la phase 2)
+## F. Vérifications sur données réelles
 
-Les points 1 à 3 et 7 demandent le jeton production (données réelles), le point 5 le jeton sandbox ; les points 4 et 6 fonctionnent avec l'un ou l'autre.
+Faites le 10 septembre 2026 avec le jeton production. Détail dans `docs/API_ALTERNANCE.md`, section 0.
 
-1. Part des offres avec `apply.recipient_id` non nul, par `partner_label`, sur 5 couples ROME/zone représentatifs (décision A2).
-2. Ordre réel des coordonnées dans `workplace.location.geopoint.coordinates` (GeoJSON attendu : `[longitude, latitude]`).
-3. Présence de `identifier.id` et de `apply.recipient_id` sur les offres France Travail (la spécification dit nul ; le code récent de LBA lit ces offres depuis sa base).
-4. En-têtes `x-ratelimit-limit`, `x-ratelimit-remaining`, `x-ratelimit-reset`, `retry-after` sur les réponses authentifiées, et code réel du dépassement (429 attendu, 419 dans le schéma).
-5. Comportement de la sandbox pour `POST /job/v1/apply` : réponse 202, boîte de réception de l'environnement de recette, format exact de `recipient_id` (`partners_<id>` attendu).
-6. Nombre maximal de codes ROME acceptés dans `romes` (aucune limite documentée).
-7. Volume de résultats réel avec `radius = 30` et 3 codes ROME sur Paris, Lyon, une ville moyenne et une zone rurale (pour calibrer le score et la fréquence de sync).
-8. Auprès du support : limite de 20 candidatures par jour et par SIRET pour une organisation multi-utilisateurs, engagement de maintien de la route `apply`, règles de conservation des données transmises.
+1. Part des offres candidatables par l'API : 46 % (69 sur 151). Toutes les offres déposées sur La bonne alternance le sont, aucune offre France Travail, Meteojob, RH Alternance ou iquesta.
+2. Ordre des coordonnées : `[longitude, latitude]` sur les 204 offres reçues.
+3. Offres France Travail : toutes ont un `identifier.id`, aucune n'a de `recipient_id`.
+4. En-têtes de quota présents sur une recherche authentifiée : `x-ratelimit-limit: 60`, `x-ratelimit-remaining`, `x-ratelimit-reset`. Aucun 429 n'a été provoqué.
+5. Route de candidature en environnement de test : à faire avec un jeton sandbox, pas encore créé.
+6. Nombre de codes ROME par requête : 20, 21 et 30 codes acceptés.
+7. Volumes d'offres publiées, rayon de 30 km, trois codes ROME par domaine :
+
+| Zone | Développement informatique | Commerce et marketing | Comptabilité et RH |
+|---|---|---|---|
+| Paris | 9 | 46 | 124 |
+| Lyon | 0 | 9 | 12 |
+| Angers | 0 | 0 | 0 |
+| Guéret | 0 | 0 | 4 |
+
+8. Questions pour le support, à poser dans l'email de A1 ou après sa réponse : limite de 20 candidatures par jour et par SIRET pour une organisation, engagement de maintien de la route de candidature, conservation des données.

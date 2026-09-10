@@ -11,15 +11,50 @@ Conventions de lecture :
 - « (observé) » : réponse HTTP réellement obtenue le 9 septembre 2026, sans clé API.
 - « ⚠️ Non vérifié : » : affirmation qui n'a pas pu être confirmée sur une source primaire. Ne pas l'implémenter à l'aveugle ; voir la section « Points restant à vérifier ».
 
-Aucun compte n'a été créé, aucune clé demandée, aucune candidature envoyée pendant la phase 0.
+Aucune candidature n'a été envoyée. Un jeton production en lecture seule a servi aux vérifications de la section 0, le 10 septembre 2026.
 
 ## Résumé en 5 points
 
 1. **Une seule URL, une clé gratuite, un environnement porté par la clé.** Base `https://api.apprentissage.beta.gouv.fr/api`, en-tête `Authorization: Bearer <clé>`. Le compte se crée par lien magique e-mail, le jeton vit 365 jours et n'est pas prolongeable. Une clé de type `sandbox` (défaut à la création) route **tous** les échanges avec La bonne alternance, lectures comprises, vers l'environnement de recette ; pour lire les offres réelles il faut une clé `production`.
 2. **Trois routes pour Candidatly, plus une alternative.** `GET /job/v1/search` (60 appels/min, 150 offres maximum par source, aucune pagination), `GET /job/v1/offer/{id}` (120/min), `POST /job/v1/apply` (10/min, réponse `202 { id }`, habilitation `applications:write` accordée d'office en sandbox et sur demande e-mail en production). `GET /job/v1/export` (2/min) fournit un dump quotidien de toutes les opportunités, utilisable comme source principale de `sync-offers`.
-3. **Candidatable ou non : le champ `apply.recipient_id`.** S'il est non nul, la candidature passe par l'API (canal `api_alternance`) ; sinon, seule la redirection vers `apply.url` reste possible (canal `external_url`). Les offres France Travail n'exposent pas de `recipient_id`. Aucune route de lecture de candidature, aucun webhook, aucun callback : le suivi « vue / réponse » du brief ne peut être alimenté que manuellement.
+3. **Candidatable ou non : le champ `apply.recipient_id`.** S'il est non nul, la candidature passe par l'API (canal `api_alternance`) ; sinon, seule la redirection vers `apply.url` reste possible (canal `external_url`). Mesure du 10 septembre 2026 : 46 % des offres ont un `recipient_id`, dont toutes celles déposées sur La bonne alternance et aucune offre France Travail. Aucune route de lecture de candidature, aucun webhook, aucun callback : le suivi « vue / réponse » du brief ne peut être alimenté que manuellement.
 4. **Garde-fous côté La bonne alternance (code), non documentés publiquement.** 3 candidatures maximum par candidat et par offre, 20 par jour par organisation consommatrice et par SIRET, 100 par jour par candidat, clôture automatique d'une offre à 80 candidatures. Aucune clé d'idempotence : ne jamais rejouer un envoi après un 202 ou un timeout.
 5. **Point bloquant juridique.** Les pages officielles du portail réservent l'API à des « usages non lucratifs », interdisent « la facturation de l'accès pour des tiers comme des candidats » et refusent l'habilitation d'envoi pour un « usage individuel ». Les CGU interdisent de « commercialiser les données reçues ». Le modèle « 1 crédit = 1 envoi » doit être validé par écrit avec `support_api@apprentissage.beta.gouv.fr` avant de construire sur ces données en phase 2 (voir §15 et `docs/QUESTIONS.md`, A1).
+
+## 0. Vérifications sur données réelles (10 septembre 2026)
+
+Faites avec un jeton production en lecture seule : 12 recherches sur Paris, Lyon, Angers et Guéret, avec les codes M1805, M1855 et M1825 pour le développement, M1705, D1406 et D1402 pour le commerce et le marketing, M1203, M1501 et M1503 pour la comptabilité et les RH, rayon de 30 km, sans filtre de niveau ; puis 3 recherches sur le nombre de codes ROME, 4 appels de détail et 1 appel d'export. Aucune candidature n'a été envoyée. Échantillon anonymisé : `docs/reference/api-alternance.search.sample.json`.
+
+| Point | Résultat |
+|---|---|
+| Offres uniques reçues | 151, pour 204 lignes avant dédoublonnage entre recherches |
+| `apply.recipient_id` renseigné | 69 sur 151 (46 %). `offres_emploi_lba` 63/63, `PASS` 5/5, `OPCO EP` 1/1 ; `France Travail` 0/53, `Meteojob` 0/11, `RH Alternance` 0/9, `iquesta` 0/5, autres partenaires 0 |
+| Format de `recipient_id` | `partners_<ObjectId>` pour les 69 |
+| `identifier.id` | Jamais nul (151/151), y compris pour les 53 offres France Travail : la phrase de la spécification sur les offres France Travail sans identifiant est périmée |
+| Ordre des coordonnées | `[longitude, latitude]` pour les 204 lignes |
+| Adresse email dans le texte de l'offre | 0 sur 151 (titre, description, description de l'employeur, conditions d'accès) |
+| `workplace.website` | 10 sur 151 (RH Alternance 9, Jobs that make sense 1) |
+| `workplace.siret` | 101 sur 151 |
+| `is_delegated` | 57 sur 151 : l'offre est gérée par une école, et `workplace` décrit l'école |
+| `offer.publication.expiration` | Toujours renseignée |
+| `offer.target_diploma` | Souvent nul ; à Paris en développement, `target_diploma_level=6` renvoie les mêmes 9 offres que sans filtre, ce qui confirme le filtre inclusif |
+| Destinations de `apply.url` | labonnealternance.apprentissage.beta.gouv.fr 63, directemploi.com 18, candidat.francetravail.fr 13, meteojob.com 12, rhalternance.com 9, puis 18 autres sites de partenaires ou d'entreprises |
+| `recruiters` (entreprises sans offre publiée) | 934 uniques, 293 avec `recipient_id`, 315 avec téléphone, aucune avec site web ; plafond de 150 atteint dans chaque recherche à Paris et à Lyon |
+| En-têtes de quota sur une recherche authentifiée | `x-ratelimit-limit: 60`, `x-ratelimit-remaining: 59`, `x-ratelimit-reset: 60` |
+| Nombre de codes ROME | 20, 21 et 30 codes acceptés (HTTP 200) |
+| Détail d'offre | HTTP 200 pour une offre La bonne alternance, France Travail et PASS, avec les mêmes `partner_job_id` et `recipient_id` que dans la recherche. Identifiant inconnu : `404 {"statusCode":404,"error":"Not Found","message":"Aucune offre d'emploi trouvée pour l'ID: …"}`, avec la clé `error` et non `name` |
+| Export | `lastUpdate` 2026-09-10T01:01:04Z ; un seul fichier sur un stockage S3 OVH, `binary/octet-stream`, non compressé, 581 351 525 octets, tableau JSON indenté |
+
+Volumes d'offres publiées par recherche :
+
+| Zone | Développement | Commerce et marketing | Comptabilité et RH |
+|---|---|---|---|
+| Paris | 9 | 46 | 124 |
+| Lyon | 0 | 9 | 12 |
+| Angers | 0 | 0 | 0 |
+| Guéret | 0 | 0 | 4 |
+
+Conséquences pour Candidatly : l'API ne fournit l'adresse email du recruteur pour aucune offre ; la route de candidature, ou le widget `/postuler`, est le seul moyen de joindre les recruteurs des offres déposées sur La bonne alternance ; le volume d'offres publiées est faible hors de Paris en septembre ; la fiche employeur ne peut presque jamais s'appuyer sur un site web fourni par l'offre. Voir `docs/QUESTIONS.md`, sections 0, A3 et F.
 
 ## 1. Architecture et sources primaires
 
@@ -197,7 +232,7 @@ Le parseur doit donc accepter `name` ou `error` et ne jamais dépendre du texte 
 
 ### 5.3 Rate limiting
 
-Politique générale (spec, `info.description`) : limite **par consommateur (clé API)**, indiquée dans la description de chaque route. En-têtes annoncés sur chaque réponse authentifiée : `x-ratelimit-limit`, `x-ratelimit-remaining`, `x-ratelimit-reset` (secondes) et `retry-after` sur 429. « Lorsque votre quota est atteint, l'API renvoie un code HTTP 429 - Too Many Requests avec un corps JSON ». Bonnes pratiques recommandées : surveiller `x-ratelimit-remaining`, réessayer avec un backoff exponentiel en respectant `retry-after`, contacter le support pour des limites supérieures. ⚠️ Non vérifié : la présence effective des en-têtes `x-ratelimit-*` sur les réponses authentifiées n'a pas pu être observée sans clé.
+Politique générale (spec, `info.description`) : limite **par consommateur (clé API)**, indiquée dans la description de chaque route. En-têtes annoncés sur chaque réponse authentifiée : `x-ratelimit-limit`, `x-ratelimit-remaining`, `x-ratelimit-reset` (secondes) et `retry-after` sur 429. « Lorsque votre quota est atteint, l'API renvoie un code HTTP 429 - Too Many Requests avec un corps JSON ». Bonnes pratiques recommandées : surveiller `x-ratelimit-remaining`, réessayer avec un backoff exponentiel en respectant `retry-after`, contacter le support pour des limites supérieures. Vérifié le 10 septembre 2026 : `x-ratelimit-limit: 60`, `x-ratelimit-remaining` et `x-ratelimit-reset: 60` sont présents sur une recherche authentifiée (§0).
 
 Implémentation (code, `@fastify/rate-limit`, fenêtre glissante d'une minute, clé de comptage `api_key:<id>`, sinon `user:<email>`, sinon `ip:<ip>`). Le plugin est enregistré avec `global: false` : seules les routes portant `config.rateLimit` sont limitées.
 
@@ -226,7 +261,7 @@ Description (spec) : « Accéder en temps réel à toutes les opportunités d'em
 
 | Paramètre | Type | Obligatoire | Valeurs / contraintes | Remarques |
 |---|---|---|---|---|
-| `romes` | string | non | Codes ROME séparés par des virgules, chaque code au format `^[A-Z]\d{4}$`. Exemples : `F1601,F1201,F1106`, `M1806` | Côté LBA : `split(",")`, trim, test de chaque code ; sinon 400 « One or more ROME codes are invalid. Expected format is 'D1234'. » (code). Aucune limite de nombre de codes dans la doc ni dans le code ; 2 à 5 codes (brief) sans risque a priori |
+| `romes` | string | non | Codes ROME séparés par des virgules, chaque code au format `^[A-Z]\d{4}$`. Exemples : `F1601,F1201,F1106`, `M1806` | Côté LBA : `split(",")`, trim, test de chaque code ; sinon 400 « One or more ROME codes are invalid. Expected format is 'D1234'. » (code). Aucune limite dans la doc ni dans le code ; 30 codes acceptés lors du test du 10 septembre 2026 |
 | `rncp` | string | non | Un seul code, pattern `^RNCP\d{3,5}$`. Exemples : `RNCP34436`, `RNCP183` | |
 | `latitude` | number | non, mais obligatoire si `longitude` est fourni | -90 à 90 | Sans lat/lon, la recherche couvre toute la France. LBA renvoie 400 « longitude is required when latitude is provided » (et inversement) (code) |
 | `longitude` | number | non, mais obligatoire si `latitude` est fourni | -180 à 180 | **Les exemples de la spécification sont inversés** (`longitude` 48.8566, `latitude` 2.3522) et la description de `latitude` est copiée sur celle de `longitude`. Paris = `latitude=48.8566&longitude=2.3522` |
@@ -361,7 +396,7 @@ Notation : « string \| null » signifie type `[string, null]` dans la spécific
 | `website` | string (uri) \| null | |
 | `siret` | string \| null, pattern `^\d{14}$` | SIRET du lieu d'exécution, ou de l'école si `is_delegated` |
 | `location.address` | string | Adresse du lieu d'exécution |
-| `location.geopoint` | `GeoJsonPoint` | `{ "type": "Point", "coordinates": [longitude, latitude] }`. Le schéma décrit le premier élément comme « Longitude » et le second comme « Latiude » (sic), mais **les valeurs d'exemple (48.850699, 2.308628) sont inversées**. Le code LBA construit le point avec `{ longitude, latitude }` explicites (ordre GeoJSON `[lng, lat]`). ⚠️ Non vérifié : ordre réel sur des données réelles, à contrôler au premier appel authentifié |
+| `location.geopoint` | `GeoJsonPoint` | `{ "type": "Point", "coordinates": [longitude, latitude] }`. Le schéma décrit le premier élément comme « Longitude » et le second comme « Latiude » (sic), mais **les valeurs d'exemple (48.850699, 2.308628) sont inversées**. Le code LBA construit le point avec `{ longitude, latitude }` explicites (ordre GeoJSON `[lng, lat]`). Vérifié le 10 septembre 2026 : `[longitude, latitude]` sur 204 offres réelles (§0) |
 | `brand` | string \| null | Marque |
 | `legal_name` | string \| null | Raison sociale |
 | `size` | string \| null | Tranche d'effectif, ex. `100-199` |
@@ -415,7 +450,7 @@ Deux chemins coexistent dans le code LBA :
 - `convertFranceTravailJobToJobOfferApi` (conversion à la volée) produit `identifier.id = null`, `partner_job_id` = identifiant FT, `partner_label = "France Travail"`, `contract.start = null`, `offer.target_diploma = null`, `desired_skills` et `to_be_acquired_skills = []`, `publication.expiration = null`, `workplace.siret = null`, `apply.recipient_id = null`, `apply.url` = URL d'origine France Travail ; les offres FT sans latitude/longitude sont filtrées à la conversion (TODO dans le code).
 - Mais `findJobsOpportunities` appelle désormais `findFranceTravailOpportunitiesFromDB`, qui lit les offres `partner_label = "France Travail"` stockées dans `jobs_partners` et passe par `convertToJobOfferApiReadV3` : ces offres **ont un `identifier.id`** (ObjectId) et auraient un `recipient_id` si un `apply_email` était renseigné. La phrase de la spécification « not stored… retrieved on the fly » est périmée.
 
-Règles pour Candidatly : `identifier.id` et `apply.recipient_id` nullables dans tous les cas ; considérer en pratique que les offres France Travail ne sont pas candidatables par l'API (canal `external_url`). ⚠️ Non vérifié : part réelle des offres à `id` null et présence d'un `recipient_id` sur des offres France Travail, à mesurer sur données réelles.
+Règles pour Candidatly : `identifier.id` et `apply.recipient_id` nullables dans tous les cas ; considérer en pratique que les offres France Travail ne sont pas candidatables par l'API (canal `external_url`). Vérifié le 10 septembre 2026 : les 53 offres France Travail reçues ont toutes un `identifier.id`, et aucune n'a de `recipient_id` (§0).
 
 ### 7.8 `JobRecruiter` (tableau `recruiters`)
 
@@ -445,7 +480,7 @@ curl -sS "https://api.apprentissage.beta.gouv.fr/api/job/v1/offer/6687165396d52b
 - Description (spec) : « Liste toutes les opportunités (offres et entreprises pour candidature spontanée). Mises à jour une fois par jour à 3:00 heure de Paris. Limite : 2 appels par minute. » « La structure des offres est identique à la réponse de la route de recherche. »
 - Réponse 200 : `{ "url": string, "lastUpdate": string (date-time) }`. `url` est une URL S3 signée **valide 2 minutes** (`s3SignedUrl(..., { expiresIn: 120 })`, code) : télécharger immédiatement.
 - Intérêt pour `sync-offers` : un téléchargement quotidien puis filtrage local (ROME, distance, niveau) évite le plafond de 150 offres par source et le découpage par couple (ROME, zone). Contrepartie : fraîcheur d'un jour au lieu du temps réel, alors que le brief impose un cache de 6 h par couple ROME + zone. Décision à prendre en phase 2 (voir `docs/QUESTIONS.md`) ; une stratégie mixte (export quotidien comme base, recherche temps réel en complément pour les couples actifs) est compatible avec les quotas.
-- ⚠️ Non vérifié : format exact du fichier exporté (JSON, découpage, compression) ; seule la structure des offres est documentée.
+- Vérifié le 10 septembre 2026 : un seul fichier, tableau JSON indenté, non compressé, 581 Mo, servi par un stockage S3 OVH en `binary/octet-stream` (§0). Son traitement exige un parseur en flux.
 
 ## 10. Candidature : `POST /job/v1/apply`
 
@@ -744,13 +779,13 @@ La fiche est construite par `enrich-company` à partir de l'API Recherche d'entr
 
 1. **Juridique (bloquant)** : compatibilité du modèle à crédits avec « réservée à des usages non lucratifs », « facturation de l'accès pour des tiers comme des candidats […] interdite » et « ne pas commercialiser les données reçues ». À demander par écrit à `support_api@apprentissage.beta.gouv.fr` avant la phase 2.
 2. **Habilitation (bloquant)** : obtention de `applications:write` en production pour Candidatly (critères, délai, organisation à déclarer), sachant que l'usage individuel est refusé. Sans habilitation, seul le canal `external_url` (ou le widget `/postuler`) reste possible en production.
-3. **Aucun appel authentifié n'a été fait** : à valider dès qu'une clé production existe : ordre réel des coordonnées `geopoint`, présence effective de `recipient_id` par `partner_label`, part des offres à `identifier.id` null, format réel de `recipient_id` (`partners_<ObjectId>` déduit du code), présence des en-têtes `x-ratelimit-*` et `retry-after`.
-4. **Offres France Travail** : la spécification dit `id = null`, le code courant les lit depuis la base (avec `id`). Accepter les deux cas ; mesurer sur données réelles avant de figer les hypothèses de `sync-offers`.
+3. **Résolu le 10 septembre 2026 (§0)** : coordonnées `[longitude, latitude]`, `recipient_id` présent sur toutes les offres `offres_emploi_lba` et absent des offres France Travail, `identifier.id` jamais nul, format `partners_<ObjectId>`, en-têtes `x-ratelimit-*` présents. Reste à observer : `retry-after` sur un 429.
+4. **Offres France Travail, résolu le 10 septembre 2026** : toutes ont un `identifier.id`, aucune n'a de `recipient_id`. Garder `id` nullable dans le schéma par prudence.
 5. **Code HTTP de dépassement de quota** : 429 selon le serveur, 419 selon les réponses documentées ; traiter les deux jusqu'à observation.
 6. **Corps des 429 métier de LBA** (« Maximum application per … reached ») : format Boom inféré, non observé.
 7. **Limite de 20 candidatures par jour et par SIRET pour toute l'organisation** : codée en dur ; demander au support si un aménagement est possible pour un service multi-utilisateurs.
-8. **Nombre de codes ROME par requête** : aucune limite trouvée ; vérifier en pratique (longueur d'URL, temps de réponse) avec 5 codes.
-9. **Export ou recherche comme source principale de `sync-offers`** : décision de phase 2 (fraîcheur quotidienne contre plafond de 150 par source) ; format exact du fichier d'export non documenté.
+8. **Nombre de codes ROME par requête, résolu le 10 septembre 2026** : 20, 21 et 30 codes acceptés (HTTP 200).
+9. **Export ou recherche comme source principale de `sync-offers`** : décision de phase 2. Le fichier d'export pèse 581 Mo (tableau JSON non compressé, offres et entreprises) et impose un parseur en flux.
 10. **Mapping `bac+4` → niveau `6`** et sens de `profiles.diploma_level` (actuel ou visé) : à valider par l'owner.
 11. **Routes publiques non documentées `/api/rome`** de La bonne alternance : usage limité au développement, ou abstention ; à trancher.
 12. **Liste courante des `partner_label`** et des partenaires candidatables : Metabase mort ; à mesurer empiriquement.

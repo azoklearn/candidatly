@@ -4,7 +4,7 @@ Nom de code provisoire : `candidatly`. Ce fichier est la mémoire de travail du 
 
 ## 1. Le projet en trois lignes
 
-SaaS pour étudiants français : trouve les offres d'alternance publiées qui correspondent au profil (ROME, niveau, zone), construit une fiche employeur, adapte la lettre de motivation de l'étudiant à chaque offre sans inventer de faits, envoie la candidature après validation explicite, puis suit les réponses et propose les relances. Monétisation par crédits (1 crédit = 1 envoi), packs Stripe, pas d'abonnement.
+SaaS pour étudiants français : trouve les offres d'alternance publiées qui correspondent au profil (ROME, niveau, zone), construit une fiche employeur, adapte la lettre de motivation de l'étudiant à chaque offre sans inventer de faits, envoie la candidature après validation explicite, puis suit les réponses et propose les relances. Monétisation en cours de redéfinition : le brief prévoyait des packs de crédits sans abonnement ; depuis le 10 septembre 2026, l'envoi des candidatures est prévu dans un abonnement premium (questions A1, A3 à A5 de `docs/QUESTIONS.md`).
 
 Principes non négociables : validation humaine avant chaque envoi, aucun fait inventé par le LLM, aucun scraping de job boards, RGPD (données minimales, suppression réelle, fichiers privés chiffrés au repos).
 
@@ -26,7 +26,7 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 - **Supabase** : Auth (email + Google, flux PKCE), Postgres avec RLS sur toutes les tables, Storage bucket privé `documents`. Clés « publishable » et « secret » (les clés `anon` / `service_role` sont dépréciées fin 2026).
 - **Trigger.dev v4** pour les jobs asynchrones et planifiés. La v3 imposée par le brief est retirée ; la v4 n'a pas besoin de route `/api/trigger` (écart documenté dans `docs/QUESTIONS.md`).
 - **Anthropic SDK** `@anthropic-ai/sdk` : `claude-sonnet-5` (lettres), `claude-haiku-4-5-20251001` (ROME, résumé entreprise, extraction). Sorties JSON par « structured outputs » (`client.messages.parse` + `zodOutputFormat`).
-- **Stripe** Checkout + webhooks (`checkout.session.completed` et `checkout.session.async_payment_succeeded`).
+- **Stripe** Checkout + webhooks (`checkout.session.completed` et `checkout.session.async_payment_succeeded`) ; abonnements par Stripe Billing si l'abonnement premium est confirmé (A5).
 - **Zod 4** à toutes les frontières (formulaires, réponses API externes, sorties JSON LLM).
 - **Vitest 5** (unitaires), **Playwright** (2 à 3 parcours critiques).
 - Déploiement : Vercel (Node 24) + Supabase cloud (région UE) + Trigger.dev cloud (`runtime: "node-24"`).
@@ -54,6 +54,7 @@ Points structurants confirmés en phase 0 (détails dans `docs/API_ALTERNANCE.md
 - Une offre n'est candidatable par l'API que si `apply.recipient_id` est non nul ; les offres France Travail ne le sont en pratique pas (URL externe seulement). D'où le canal `external_url` du brief.
 - La recherche renvoie au plus 150 offres par source, sans pagination. `identifier.id` peut être nul (offres France Travail selon la spécification) : la clé externe est `partner_label` + `partner_job_id`.
 - Limites : 60 recherches/min, 120 détails/min, 10 candidatures/min par clé ; côté La bonne alternance, 20 candidatures par jour et par SIRET pour une même organisation consommatrice, 3 par candidat et par offre. Pas d'idempotence sur la candidature : ne jamais rejouer un envoi accepté.
+- Mesure du 10 septembre 2026 avec le jeton production : 46 % des offres ont un `recipient_id` ; aucune offre ne contient d'adresse email ; le site web n'est connu que pour 7 % des offres ; 38 % des offres sont gérées par une école (`is_delegated`). Détail dans `docs/API_ALTERNANCE.md`, section 0.
 
 ## 5. Arborescence cible
 
@@ -198,3 +199,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-08 : phase 0 démarrée. Brief archivé dans `docs/BRIEF.md`. Docs API produites à partir de la documentation officielle et des spécifications OpenAPI sauvegardées dans `docs/reference/`, avec vérification croisée ; toute affirmation non confirmée est marquée « ⚠️ Non vérifié » dans les docs.
 - 2026-09-09 : écarts de stack constatés et proposés par défaut (Trigger.dev v4, `proxy.ts`, clés Supabase publishable/secret, Zod 4, pas de température sur Sonnet 5, géocodage sur la Géoplateforme). Deux questions bloquantes posées à l'owner : compatibilité du modèle payant avec les conditions de l'API Alternance (clause « usage non lucratif » confirmée sur les pages officielles) et obtention de l'habilitation de production ; canal de candidature pour les offres sans `recipient_id`. Détail dans `docs/QUESTIONS.md`.
 - 2026-09-10 : docs de référence finalisées et relues (`docs/API_ALTERNANCE.md`, `docs/API_RECHERCHE_ENTREPRISES.md`, `docs/API_ADRESSE.md`, `docs/ROME.md`). Écarts de schéma par rapport au brief regroupés dans `docs/QUESTIONS.md` (C42 à C47). La question A1 bloque la phase 2, pas la phase 1. Un jeton sandbox renvoie des données de test même en lecture : jeton production pour la lecture, jeton sandbox pour tester l'envoi.
+- 2026-09-10 : l'owner décide que l'envoi des candidatures sera une fonctionnalité d'un abonnement premium, par un email ouvert dans la boîte de l'étudiant. Les mesures sur données réelles montrent qu'aucune source autorisée ne fournit l'adresse du recruteur : questions A3 à A5 ajoutées et email au support réécrit. Jeton production rangé dans `.env.local`, échéance le 10 septembre 2027 (`docs/RUNBOOK.md`).
