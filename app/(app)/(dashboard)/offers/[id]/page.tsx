@@ -183,7 +183,11 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                 <p className="text-muted-foreground">{job.workplace.domain.naf.label}</p>
               ) : null}
               {job?.workplace.size ? (
-                <p className="text-muted-foreground">{job.workplace.size} salariés</p>
+                <p className="text-muted-foreground">
+                  {/salari/i.test(job.workplace.size)
+                    ? job.workplace.size
+                    : `${job.workplace.size} salariés`}
+                </p>
               ) : null}
               {job?.workplace.description ? (
                 <p className="whitespace-pre-line text-muted-foreground">
