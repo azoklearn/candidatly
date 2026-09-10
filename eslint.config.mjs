@@ -5,13 +5,25 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
+  {
+    rules: {
+      // Project conventions (CLAUDE.md): no `any`, no console outside the logger.
+      "@typescript-eslint/no-explicit-any": "error",
+      "no-console": "error",
+    },
+  },
+  {
+    files: ["lib/logger.ts"],
+    rules: { "no-console": "off" },
+  },
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",
+    "coverage/**",
     "next-env.d.ts",
+    "docs/**",
+    "supabase/**",
   ]),
 ]);
 
