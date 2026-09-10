@@ -1,0 +1,2 @@
+-- Local seed data, applied after migrations by `npx supabase db reset`.
+-- The ROME nomenclature is loaded by scripts/import-rome.ts (phase 2), not here.
