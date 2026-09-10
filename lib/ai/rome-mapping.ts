@@ -21,6 +21,15 @@ export type RomeSuggestions = {
 
 const MAX_CANDIDATES = 30;
 const MAX_SUGGESTIONS = 5;
+const MAX_FALLBACK_SUGGESTIONS = 8;
+const STEM_LENGTH = 7;
+
+/** Words that describe the search itself rather than a trade. */
+const SEARCH_NOISE = new Set(
+  "cherche chercher recherche recherches alternance alternant alternante apprentissage apprenti apprentie stage stagiaire contrat poste postes emploi travail travailler metier metiers domaine secteur formation souhaite voudrais aimerais entreprise".split(
+    " ",
+  ),
+);
 
 const OutputSchema = z.object({
   codes: z.array(z.object({ code: z.string(), reason: z.string() })),
@@ -33,15 +42,21 @@ Règles absolues :
 3. Pour chaque code, donne une raison en français, en une phrase de 15 mots au plus, factuelle, sans formule creuse.
 4. Si aucun candidat ne convient, renvoie une liste vide.`;
 
-/** Search terms for search_rome_candidates: accent-free words, no stop words, at most 12. */
+/**
+ * Search terms for search_rome_candidates: accent-free words without stop words or search
+ * noise, cut to a 7-letter stem so that "développement" also finds "développeur". At most 12.
+ */
 export function toSearchTerms(text: string): string[] {
-  return [...new Set(tokenize(text, 3))].slice(0, 12);
+  const stems = tokenize(text, 3)
+    .filter((word) => !SEARCH_NOISE.has(word))
+    .map((word) => (word.length > STEM_LENGTH ? word.slice(0, STEM_LENGTH) : word));
+  return [...new Set(stems)].slice(0, 12);
 }
 
 function fallbackSuggestions(candidates: RomeCandidate[]): RomeSuggestions {
   return {
     source: "search",
-    suggestions: candidates.slice(0, MAX_SUGGESTIONS).map((candidate) => ({
+    suggestions: candidates.slice(0, MAX_FALLBACK_SUGGESTIONS).map((candidate) => ({
       code: candidate.code,
       label: candidate.label,
       reason:

@@ -47,14 +47,13 @@ const reply = (codes: { code: string; reason: string }[]): ParsedReply => ({
 });
 
 describe("toSearchTerms", () => {
-  it("keeps meaningful accent-free words", () => {
+  it("keeps meaningful accent-free stems and drops search noise", () => {
     expect(toSearchTerms("Je cherche une alternance en développement web et mobile !")).toEqual([
-      "cherche",
-      "alternance",
-      "developpement",
+      "develop",
       "web",
       "mobile",
     ]);
+    expect(toSearchTerms("Ressources humaines, ressources")).toEqual(["ressour", "humaine"]);
   });
 });
 

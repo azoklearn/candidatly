@@ -12,6 +12,7 @@ const codes = [
   ["M1805", "Développeur / Développeuse informatique"],
   ["M1855", "Développeur / Développeuse web"],
   ["M1705", "Responsable marketing"],
+  ["K1802", "Chargé / Chargée de développement économique et local"],
 ] as const;
 const appellations = [
   [1, "M1855", "Développeur / Développeuse front-end", false],
@@ -19,6 +20,10 @@ const appellations = [
   [3, "M1805", "Programmeur / Programmeuse", false],
   [4, "M1705", "Chargé / Chargée de marketing digital", false],
   [5, "M1705", "Webmarketeur / Webmarketeuse", true],
+  [6, "K1802", "Développeur / Développeuse économique", false],
+  [7, "K1802", "Agent / Agente de développement local", false],
+  [8, "K1802", "Chargé / Chargée de développement territorial", false],
+  [9, "K1802", "Animateur / Animatrice de développement rural", false],
 ] as const;
 
 beforeAll(async () => {
@@ -26,8 +31,8 @@ beforeAll(async () => {
   await db.exec(`
     insert into auth.users (id) values ('${USER}');
     insert into public.rome_versions (version) values (61);
-    insert into public.rome_grand_domaines (code, label) values ('M', 'Support');
-    insert into public.rome_domaines_professionnels (code, grand_domaine, label) values ('M18', 'M', 'SI'), ('M17', 'M', 'Marketing');
+    insert into public.rome_grand_domaines (code, label) values ('M', 'Support'), ('K', 'Services');
+    insert into public.rome_domaines_professionnels (code, grand_domaine, label) values ('M18', 'M', 'SI'), ('M17', 'M', 'Marketing'), ('K18', 'K', 'Territoires');
   `);
   for (const [code, label] of codes) {
     await db.query(
@@ -63,6 +68,12 @@ describe("search_rome_candidates", () => {
     expect(results[0]?.code).toBe("M1855");
     expect(results.map((r) => r.code)).toContain("M1805");
     expect(results[0]?.appellations.length).toBeGreaterThan(0);
+  });
+
+  it("lets a rare decisive word beat a code with many partial matches", async () => {
+    const results = await search(["develop", "web"]);
+    expect(results[0]?.code).toBe("M1855");
+    expect(results.map((r) => r.code)).toContain("K1802");
   });
 
   it("matches word prefixes and ignores accents", async () => {

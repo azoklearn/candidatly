@@ -25,7 +25,9 @@ export function RomeStep({ initialText, selected }: { initialText: string; selec
   const selectedCodes = new Set(selected.map((option) => option.code));
   const options: Option[] = [...selected, ...suggestions.filter((s) => !selectedCodes.has(s.code))];
   const defaults =
-    selectedCodes.size > 0 ? selectedCodes : new Set(suggestions.slice(0, 3).map((s) => s.code));
+    selectedCodes.size > 0
+      ? selectedCodes
+      : new Set(suggestions.slice(0, suggestState.source === "llm" ? 3 : 1).map((s) => s.code));
   const isChecked = (code: string) => overrides[code] ?? defaults.has(code);
   const checkedCount = options.filter((option) => isChecked(option.code)).length;
 
