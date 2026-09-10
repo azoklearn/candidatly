@@ -1,58 +1,13 @@
-import { readdirSync, readFileSync } from "node:fs";
-
-import { PGlite } from "@electric-sql/pglite";
+import type { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
+import { asRole, createMigratedDb } from "./setup";
 
 /**
  * Replays supabase/migrations on PGlite (Postgres compiled to WebAssembly) with a
  * minimal stub of the Supabase roles, auth and storage schemas, then checks RLS,
  * grants and constraints. No Docker, no network.
  */
-
-const MIGRATIONS_DIR = new URL("../../supabase/migrations/", import.meta.url);
-
-const SUPABASE_STUB = `
-create role anon nologin noinherit;
-create role authenticated nologin noinherit;
-create role service_role nologin noinherit bypassrls;
-grant usage on schema public to anon, authenticated, service_role;
-alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
-alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
-alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
-create schema auth;
-create table auth.users (
-  id uuid primary key default gen_random_uuid(),
-  email text,
-  raw_user_meta_data jsonb default '{}'::jsonb,
-  created_at timestamptz default now()
-);
-create function auth.uid() returns uuid language sql stable as $$
-  select coalesce(
-    nullif(current_setting('request.jwt.claim.sub', true), ''),
-    (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub')
-  )::uuid
-$$;
-grant usage on schema auth to anon, authenticated, service_role;
-grant execute on all functions in schema auth to anon, authenticated, service_role;
-create schema storage;
-create table storage.buckets (
-  id text primary key, name text not null, owner uuid, public boolean default false,
-  file_size_limit bigint, allowed_mime_types text[],
-  created_at timestamptz default now(), updated_at timestamptz default now()
-);
-create table storage.objects (
-  id uuid primary key default gen_random_uuid(), bucket_id text references storage.buckets (id),
-  name text, owner uuid, metadata jsonb,
-  created_at timestamptz default now(), updated_at timestamptz default now()
-);
-alter table storage.objects enable row level security;
-create function storage.foldername(name text) returns text[] language sql immutable as $$
-  select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1]
-$$;
-grant usage on schema storage to anon, authenticated, service_role;
-grant all on storage.objects to anon, authenticated, service_role;
-grant select on storage.buckets to anon, authenticated, service_role;
-`;
 
 const USER_A = "00000000-0000-0000-0000-00000000000a";
 const USER_B = "00000000-0000-0000-0000-00000000000b";
@@ -74,26 +29,11 @@ async function errorOf(sql: string): Promise<string> {
   }
 }
 
-async function as(role: "authenticated" | "anon", userId: string | null, run: () => Promise<void>) {
-  await db.exec(
-    `set role ${role}; select set_config('request.jwt.claim.sub', '${userId ?? ""}', false);`,
-  );
-  try {
-    await run();
-  } finally {
-    await db.exec(`reset role; select set_config('request.jwt.claim.sub', '', false);`);
-  }
-}
+const as = (role: "authenticated" | "anon", userId: string | null, run: () => Promise<void>) =>
+  asRole(db, role, userId, run);
 
 beforeAll(async () => {
-  db = new PGlite();
-  await db.exec(SUPABASE_STUB);
-  const files = readdirSync(MIGRATIONS_DIR)
-    .filter((file) => file.endsWith(".sql"))
-    .sort();
-  for (const file of files) {
-    await db.exec(readFileSync(new URL(file, MIGRATIONS_DIR), "utf8"));
-  }
+  db = await createMigratedDb();
   await db.exec(`
     insert into auth.users (id, email, raw_user_meta_data) values
       ('${USER_A}', 'a@example.org', '{"given_name":"Alice","family_name":"Martin"}'),

@@ -570,6 +570,8 @@ export type Database = {
           label_short: string
           peu_usite: boolean
           rome_version: number
+          search_text: string
+          search_vector: unknown
           updated_at: string
         }
         Insert: {
@@ -583,6 +585,8 @@ export type Database = {
           label_short: string
           peu_usite?: boolean
           rome_version: number
+          search_text?: string
+          search_vector?: unknown
           updated_at?: string
         }
         Update: {
@@ -596,6 +600,8 @@ export type Database = {
           label_short?: string
           peu_usite?: boolean
           rome_version?: number
+          search_text?: string
+          search_vector?: unknown
           updated_at?: string
         }
         Relationships: [
@@ -627,6 +633,8 @@ export type Database = {
           is_active: boolean
           label: string
           rome_version: number
+          search_text: string
+          search_vector: unknown
           transition_demo: boolean | null
           transition_eco: string | null
           transition_num: boolean | null
@@ -643,6 +651,8 @@ export type Database = {
           is_active?: boolean
           label: string
           rome_version: number
+          search_text?: string
+          search_vector?: unknown
           transition_demo?: boolean | null
           transition_eco?: string | null
           transition_num?: boolean | null
@@ -659,6 +669,8 @@ export type Database = {
           is_active?: boolean
           label?: string
           rome_version?: number
+          search_text?: string
+          search_vector?: unknown
           transition_demo?: boolean | null
           transition_eco?: string | null
           transition_num?: boolean | null
@@ -847,7 +859,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      grant_signup_bonus: { Args: never; Returns: number }
+      search_rome_candidates: {
+        Args: { p_limit?: number; p_terms: string[] }
+        Returns: {
+          appellations: string[]
+          code: string
+          label: string
+          rank: number
+        }[]
+      }
     }
     Enums: {
       applications_sent_via:
