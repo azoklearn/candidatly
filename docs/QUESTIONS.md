@@ -96,6 +96,7 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 | B6 | Clés Supabase | Non précisé | Les clés `anon` / `service_role` sont dépréciées fin 2026 au profit des clés `sb_publishable_...` / `sb_secret_...` | Variables `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` et `SUPABASE_SECRET_KEY` |
 | B7 | Logger | « utilise un logger » | Aucune lib de log dans la stack | Wrapper maison `lib/logger.ts` (JSON sur stdout, délègue au logger Trigger.dev dans les jobs). Pas de lib externe au MVP ; Sentry en phase 5 comme prévu |
 | B8 | Zod | « Zod » | Zod 4 est la version courante (`zod` 4.5.x) ; API v4 (`z.email()`, `error:`) | Zod 4 |
+| B9 | Tests de la base sans Docker | Non précisé | Docker est absent du poste, donc `supabase start` est impossible. PGlite (Postgres 18 compilé en WebAssembly, paquet `@electric-sql/pglite`) rejoue les migrations et teste la RLS en quelques secondes, en CI comme en local | **Accord requis** : ajouter `@electric-sql/pglite` en dépendance de développement et versionner le script de test des migrations dans `tests/db/`. En attendant, il tourne hors du dépôt |
 
 ---
 
@@ -174,6 +175,15 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 |---|---|---|---|
 | C48 | Volume d'offres publiées faible hors des grandes villes | Rayon par défaut de 30 km, modifiable jusqu'à 200 km ; élargissement automatique aux codes ROME voisins du même domaine professionnel quand une recherche renvoie moins de 10 offres ; mesure sur de vrais profils en phase 2, puis décision d'afficher ou non les entreprises qui recrutent sans offre publiée | Mesure F7 : aucune offre en développement à Lyon ni à Angers |
 | C49 | Fiche employeur pauvre | La fiche repose sur l'API Recherche d'entreprises ; le résumé du site n'est produit que si une URL est connue ; pour une offre gérée par une école, la fiche le signale et ne présente pas l'école comme l'employeur | Site web connu pour 7 % des offres, 38 % des offres gérées par une école |
+
+### Constats de la phase 1
+
+| # | Question | Hypothèse par défaut | Raison |
+|---|---|---|---|
+| C50 | Supabase en local | Docker est absent du poste. Avant la phase 2, installer Docker Desktop ou OrbStack (action de l'owner), ou travailler sur un projet Supabase cloud de développement | Les tests de RLS tournent sur PGlite en attendant (B9) |
+| C51 | ESLint 9 signalé comme plus maintenu | Rester en ESLint 9 tant que `eslint-config-next` et ses plugins ne déclarent pas ESLint 10 | Éviter un conflit de dépendances |
+| C52 | Modèle de l'email de confirmation | Le lien pointe vers `/auth/confirm?token_hash=…` (`supabase/templates/confirmation.html`) ; à recopier dans le projet cloud (Authentication > Email Templates) | Sinon le lien par défaut passe par `/auth/callback`, qui ne fonctionne que dans le même navigateur |
+| C53 | Connexion Google | Désactivée dans la configuration locale ; à activer dans le projet cloud avec un client OAuth Google (section D, point 3) | Aucun secret dans le dépôt |
 
 ---
 
