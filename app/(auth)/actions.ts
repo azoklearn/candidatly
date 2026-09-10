@@ -11,7 +11,6 @@ import { createClient } from "@/lib/supabase/server";
 export type AuthFormState = {
   error?: string;
   message?: string;
-  email?: string;
   fieldErrors?: { email?: string; password?: string };
 };
 
@@ -50,17 +49,15 @@ function toFieldErrors(error: z.ZodError): NonNullable<AuthFormState["fieldError
 }
 
 export async function signIn(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
-  const email = String(formData.get("email") ?? "");
   const parsed = readCredentials(formData);
-  if (!parsed.success) return { email, fieldErrors: toFieldErrors(parsed.error) };
-  if (!isSupabaseConfigured()) return { email: parsed.data.email, error: NOT_CONFIGURED };
+  if (!parsed.success) return { fieldErrors: toFieldErrors(parsed.error) };
+  if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
     log.info("sign_in_failed", { code: error.code });
     return {
-      email: parsed.data.email,
       error:
         error.code === "email_not_confirmed"
           ? "Confirmez d’abord votre adresse email grâce au lien que nous vous avons envoyé."
@@ -71,10 +68,9 @@ export async function signIn(_previous: AuthFormState, formData: FormData): Prom
 }
 
 export async function signUp(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
-  const email = String(formData.get("email") ?? "");
   const parsed = readCredentials(formData);
-  if (!parsed.success) return { email, fieldErrors: toFieldErrors(parsed.error) };
-  if (!isSupabaseConfigured()) return { email: parsed.data.email, error: NOT_CONFIGURED };
+  if (!parsed.success) return { fieldErrors: toFieldErrors(parsed.error) };
+  if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED };
 
   const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
   const supabase = await createClient();
@@ -85,12 +81,11 @@ export async function signUp(_previous: AuthFormState, formData: FormData): Prom
   if (error) {
     log.info("sign_up_failed", { code: error.code });
     const known = error.code ? SIGN_UP_ERRORS[error.code] : undefined;
-    return { email: parsed.data.email, error: known ?? "L’inscription n’a pas abouti. Réessayez." };
+    return { error: known ?? "L’inscription n’a pas abouti. Réessayez." };
   }
   // A session is returned directly when email confirmation is disabled.
   if (data.session) redirect("/onboarding/1");
   return {
-    email: parsed.data.email,
     message:
       "Nous vous avons envoyé un email de confirmation. Cliquez sur le lien qu’il contient pour activer votre compte.",
   };

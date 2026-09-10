@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ type CredentialsFormProps = {
 
 export function CredentialsForm({ action, mode, next }: CredentialsFormProps) {
   const [state, formAction, pending] = useActionState(action, {});
+  // Controlled, so the address survives the automatic form reset after each submission.
+  const [email, setEmail] = useState("");
   const isSignUp = mode === "sign-up";
 
   if (state.message) {
@@ -43,7 +45,8 @@ export function CredentialsForm({ action, mode, next }: CredentialsFormProps) {
           type="email"
           autoComplete="email"
           required
-          defaultValue={state.email}
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
           aria-invalid={Boolean(state.fieldErrors?.email)}
           aria-describedby={state.fieldErrors?.email ? "email-error" : undefined}
         />
