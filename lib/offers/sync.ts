@@ -27,6 +27,19 @@ export function isRunFresh(run: SearchRun | null, now: Date): boolean {
   );
 }
 
+/**
+ * The API sometimes returns the same offer twice in one response (every France Travail
+ * offer of a Paris search on 11 September 2026), and one upsert cannot touch a row twice.
+ */
+export function uniqueByExternalId<T extends { external_id: string }>(rows: T[]): T[] {
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    if (seen.has(row.external_id)) return false;
+    seen.add(row.external_id);
+    return true;
+  });
+}
+
 export type SyncResult = { key: string; skipped: boolean; offers: number; invalidItems: number };
 
 export async function syncSearchKey(options: {
@@ -68,7 +81,7 @@ export async function syncSearchKey(options: {
     throw error;
   }
 
-  const rows = result.offers.map((offer) => toOfferRow(offer, now));
+  const rows = uniqueByExternalId(result.offers.map((offer) => toOfferRow(offer, now)));
   for (let i = 0; i < rows.length; i += UPSERT_CHUNK) {
     const { error } = await db
       .from("offers")
@@ -83,7 +96,11 @@ export async function syncSearchKey(options: {
   });
   if (inserted.error) throw new DatabaseError("offer_search_runs.insert", inserted.error);
 
-  log.info("search_synced", { offers: rows.length, invalidItems: result.skipped });
+  log.info("search_synced", {
+    offers: rows.length,
+    duplicates: result.offers.length - rows.length,
+    invalidItems: result.skipped,
+  });
   return { key: searchKey.key, skipped: false, offers: rows.length, invalidItems: result.skipped };
 }
 

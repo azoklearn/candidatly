@@ -198,6 +198,7 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 | C58 | Doublons du géocodeur | La Géoplateforme a renvoyé deux fois la même commune pour « Lyon » | Doublons retirés dans `lib/geocoding/geocode.ts` |
 | C59 | Documents | CV en PDF uniquement (brief) ; lettre en PDF, Word ou texte collé de 200 caractères minimum. Remplacer un document supprime l'ancien fichier (minimisation). Un PDF sans texte, par exemple un scan, est refusé avec un message | Pas d'OCR au MVP |
 | C60 | Filtres de la liste d'offres | Distance, date de publication, entreprise et « offres enregistrées », dans l'URL ; liste limitée aux 300 meilleures correspondances | Aucun état caché côté client |
+| C61 | Offres en double dans une réponse | Le 11 septembre, une recherche sur Paris a renvoyé chaque offre France Travail deux fois, avec le même identifiant : 9 résultats pour 5 offres. L'enregistrement échouait (« ON CONFLICT DO UPDATE command cannot affect row a second time ») | Doublons retirés avant l'enregistrement, nombre de doublons dans les logs |
 
 ## D. Comptes et accès à préparer (owner)
 
