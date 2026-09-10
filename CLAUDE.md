@@ -15,8 +15,8 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 | Phase | Contenu | État |
 |---|---|---|
 | 0 | Cadrage, lecture des API, questions ouvertes, ce fichier | Validée le 10 septembre 2026 |
-| 1 | Init Next.js, Supabase (migrations, RLS, bucket), auth, `OfferProvider` + tests | Livrée sur la branche `phase-1`, en attente de validation |
-| 2 | Onboarding 6 étapes, mapping ROME, extraction CV/lettre, jobs `sync-offers` / `compute-matches`, écrans offres | À faire |
+| 1 | Init Next.js, Supabase (migrations, RLS, bucket), auth, `OfferProvider` + tests | Validée le 11 septembre 2026, fusionnée dans `main` |
+| 2 | Onboarding 6 étapes, mapping ROME, extraction CV/lettre, jobs `sync-offers` / `compute-matches`, écrans offres | En cours sur la branche `phase-2` |
 | 3 | `enrich-company`, résumé entreprise, génération de lettre + diff | À faire |
 | 4 | Envoi, suivi, facturation (crédits ou abonnement selon A5), compte / export / suppression, Playwright | À faire |
 | 5 | Landing, légal, rate limiting, Sentry, coûts LLM, `docs/RUNBOOK.md` complet | À faire |
@@ -130,7 +130,7 @@ docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RU
 - Toute opération sur les crédits passe par une fonction Postgres transactionnelle et idempotente (index uniques partiels sur `credit_transactions`). Les `event.id` Stripe traités sont stockés dans `stripe_events`.
 - `offers.external_id` = `<partner_label>:<partner_job_id>` (source `api_alternance`).
 - Un profil et un solde de crédits sont créés par trigger à l'inscription (`handle_new_user`).
-- Migrations dans `supabase/migrations`. Sans Docker, elles sont rejouées sur PGlite avec une simulation d'auth et de storage Supabase (46 contrôles de RLS et de contraintes) ; le script est hors dépôt en attendant l'accord B9. `lib/supabase/database.types.ts` est généré par la CLI officielle depuis le projet lié (`npm run db:types`).
+- Migrations dans `supabase/migrations`. Sans Docker, elles sont rejouées sur PGlite avec une simulation d'auth et de storage Supabase (46 contrôles de RLS et de contraintes) ; ces tests sont dans `tests/db/migrations.test.ts` et tournent avec `npm test`. `lib/supabase/database.types.ts` est généré par la CLI officielle depuis le projet lié (`npm run db:types`).
 
 ### Jobs Trigger.dev (phase 2)
 - Un fichier par job dans `/trigger`, `import { task, schedules } from "@trigger.dev/sdk"`, `schemaTask` avec Zod pour les payloads.
@@ -138,7 +138,7 @@ docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RU
 - Les jobs orchestrent des fonctions de `/lib` testables unitairement.
 
 ### Tests
-- Vitest : `tests/unit/**/*.test.ts`. Réponses API simulées depuis `tests/fixtures/` (réponses réelles tronquées et anonymisées). Les clients externes acceptent `fetchImpl` et `sleep` injectés.
+- Vitest : `tests/unit/**/*.test.ts` et `tests/db/**/*.test.ts` (migrations et RLS sur PGlite). Réponses API simulées depuis `tests/fixtures/` (réponses réelles tronquées et anonymisées). Les clients externes acceptent `fetchImpl` et `sleep` injectés.
 - Aucun test n'appelle une API externe réelle ni un LLM réel.
 - Playwright (phase 4) : `tests/e2e/`, contre `next build && next start` et une base Supabase de test.
 
@@ -147,7 +147,7 @@ docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RU
 - Une phase = une branche (`phase-1`...), fusionnée dans `main` après validation de l'owner.
 
 ### Librairies hors stack
-- Avant d'ajouter une librairie non listée dans le brief : justification en une phrase dans `docs/QUESTIONS.md` et accord de l'owner. Validées avec la phase 0 : `unpdf`, `mammoth`. En attente : `@electric-sql/pglite` (B9). Les dépendances installées par shadcn/ui (`@base-ui/react`, `class-variance-authority`, `cn`, `lucide-react`, `tw-animate-css`, `shadcn`) font partie de shadcn/ui.
+- Avant d'ajouter une librairie non listée dans le brief : justification en une phrase dans `docs/QUESTIONS.md` et accord de l'owner. Validées : `unpdf`, `mammoth` (phase 0), `@electric-sql/pglite` en développement (B9, 11 septembre 2026). Les dépendances installées par shadcn/ui (`@base-ui/react`, `class-variance-authority`, `cn`, `lucide-react`, `tw-animate-css`, `shadcn`) font partie de shadcn/ui.
 
 ## 7. Commandes utiles
 

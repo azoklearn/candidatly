@@ -96,7 +96,7 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 | B6 | Clés Supabase | Non précisé | Les clés `anon` / `service_role` sont dépréciées fin 2026 au profit des clés `sb_publishable_...` / `sb_secret_...` | Variables `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` et `SUPABASE_SECRET_KEY` |
 | B7 | Logger | « utilise un logger » | Aucune lib de log dans la stack | Wrapper maison `lib/logger.ts` (JSON sur stdout, délègue au logger Trigger.dev dans les jobs). Pas de lib externe au MVP ; Sentry en phase 5 comme prévu |
 | B8 | Zod | « Zod » | Zod 4 est la version courante (`zod` 4.5.x) ; API v4 (`z.email()`, `error:`) | Zod 4 |
-| B9 | Tests de la base sans Docker | Non précisé | Docker est absent du poste, donc `supabase start` est impossible. PGlite (Postgres 18 compilé en WebAssembly, paquet `@electric-sql/pglite`) rejoue les migrations et teste la RLS en quelques secondes, en CI comme en local | **Accord requis** : ajouter `@electric-sql/pglite` en dépendance de développement et versionner le script de test des migrations dans `tests/db/`. En attendant, il tourne hors du dépôt |
+| B9 | Tests de la base sans Docker | Non précisé | PGlite (Postgres 18 compilé en WebAssembly, `@electric-sql/pglite`, licence Apache 2.0) rejoue les migrations et teste la RLS en quelques secondes, sans Docker ni réseau | **Accepté le 11 septembre 2026** : dépendance de développement, tests dans `tests/db/`, lancés par `npm test` |
 
 ---
 
