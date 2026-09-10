@@ -16,7 +16,7 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 |---|---|---|
 | 0 | Cadrage, lecture des API, questions ouvertes, ce fichier | Validée le 10 septembre 2026 |
 | 1 | Init Next.js, Supabase (migrations, RLS, bucket), auth, `OfferProvider` + tests | Validée le 11 septembre 2026, fusionnée dans `main` |
-| 2 | Onboarding 6 étapes, mapping ROME, extraction CV/lettre, jobs `sync-offers` / `compute-matches`, écrans offres | En cours sur la branche `phase-2` |
+| 2 | Onboarding 6 étapes, mapping ROME, extraction CV/lettre, jobs `sync-offers` / `compute-matches`, écrans offres | Livrée sur la branche `phase-2`, en attente de validation |
 | 3 | `enrich-company`, résumé entreprise, génération de lettre + diff | À faire |
 | 4 | Envoi, suivi, facturation (crédits ou abonnement selon A5), compte / export / suppression, Playwright | À faire |
 | 5 | Landing, légal, rate limiting, Sentry, coûts LLM, `docs/RUNBOOK.md` complet | À faire |
@@ -118,6 +118,7 @@ docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RU
 - Jamais de secret, de contenu de CV ni de lettre complète dans les logs : clés sensibles masquées, chaînes tronquées à 1 000 caractères.
 
 ### Next.js et interface
+- Les formulaires à server action passent par `components/action-form.tsx` : la saisie reste en place quand le serveur renvoie une erreur (React 19 vide le formulaire après une action native).
 - Server actions dans `app/**/actions.ts` : un fichier `"use server"` n'exporte que des fonctions async (et des types).
 - `params` et `searchParams` des pages sont des `Promise` (Next 16).
 - L'espace connecté est protégé deux fois : par `proxy.ts` et par les layouts `(app)` (session) et `(dashboard)` (onboarding terminé). Toute server action qui touche aux données vérifie à nouveau l'utilisateur.
@@ -136,6 +137,8 @@ docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RU
 - Un fichier par job dans `/trigger`, `import { task, schedules } from "@trigger.dev/sdk"`, `schemaTask` avec Zod pour les payloads.
 - Idempotence : `idempotencyKey` explicite au déclenchement ; retry avec backoff (`maxAttempts: 3`), `AbortTaskRunError` pour les erreurs non rejouables.
 - Les jobs orchestrent des fonctions de `/lib` testables unitairement.
+- Tâches : `sync-offers` (cron `0 */6 * * *`, fuseau Europe/Paris, une recherche par combinaison codes ROME et zone, puis suppression logique des offres périmées), `compute-matches` (par utilisateur), `refresh-user-offers` (fin d'onboarding et bouton « Actualiser »).
+- Sans `TRIGGER_SECRET_KEY`, `lib/jobs/dispatch.ts` exécute le rafraîchissement directement dans la server action : c'est le mode du développement local tant que le compte Trigger.dev n'existe pas. Le cron ne tourne qu'une fois les jobs déployés.
 
 ### Tests
 - Vitest : `tests/unit/**/*.test.ts` et `tests/db/**/*.test.ts` (migrations et RLS sur PGlite). Réponses API simulées depuis `tests/fixtures/` (réponses réelles tronquées et anonymisées). Les clients externes acceptent `fetchImpl` et `sleep` injectés.
@@ -163,7 +166,9 @@ npm run db:reset     # rejoue migrations + seed.sql
 npm run db:types     # régénère lib/supabase/database.types.ts depuis le projet Supabase lié
 npm run db:push      # applique les nouvelles migrations au projet lié (SUPABASE_DB_PASSWORD dans .env.local)
 npx shadcn@latest add <composant>
-npx trigger.dev@latest dev                               # à partir de la phase 2
+npm run rome:import  # importe le référentiel ROME 4.0 (fichiers de docs/reference) dans le projet lié
+npm run trigger:dev  # jobs Trigger.dev en local (TRIGGER_SECRET_KEY et TRIGGER_PROJECT_REF requis)
+npm run trigger:deploy  # déploie les jobs sur Trigger.dev cloud
 stripe listen --forward-to localhost:3000/api/stripe/webhook   # phase 4
 ```
 
@@ -197,3 +202,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-10 : l'owner décide de ne pas contacter le support de l'API Alternance. A1 est close, le risque est accepté.
 - 2026-09-10 : phase 0 validée (« go »), hypothèses par défaut de la section B appliquées. Phase 1 : pas de Docker sur le poste, migrations vérifiées sur PGlite et types générés depuis le schéma migré ; TypeScript épinglé en 6.0 ; shadcn/ui avec Base UI ; auth email + mot de passe et Google, confirmation par `token_hash` (`/auth/confirm`) ou code PKCE (`/auth/callback`) ; le fournisseur API Alternance couvre recherche et détail, pas l'envoi (pas d'habilitation). Schéma : ajouts C42 à C47 appliqués, statut d'abonnement prévu en attendant A5.
 - 2026-09-10 : projet Supabase cloud de développement « candidatly » créé par l'owner (région Paris, ref `ylupsjydkbmryctfrfte`) et lié à la CLI. Les six migrations y sont appliquées ; les types viennent désormais de la CLI officielle. Vérifié sur la base réelle : création du profil et du solde à l'inscription, RLS (profil, crédits, historique, tables de service), stockage privé par dossier et types de fichiers.
+- 2026-09-11 : phase 2 livrée sur `phase-2`. Onboarding en 6 étapes, choix des métiers ROME (repli sur le classement de la nomenclature tant que la clé Anthropic manque), lecture des CV PDF et des lettres PDF, Word ou collées, recherche des offres et calcul des correspondances en ligne faute de compte Trigger.dev, écrans liste et détail des offres. Deux corrections après test réel : classement ROME (C55) et doublons du géocodeur (C58). Parcours complet vérifié sur le projet cloud avec un utilisateur de test.

@@ -187,6 +187,18 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 
 ---
 
+### Constats de la phase 2 (11 septembre 2026)
+
+| # | Sujet | Constat ou choix | Effet |
+|---|---|---|---|
+| C54 | Clé Anthropic absente | L'étape « Domaine recherché » propose alors 8 métiers classés par la recherche dans la nomenclature, le premier coché. Avec `ANTHROPIC_API_KEY`, Haiku choisit parmi 30 candidats officiels et ne peut rien inventer | L'onboarding fonctionne sans clé, avec des suggestions moins fines |
+| C55 | Classement des métiers ROME | La première version additionnait les scores de tous les intitulés : « développement » écrasait « web ». Désormais chaque mot pèse selon sa rareté, un métier est classé par son meilleur intitulé et les mots sont réduits à 7 lettres (« développement » trouve « développeur »). Vérifié sur 10 requêtes types avec les données du projet cloud | Migration `20260911110000_rome_search_ranking.sql` |
+| C56 | Trigger.dev pas encore configuré | Sans `TRIGGER_SECRET_KEY`, la recherche d'offres tourne dans la requête (quelques secondes). Le cron `sync-offers` toutes les 6 h n'existe qu'après `npm run trigger:deploy` avec `TRIGGER_PROJECT_REF` | Voir section D |
+| C57 | Volume d'offres en informatique | Le 11 septembre, l'API renvoie 0 offre de développement autour de Lyon, même à 100 km, et 9 à Paris, comme en section F point 7. Elle renvoie aussi 150 « recruteurs » : ce sont des entreprises susceptibles de recruter, pas des offres publiées, et Candidatly ne les affiche pas (le brief se limite aux offres publiées) | L'écran vide conseille d'élargir le rayon ou d'ajouter des métiers. Question produit pour plus tard : proposer ou non les candidatures spontanées |
+| C58 | Doublons du géocodeur | La Géoplateforme a renvoyé deux fois la même commune pour « Lyon » | Doublons retirés dans `lib/geocoding/geocode.ts` |
+| C59 | Documents | CV en PDF uniquement (brief) ; lettre en PDF, Word ou texte collé de 200 caractères minimum. Remplacer un document supprime l'ancien fichier (minimisation). Un PDF sans texte, par exemple un scan, est refusé avec un message | Pas d'OCR au MVP |
+| C60 | Filtres de la liste d'offres | Distance, date de publication, entreprise et « offres enregistrées », dans l'URL ; liste limitée aux 300 meilleures correspondances | Aucun état caché côté client |
+
 ## D. Comptes et accès à préparer (owner)
 
 Aucun n'est nécessaire pour démarrer la phase 1 (Supabase local + réponses mockées), mais tous le sont avant la phase 2.
