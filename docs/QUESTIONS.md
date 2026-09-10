@@ -35,37 +35,15 @@ Les faits cités proviennent de `docs/API_ALTERNANCE.md`, `docs/API_RECHERCHE_EN
 
 ### A1. Le modèle payant est-il compatible avec les conditions de l'API Alternance ?
 
-**Pourquoi c'est bloquant.** Toutes les offres viennent de cette API, et ses conditions, telles qu'elles sont publiées, s'opposent à un service payant :
+**Décision de l'owner, 10 septembre 2026 : pas de contact avec le support.** Le risque décrit ci-dessous est accepté, et A1 ne bloque plus aucune phase. Sans habilitation, la route de candidature de l'API reste fermée en production : voir A3.
+
+**Le risque, pour mémoire.** Toutes les offres viennent de cette API, et ses conditions publiées s'opposent à un service payant :
 1. Les pages officielles des routes de recherche et de détail d'offre (HTML servi par le portail, vérifié le 9 septembre 2026) : « L'utilisation de cette API est gratuite et réservée à des usages non lucratifs. Notez que toute utilisation de ces données à des fins commerciales, telles que la revente ou la facturation de l'accès pour des tiers comme des candidats est interdite. » La page du détail d'offre ajoute « candidats, entreprises ou écoles ».
 2. Les CGU du portail (v1.0, 31 mars 2025) : « Il s'engage à ne pas commercialiser les données reçues et à ne pas les communiquer à des tiers en dehors des cas prévus par la loi. »
-3. La route de candidature est, avec le widget `/postuler`, le seul moyen de joindre le recruteur des offres déposées sur La bonne alternance (section 0). Elle exige une habilitation accordée à la main par le support : « Cette API est réservée aux services traitant un volume important de candidatures. Les demandes d'habilitation pour un usage individuel ne seront pas accordées. » Le compte actuel n'est rattaché à aucune organisation, condition de l'habilitation.
+3. La route de candidature est, avec le widget `/postuler`, le seul moyen de joindre le recruteur des offres déposées sur La bonne alternance (section 0). Elle exige une habilitation accordée à la main par le support, que le compte actuel, rattaché à aucune organisation, n'a pas.
 4. Nuance : la licence des données déclarée dans la spécification est Etalab 2.0, qui autorise la réutilisation commerciale avec mention de la source. Elle ne l'emporte pas sur les conditions affichées par le portail.
 
-Sans accord écrit du support, un abonnement donnant accès à ces offres expose à la révocation de la clé (CGU art. 5.1).
-
-**Options.**
-1. Demander maintenant un accord écrit au support, en décrivant le service honnêtement, ainsi que l'habilitation d'envoi (brouillon ci-dessous).
-2. Laisser gratuites la consultation des offres et la candidature, et ne faire payer que les services propres : lettre adaptée, fiche entreprise, suivi, envoi assisté. À confirmer aussi avec le support, le service restant lucratif dans son ensemble.
-3. Chercher en V2 des sources d'offres dont les conditions autorisent explicitement un usage commercial, à vérifier : API France Travail, Adzuna.
-
-**Recommandation.** Option 1 immédiatement, avec l'option 2 proposée dans l'email comme position de repli. Concevoir la phase 1 pour que la facturation (crédits ou abonnement) et le canal d'envoi soient des paramètres, pas des choix figés dans le schéma.
-
-**Ce que A1 bloque.** La phase 1 (fondations, schéma, authentification, client API testé sur des réponses simulées) n'en dépend pas et peut démarrer dès la validation de la phase 0. La phase 2 affiche à des utilisateurs d'un service payant des offres issues de l'API : elle ne devrait pas démarrer sans réponse du support, sauf décision explicite de l'owner d'avancer sans cette réponse.
-
-**Brouillon d'email au support**, à envoyer par l'owner depuis l'adresse de son compte sur le portail, à `support_api@apprentissage.beta.gouv.fr`. Il remplace la version précédente, qui parlait de crédits.
-
-> **Objet :** Usage de l'API La bonne alternance dans un service payant pour étudiants
->
-> Bonjour,
->
-> Je développe Candidatly, un service en ligne qui aide les étudiants de Bac+2 à Bac+5 à trouver une alternance. Il recherche les offres via votre API, présente une fiche de l'employeur construite à partir de données publiques, et aide l'étudiant, avec un outil d'IA, à adapter sa propre lettre de motivation à chaque offre. L'étudiant relit et valide chaque candidature : aucune n'est envoyée automatiquement.
->
-> Le service sera payant, par abonnement. Vos pages indiquent que l'API est réservée à des usages non lucratifs et que la facturation de l'accès aux candidats est interdite. Pouvez-vous nous indiquer si un tel service est compatible avec vos conditions, et sous quelles conditions ? Nous pouvons par exemple laisser gratuites la consultation des offres et la candidature, et ne faire payer que l'aide à la rédaction et au suivi. Les données ne sont ni revendues ni communiquées à des tiers, et la source « La bonne alternance » est affichée avec un lien vers chaque offre.
->
-> Si c'est compatible, nous souhaitons aussi obtenir l'habilitation applications:write pour une clé de production, afin de transmettre à vos recruteurs les candidatures validées par l'étudiant. Mon compte n'est rattaché à aucune organisation : pouvez-vous me dire ce qu'il faut fournir ? Volumes estimés au lancement : [X] candidatures par jour pour [Y] étudiants actifs, avec un pic entre juin et novembre.
->
-> Cordialement,
-> [Prénom Nom, statut ou société, site web s'il existe]
+En cas de contrôle, l'éditeur peut suspendre ou bloquer l'accès du compte (CGU art. 5.1). Précaution retenue : afficher la source « La bonne alternance » avec un lien vers chaque offre, et ne jamais revendre ni transmettre les données.
 
 ### A2. Que fait-on des offres qui ne sont pas candidatables par l'API ?
 
@@ -81,7 +59,7 @@ Mesuré le 10 septembre 2026 : 54 % des offres n'ont pas de `recipient_id`, dont
 3. Recherche d'adresses sur les sites des entreprises, page contact comprise, dans le respect de `robots.txt`. Couverture faible : le site n'est connu que pour 7 % des offres, et l'adresse trouvée sera souvent générique.
 4. Service tiers d'enrichissement d'emails : exclu par le brief au MVP, et fragile au regard du RGPD pour des adresses nominatives.
 
-**Recommandation.** Option 1, en demandant l'habilitation dans l'email de A1 ; en attendant, l'option 2 couvre les mêmes offres. L'abonnement premium peut alors porter sur l'envoi assisté, quel que soit le canal. Si l'envoi par la route de l'API est facturé, c'est précisément ce que A1 doit faire valider. Piste à vérifier : l'API Offres d'emploi de France Travail exposerait parfois un contact recruteur. ⚠️ Non vérifié : il faut un compte francetravail.io pour le confirmer.
+**Recommandation.** Sans habilitation (A1), l'option 1 n'est pas disponible en production. Option 2 pour les offres qui ont un `recipient_id`, site du partenaire pour les autres, et email ouvert dans la boîte de l'étudiant quand une adresse est connue. L'abonnement premium peut porter sur l'envoi assisté, quel que soit le canal. Piste à vérifier : l'API Offres d'emploi de France Travail exposerait parfois un contact recruteur. ⚠️ Non vérifié : il faut un compte francetravail.io pour le confirmer.
 
 ### A4. Comment l'email s'ouvre-t-il dans la boîte de l'étudiant ?
 
@@ -203,7 +181,7 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 
 Aucun n'est nécessaire pour démarrer la phase 1 (Supabase local + réponses mockées), mais tous le sont avant la phase 2.
 
-1. **API Alternance** (jeton production créé le 10 septembre 2026, rangé dans `.env.local`, échéance dans `docs/RUNBOOK.md`) : compte sur `https://api.apprentissage.beta.gouv.fr` (inscription gratuite par lien envoyé par email), puis deux jetons de 365 jours, non prolongeables. Un jeton **production** dans `API_ALTERNANCE_KEY` : la lecture des offres réelles ne demande aucune habilitation, alors qu'un jeton sandbox renvoie les offres de l'environnement de test, même en lecture. Un jeton **sandbox** dans `API_ALTERNANCE_SANDBOX_KEY` pour tester l'envoi de candidatures. Envoyer en parallèle l'email de A1 au support. Ne jamais partager un jeton (interdit par les CGU).
+1. **API Alternance** (jeton production créé le 10 septembre 2026, rangé dans `.env.local`, échéance dans `docs/RUNBOOK.md`) : compte sur `https://api.apprentissage.beta.gouv.fr` (inscription gratuite par lien envoyé par email), puis deux jetons de 365 jours, non prolongeables. Un jeton **production** dans `API_ALTERNANCE_KEY` : la lecture des offres réelles ne demande aucune habilitation, alors qu'un jeton sandbox renvoie les offres de l'environnement de test, même en lecture. Un jeton **sandbox** dans `API_ALTERNANCE_SANDBOX_KEY` pour tester l'envoi de candidatures. Ne jamais partager un jeton (interdit par les CGU).
 2. **Supabase** : projet cloud en région UE ; noter l'URL, la clé publishable et la clé secret.
 3. **Google Cloud** : client OAuth 2.0 (type Web), URI de redirection `https://<project-ref>.supabase.co/auth/v1/callback`, écran de consentement ; client ID et secret à saisir dans Supabase Auth.
 4. **Anthropic** : clé API dans `ANTHROPIC_API_KEY`, limite de dépense mensuelle configurée.
@@ -248,4 +226,4 @@ Faites le 10 septembre 2026 avec le jeton production. Détail dans `docs/API_ALT
 | Angers | 0 | 0 | 0 |
 | Guéret | 0 | 0 | 4 |
 
-8. Questions pour le support, à poser dans l'email de A1 ou après sa réponse : limite de 20 candidatures par jour et par SIRET pour une organisation, engagement de maintien de la route de candidature, conservation des données.
+8. Sans réponse, faute de contact avec le support par décision de l'owner : limite de 20 candidatures par jour et par SIRET pour une organisation, engagement de maintien de la route de candidature, conservation des données.
