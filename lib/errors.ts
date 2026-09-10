@@ -7,7 +7,8 @@ export type AppErrorCode =
   | "RATE_LIMITED"
   | "NOT_FOUND"
   | "INSUFFICIENT_CREDITS"
-  | "NOT_IMPLEMENTED";
+  | "NOT_IMPLEMENTED"
+  | "DATABASE";
 
 export type ValidationIssue = { path: string; message: string };
 
@@ -104,6 +105,21 @@ export class InsufficientCreditsError extends AppError {
 export class NotImplementedError extends AppError {
   constructor(message: string) {
     super("NOT_IMPLEMENTED", message);
+  }
+}
+
+/** A Supabase query failed. The operation name goes to logs, never the data. */
+export class DatabaseError extends AppError {
+  readonly operation: string;
+  readonly dbCode: string | null;
+
+  constructor(operation: string, cause: { message: string; code?: string } | null) {
+    super("DATABASE", `${operation}: ${cause?.message ?? "unknown error"}`, {
+      cause,
+      retryable: true,
+    });
+    this.operation = operation;
+    this.dbCode = cause?.code ?? null;
   }
 }
 

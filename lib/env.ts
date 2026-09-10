@@ -92,6 +92,46 @@ export function parseApiAlternanceEnv(source: EnvSource): ApiAlternanceEnv {
 
 export const getApiAlternanceEnv = memoize(() => parseApiAlternanceEnv(process.env));
 
+const GeocodingEnvSchema = z.object({
+  GEOCODING_API_BASE_URL: z.url().default("https://data.geopf.fr/geocodage"),
+});
+export type GeocodingEnv = z.output<typeof GeocodingEnvSchema>;
+
+export function parseGeocodingEnv(source: EnvSource): GeocodingEnv {
+  return parseGroup("geocoding", GeocodingEnvSchema, source);
+}
+
+export const getGeocodingEnv = memoize(() => parseGeocodingEnv(process.env));
+
+const AnthropicEnvSchema = z.object({
+  ANTHROPIC_API_KEY: z.string().min(1),
+  ANTHROPIC_MODEL_LETTER: z.string().min(1).default("claude-sonnet-5"),
+  ANTHROPIC_MODEL_LIGHT: z.string().min(1).default("claude-haiku-4-5-20251001"),
+});
+export type AnthropicEnv = z.output<typeof AnthropicEnvSchema>;
+
+export function parseAnthropicEnv(source: EnvSource): AnthropicEnv {
+  return parseGroup("anthropic", AnthropicEnvSchema, source);
+}
+
+export const getAnthropicEnv = memoize(() => parseAnthropicEnv(process.env));
+
+export function isAnthropicConfigured(): boolean {
+  try {
+    getAnthropicEnv();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const TriggerEnvSchema = z.object({ TRIGGER_SECRET_KEY: z.string().min(1) });
+
+/** Trigger.dev reads TRIGGER_SECRET_KEY itself; without it, jobs run inline (local development). */
+export function isTriggerConfigured(): boolean {
+  return TriggerEnvSchema.safeParse(withoutEmptyStrings(process.env)).success;
+}
+
 const LOG_LEVELS = ["debug", "info", "warn", "error"] as const;
 export type LogLevelName = (typeof LOG_LEVELS)[number];
 
