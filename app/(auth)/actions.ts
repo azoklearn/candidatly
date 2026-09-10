@@ -1,0 +1,123 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { z } from "zod";
+
+import { DEFAULT_AFTER_LOGIN, safeNextPath } from "@/lib/auth/routes";
+import { getPublicEnv, isSupabaseConfigured } from "@/lib/env";
+import { logger } from "@/lib/logger";
+import { createClient } from "@/lib/supabase/server";
+
+export type AuthFormState = {
+  error?: string;
+  message?: string;
+  email?: string;
+  fieldErrors?: { email?: string; password?: string };
+};
+
+const NOT_CONFIGURED = "L’authentification n’est pas encore configurée sur cet environnement.";
+const log = logger.child({ area: "auth" });
+
+const CredentialsSchema = z.object({
+  email: z.email({ error: "Saisissez une adresse email valide." }),
+  password: z.string().min(8, { error: "Le mot de passe doit contenir au moins 8 caractères." }),
+});
+
+const SIGN_UP_ERRORS: Record<string, string> = {
+  user_already_exists: "Un compte existe déjà avec cette adresse email.",
+  weak_password: "Ce mot de passe est trop faible. Choisissez-en un plus long.",
+  over_email_send_rate_limit: "Trop de tentatives. Réessayez dans quelques minutes.",
+};
+
+function readCredentials(formData: FormData) {
+  return CredentialsSchema.safeParse({
+    email: String(formData.get("email") ?? "")
+      .trim()
+      .toLowerCase(),
+    password: String(formData.get("password") ?? ""),
+  });
+}
+
+function toFieldErrors(error: z.ZodError): NonNullable<AuthFormState["fieldErrors"]> {
+  const fieldErrors: NonNullable<AuthFormState["fieldErrors"]> = {};
+  for (const issue of error.issues) {
+    const field = issue.path[0];
+    if ((field === "email" || field === "password") && !fieldErrors[field]) {
+      fieldErrors[field] = issue.message;
+    }
+  }
+  return fieldErrors;
+}
+
+export async function signIn(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const email = String(formData.get("email") ?? "");
+  const parsed = readCredentials(formData);
+  if (!parsed.success) return { email, fieldErrors: toFieldErrors(parsed.error) };
+  if (!isSupabaseConfigured()) return { email: parsed.data.email, error: NOT_CONFIGURED };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  if (error) {
+    log.info("sign_in_failed", { code: error.code });
+    return {
+      email: parsed.data.email,
+      error:
+        error.code === "email_not_confirmed"
+          ? "Confirmez d’abord votre adresse email grâce au lien que nous vous avons envoyé."
+          : "Email ou mot de passe incorrect.",
+    };
+  }
+  redirect(safeNextPath(String(formData.get("next") ?? ""), DEFAULT_AFTER_LOGIN));
+}
+
+export async function signUp(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const email = String(formData.get("email") ?? "");
+  const parsed = readCredentials(formData);
+  if (!parsed.success) return { email, fieldErrors: toFieldErrors(parsed.error) };
+  if (!isSupabaseConfigured()) return { email: parsed.data.email, error: NOT_CONFIGURED };
+
+  const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signUp({
+    ...parsed.data,
+    options: { emailRedirectTo: `${NEXT_PUBLIC_SITE_URL}/auth/callback?next=/onboarding/1` },
+  });
+  if (error) {
+    log.info("sign_up_failed", { code: error.code });
+    const known = error.code ? SIGN_UP_ERRORS[error.code] : undefined;
+    return { email: parsed.data.email, error: known ?? "L’inscription n’a pas abouti. Réessayez." };
+  }
+  // A session is returned directly when email confirmation is disabled.
+  if (data.session) redirect("/onboarding/1");
+  return {
+    email: parsed.data.email,
+    message:
+      "Nous vous avons envoyé un email de confirmation. Cliquez sur le lien qu’il contient pour activer votre compte.",
+  };
+}
+
+export async function signInWithGoogle(formData: FormData): Promise<void> {
+  if (!isSupabaseConfigured()) redirect("/login?error=config");
+  const next = safeNextPath(String(formData.get("next") ?? ""), DEFAULT_AFTER_LOGIN);
+  const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${NEXT_PUBLIC_SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`,
+    },
+  });
+  if (error || !data.url) {
+    log.warn("google_sign_in_failed", { code: error?.code });
+    redirect("/login?error=oauth");
+  }
+  redirect(data.url);
+}
+
+export async function signOut(): Promise<void> {
+  if (isSupabaseConfigured()) {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
+  }
+  redirect("/login");
+}
