@@ -1,0 +1,1920 @@
+ 
+               C2 – Usage restreint 
+ 
+ 
+ 
+ 
+ 
+ 
+OPEN DATA 
+ 
+Description des exports  
+de données du ROME 
+ 
+  
+
+Description des exports de données du ROME 
+2 
+ 
+               C2 – Usage restreint 
+HISTORIQUE DES VERSIONS 
+ 
+Version Date Objet modification 
+1.0 27/01/2023 Initialisation du document, version 4.0 du ROME 
+1.1 15/03/2023 23M03 Epsilon 
+1.2 05/05/2023 23M05 Epsilon V2 (ROME 4.0 version 6.1) 
+1.3 15/06/2023 23M06 Zeta (ROME 4.0 version 7.0) 
+1.4 15/09/2023 23M09 Iota (ROME 4.0 version 8.0) 
+1.5 20/11/2023 
+ 
+23M11 Lambda (ROME 4.0 version 9.0) 
+▪ Ajout du tag transition démographique sur les 
+appellations et le ROME 
+▪ Ajout des tags emploi cadre, emploi réglementé sur le 
+ROME  
+▪ Ajout de la notion d'origine des compétences 
+▪ Ajout de la notion de cœur de métier (liant compétence 
+et fiche) 
+▪ Ajout de la notion de Titre (liant appellations et fiche) 
+▪ Ajout des secteurs d'activité dans les fiches 
+▪ Ajout de la notion de code ROME parent 
+1.6 20/12/2023 Changement de logo France Travail 
+1.7 05/01/2024 
+24M03 
+▪ 4 nouvelles ressources :  
+o secteur_naf_v4_utf8.csv 
+o arborescence_secteur_naf_v4_utf8.csv 
+o arborescence_secteur_naf_v4_iso8859-15.xml 
+o arborescence_secteur_naf_v4.json 
+▪ Ajout du champ « origine » dans les exports des 
+appellations 
+▪ Changement des valeurs possibles pour le champ 
+« transition_eco(logique) » pour les exports des ROME 
+et appellations 
+▪ Redéfinition des exports et blocs de données associés 
+aux mobilités 
+ 
+1.8 12/04/2024 
+24M06 
+▪ Ajout du champ « principal » au niveau des concepts de 
+secteurs d’activité et de centres d’intérêt 
+Description des exports de données du ROME 
+3 
+ 
+               C2 – Usage restreint 
+1.9 26/09/2024 
+24M11 
+▪ Ajout de l’information du code ROME parent et de 
+l’information peu usité au niveau des exports :  
+o referentiel_appellation_v4_utf8.csv 
+o referentiel_appellation_v4_iso8859-15.xml 
+o referentiel_appellation_v4.json 
+ 
+▪ Ajout de l’information « cœur_metier » (valeurs 
+« Principale » ou « Émergente ») au niveau de l’export :  
+o coherence_item_v4_utf8.csv 
+ 
+▪ Evolution de la valorisation de l’information secteur 
+d’activité « principal » au niveau des exports de 
+l’arborescence des secteurs d’activité : 
+o arborescence_secteur_activite_v4_utf8.csv 
+o arborescence_secteur_activite_v4_iso8859-
+15.xml 
+o arborescence_secteur_activite_v4.json 
+L’information n’est plus valorisée qu’au niveau des 
+métiers directement associés à un secteur d’activité et 
+plus au niveau des sous-secteurs d’activité 
+ 
+▪ L’appellation principale et les appellations « peu usité » 
+d’un métier sont dorénavant filtrées des listes 
+d’appellations des exports décrivant une fiche métier :  
+o fiche_emploi_metier_v4_iso8859-15.xml 
+o fiche_emploi_metier_v4.json 
+2.0 04/09/2025 
+25M09 
+▪ Ajout des schémas CSV, XML et JSON en annexes du 
+document 
+3.0 15/06/2026 
+26M06 
+▪ Pas d’évolution de structure de données des livrables 
+CSV, XML et JSON 
+ 
+  
+Description des exports de données du ROME 
+4 
+ 
+               C2 – Usage restreint 
+SOMMAIRE 
+ 
+Présentation ........................................................................................................................................... 9 
+1.1. Objectif du document ............................................................................................................. 9 
+1.2. Glossaire ................................................................................................................................. 9 
+1.3. Présentation du ROME ........................................................................................................... 9 
+2. Description des exports TXT/CSV ................................................................................................. 10 
+2.1. Ressource TXT « version.txt » ............................................................................................... 10 
+2.1.1. Description de la ressource .......................................................................................... 10 
+2.1.2. Description des données .............................................................................................. 10 
+2.2. Ressource CSV “coherence_item_v4_utf8.csv” .................................................................... 11 
+2.2.1. Description de la ressource .......................................................................................... 11 
+2.2.2. Description des données .............................................................................................. 11 
+2.3. Ressource CSV « composition_bloc_v4_utf8.csv » ............................................................... 12 
+2.3.1. Description de la ressource .......................................................................................... 12 
+2.3.2. Description des données .............................................................................................. 12 
+2.4. Ressource CSV « cr_gd_dp_appellations_v4_utf8.csv » ....................................................... 13 
+2.4.1. Description de la ressource .......................................................................................... 13 
+2.4.2. Description des données .............................................................................................. 13 
+2.5. Ressource CSV « cr_gd_dp_v4_utf8.csv » ............................................................................ 14 
+2.5.1. Description de la ressource .......................................................................................... 14 
+2.5.2. Description des données .............................................................................................. 14 
+2.6. Ressource CSV « descriptif_rubrique_v4_utf8.csv » ............................................................. 15 
+2.6.1. Description de la ressource .......................................................................................... 15 
+2.6.2. Description des données .............................................................................................. 15 
+2.7. Ressource CSV « domaine_professionnel_v4_utf8.csv » ...................................................... 16 
+2.7.1. Description de la ressource .......................................................................................... 16 
+2.7.2. Description des données .............................................................................................. 16 
+2.8. Ressource « grand_domaine_v4_utf8.csv » ......................................................................... 17 
+2.8.1. Description de la ressource .......................................................................................... 17 
+2.8.2. Description des données .............................................................................................. 17 
+2.9. Ressource CSV « themes_v4_utf8.csv » ............................................................................... 18 
+2.9.1. Description de la ressource .......................................................................................... 18 
+2.9.2. Description des données .............................................................................................. 18 
+2.10. Ressource CSV « item_v4_utf8.csv » ................................................................................ 19 
+Description des exports de données du ROME 
+5 
+ 
+               C2 – Usage restreint 
+2.10.1. Description de la ressource....................................................................................... 19 
+2.10.2. Description des données .......................................................................................... 19 
+2.11. Ressource CSV « liens_rome_referentiels_v4_utf8.csv » ................................................. 20 
+2.11.1. Description de la ressource....................................................................................... 20 
+2.11.2. Description des données .......................................................................................... 20 
+2.12. Ressource CSV « referentiel_macro_competence_riasec_v4_utf8.csv “ .......................... 21 
+2.12.1. Description de la ressource....................................................................................... 21 
+2.12.2. Description des données .......................................................................................... 21 
+2.13. Ressource CSV « referentiel_competence_v4_utf8.csv » ................................................. 22 
+2.13.1. Description de la ressource....................................................................................... 22 
+2.13.2. Description des données .......................................................................................... 22 
+2.14. Ressource CSV « referentiel_appellation_v4_utf8.csv »................................................... 23 
+2.14.1. Description de la ressource....................................................................................... 23 
+2.14.2. Description des données .......................................................................................... 23 
+2.15. Ressource CSV « referentiel_code_rome_riasec_v4_utf8.csv » ....................................... 25 
+2.15.1. Description de la ressource....................................................................................... 25 
+2.15.2. Description des données .......................................................................................... 25 
+2.16. Ressource CSV « referentiel_code_rome_v4_utf8.csv » .................................................. 26 
+2.16.1. Description de la ressource....................................................................................... 26 
+2.16.2. Description des données .......................................................................................... 26 
+2.17. Ressource CSV « referentiel_savoir_v4_utf8.csv » ........................................................... 27 
+2.17.1. Description de la ressource....................................................................................... 27 
+2.17.2. Description des données .......................................................................................... 27 
+2.18. Ressource CSV « referentiel_contexte_travail_v4_utf8.csv » .......................................... 28 
+2.18.1. Description de la ressource....................................................................................... 28 
+2.18.2. Description des données .......................................................................................... 28 
+2.19. Ressource CSV « rubrique_mobilite_v4_utf8.csv » .......................................................... 29 
+2.19.1. Description de la ressource....................................................................................... 29 
+2.19.2. Description des données .......................................................................................... 29 
+2.20. Ressource CSV « texte_v4_utf8.csv » ............................................................................... 30 
+2.20.1. Description de la ressource....................................................................................... 30 
+2.20.2. Description des données .......................................................................................... 30 
+2.21. Ressource CSV « type_referentiel_v4_utf8.csv » ............................................................. 31 
+2.21.1. Description de la ressource....................................................................................... 31 
+2.21.2. Description des données .......................................................................................... 31 
+2.22. Ressource CSV « arborescence_competences_v4_utf8.csv » .......................................... 32 
+Description des exports de données du ROME 
+6 
+ 
+               C2 – Usage restreint 
+2.22.1. Description de la ressource....................................................................................... 32 
+2.22.2. Description des données .......................................................................................... 32 
+2.23. Ressource CSV « centre_interet_v4_utf8.csv » ................................................................ 33 
+2.23.1. Description de la ressource....................................................................................... 33 
+2.23.2. Description des données .......................................................................................... 33 
+2.24. Ressource CSV « arborescence_centre_interet_v4_utf8.csv » ......................................... 34 
+2.24.1. Description de la ressource....................................................................................... 34 
+2.24.2. Description des données .......................................................................................... 34 
+2.25. Ressource CSV « arborescence_thematique_v4_utf8.csv » ............................................. 35 
+2.25.1. Description de la ressource....................................................................................... 35 
+2.25.2. Description des données .......................................................................................... 35 
+2.26. Ressource CSV « secteur_activite_v4_utf8.csv » .............................................................. 36 
+2.26.1. Description de la ressource....................................................................................... 36 
+2.26.2. Description des données .......................................................................................... 36 
+2.27. Ressource CSV « sous_secteur_activite_v4_utf8.csv » ..................................................... 37 
+2.27.1. Description de la ressource....................................................................................... 37 
+2.27.2. Description des données .......................................................................................... 37 
+2.28. Ressource CSV « arborescence_secteur_activite_v4_utf8.csv » ...................................... 38 
+2.28.1. Description de la ressource....................................................................................... 38 
+2.28.2. Description des données .......................................................................................... 38 
+2.29. Ressource CSV « secteur_naf_v4_utf8.csv » .................................................................... 39 
+2.29.1. Description de la ressource....................................................................................... 39 
+2.29.2. Description des données .......................................................................................... 39 
+2.30. Ressource CSV « arborescence_secteur_naf_v4_utf8.csv » ............................................. 40 
+2.30.1. Description de la ressource....................................................................................... 40 
+2.30.2. Description des données .......................................................................................... 40 
+3. Description des exports XML ........................................................................................................ 41 
+3.1. Ressource XML « arborescence_principale_v4_iso8859.xml » ............................................ 41 
+3.1.1. Description de la ressource .......................................................................................... 41 
+3.1.2. Description des données .............................................................................................. 41 
+3.2. Ressource XML « fiche_emploi_metier_v4_iso8859-15.xml » ............................................. 42 
+3.2.1. Description de la ressource .......................................................................................... 42 
+3.2.2. Description des données .............................................................................................. 42 
+3.3. Ressource XML « referentiel_competence_v4_iso8859-15.xml » ........................................ 47 
+3.3.1. Description de la ressource .......................................................................................... 47 
+3.3.2. Description des données .............................................................................................. 47 
+Description des exports de données du ROME 
+7 
+ 
+               C2 – Usage restreint 
+3.4. Resource XML « referentiel_appellation_v4_iso8859-15.xml » ........................................... 48 
+3.4.1. Description de la ressource .......................................................................................... 48 
+3.4.2. Description des données .............................................................................................. 48 
+3.5. Ressource XML « referentiel_code_rome_v4_iso8859-15.xml » ......................................... 49 
+3.5.1. Description de la ressource .......................................................................................... 49 
+3.5.2. Description des données .............................................................................................. 49 
+3.6. Ressource XML « referentiel_savoir_v4_iso8859-15.xml » .................................................. 50 
+3.6.1. Description de la ressource .......................................................................................... 50 
+3.6.2. Description des données .............................................................................................. 50 
+3.7. Ressource XML « referentiel_contexte_travail_v4_iso8859-15.xml » .................................. 51 
+3.7.1. Description de la ressource .......................................................................................... 51 
+3.7.2. Description des données .............................................................................................. 51 
+3.8. Ressource XML « arborescence_competence_v4_iso8859-15.xml » ................................... 52 
+3.8.1. Description de la ressource .......................................................................................... 52 
+3.8.2. Description des données .............................................................................................. 52 
+3.9. Ressource XML « arborescence_centre_interet_v4_iso8859-15.xml » ................................ 53 
+3.9.1. Description de la ressource .......................................................................................... 53 
+3.9.2. Description des données .............................................................................................. 53 
+3.10. Ressource XML « arborescence_thematique_v4_iso8859-15.xml » ................................ 54 
+3.10.1. Description de la ressource....................................................................................... 54 
+3.10.2. Description des données .......................................................................................... 54 
+3.11. Ressource XML « arborescence_secteur_activite_v4_iso8859-15.xml » .......................... 55 
+3.11.1. Description de la ressource....................................................................................... 55 
+3.11.2. Description des données .......................................................................................... 55 
+3.12. Ressource XML « arborescence_secteur_naf_v4_iso8859-15.xml » ................................ 56 
+3.12.1. Description de la ressource....................................................................................... 56 
+3.12.2. Description des données .......................................................................................... 56 
+4. Description des exports JSON ....................................................................................................... 57 
+4.1. Ressource JSON « arborescence_principale_v4.json » ......................................................... 57 
+4.1.1. Description de la ressource .......................................................................................... 57 
+4.1.2. Description des données .............................................................................................. 57 
+4.2. Ressource JSON « fiche_emploi_metier_v4.json » ............................................................... 58 
+4.2.1. Description de la ressource .......................................................................................... 58 
+4.2.2. Description des données .............................................................................................. 58 
+4.3. Ressource JSON « referentiel_competence_v4.json » ......................................................... 63 
+4.3.1. Description de la ressource .......................................................................................... 63 
+Description des exports de données du ROME 
+8 
+ 
+               C2 – Usage restreint 
+4.3.2. Description des données .............................................................................................. 63 
+4.4. Ressource JSON « referentiel_appellation_v4.json » ........................................................... 64 
+4.4.1. Description de la ressource .......................................................................................... 64 
+4.4.2. Description des données .............................................................................................. 64 
+4.5. Ressource JSON « referentiel_code_rome_v4.json » ........................................................... 65 
+4.5.1. Description de la ressource .......................................................................................... 65 
+4.5.2. Description des données .............................................................................................. 65 
+4.6. Ressource JSON « referentiel_savoir_v4.json » .................................................................... 66 
+4.6.1. Description de la ressource .......................................................................................... 66 
+4.6.2. Description des données .............................................................................................. 66 
+4.7. Ressource JSON « referentiel_contexte_travail_v4.json » ................................................... 67 
+4.7.1. Description de la ressource .......................................................................................... 67 
+4.7.2. Description des données .............................................................................................. 67 
+4.8. Ressource JSON « arborescence_competence_v4.json » ..................................................... 68 
+4.8.1. Description de la ressource .......................................................................................... 68 
+4.8.2. Description des données .............................................................................................. 68 
+4.9. Ressource JSON « arborescence_centre_interet_v4.json » ................................................. 69 
+4.9.1. Description de la ressource .......................................................................................... 69 
+4.9.2. Description des données .............................................................................................. 69 
+4.10. Ressource JSON « arborescence_thematique_v4.json » .................................................. 70 
+4.10.1. Description de la ressource....................................................................................... 70 
+4.10.2. Description des données .......................................................................................... 70 
+4.11. Ressource XML « arborescence_secteur_activite_v4.json » ............................................ 71 
+4.11.1. Description de la ressource....................................................................................... 71 
+4.11.2. Description des données .......................................................................................... 71 
+4.12. Ressource JSON « arborescence_secteur_naf_v4.json » .................................................. 72 
+4.12.1. Description de la ressource....................................................................................... 72 
+4.12.2. Description des données .......................................................................................... 72 
+Annexes ................................................................................................................................................ 73 
+ 
+ 
+Description des exports de données du ROME 
+9 
+ 
+               C2 – Usage restreint 
+Présentation 
+ 
+1.1. Objectif du document 
+ 
+Ce document a pour objectif de décrire les données du ROME mises à disposition en Open Data via des 
+fichiers d’exports aux formats CSV, XML et JSON. 
+Pour chaque fichier d’export, il sera indiqué une description de chaque champ. 
+ 
+1.2. Glossaire 
+ 
+Terme Définition 
+OGR Outil de Gestion du ROME 
+RIASEC Théorie qui identifie 6 types de personnalité en milieu professionnel (Réaliste, 
+Investigateur, Artistique, Social, Entreprenant, Conventionnel) 
+ROME Répertoire Opérationnel des Métiers et des Emplois 
+ 
+1.3. Présentation du ROME 
+ 
+Le ROME permet de référencer les métiers et emplois de tous les secteurs d’activité (ainsi que les 
+compétences / savoirs associés à ces métiers et emplois). 
+ 
+  
+Description des exports de données du ROME 
+10 
+ 
+               C2 – Usage restreint 
+2. Description des exports TXT/CSV 
+ 
+2.1. Ressource TXT « version.txt » 
+ 
+2.1.1. Description de la ressource 
+ 
+Cette ressource fournit l’identifiant de la version du référentiel, les dates de publication et validation 
+de la version, un commentaire sur la version et une description de son contenu par rapport à la 
+précédente. 
+ 
+2.1.2. Description des données 
+ 
+Le fichier texte contient 5 parties :  
+• Numero de version 
+• Date de publication 
+• Date de validation 
+• Titre/commentaire 
+• Description 
+  
+Description des exports de données du ROME 
+11 
+ 
+               C2 – Usage restreint 
+2.2. Ressource CSV “coherence_item_v4_utf8.csv” 
+ 
+2.2.1. Description de la ressource 
+ 
+Cette ressource fournit  la liste des identifiants ( codes OGR ) d’items de type macro-compétences, 
+compétences, savoirs ou contextes de travail associés à chaque ensemble de métier identifié par un 
+code ROME. 
+ 
+2.2.2. Description des données 
+ 
+Code champ Description 
+code_rome Identifiant d’un ensemble de métier (code sur 5 caractères) 
+code_ogr Identifiant unique d’un item (types d’item : macro-compétence, compétence, 
+savoir et contexte de travail) 
+coeur_metier 
+Information de si la compétence (macro-compétence, compétence ou savoir 
+référencés via code_ogr) est « Principale » ou « Émergente » dans le métier 
+ 
+Information non valorisée pour les contextes de travail 
+ 
+  
+Description des exports de données du ROME 
+12 
+ 
+               C2 – Usage restreint 
+2.3. Ressource CSV « composition_bloc_v4_utf8.csv »  
+ 
+2.3.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des blocs qui composent une fiche métier dans le but de structurer son 
+format et pouvoir le recomposer afin de disposer d’une fiche décrivant complètement un métier. 
+ 
+2.3.2. Description des données 
+ 
+Code champ Description 
+code_compo_bloc Identifiant technique unique du bloc, la valeur indique également l’ordre des 
+blocs pour constituer la fiche métier 
+libelle_bloc Libellé du bloc 
+ 
+  
+Description des exports de données du ROME 
+13 
+ 
+               C2 – Usage restreint 
+2.4. Ressource CSV « cr_gd_dp_appellations_v4_utf8.csv » 
+ 
+2.4.1. Description de la ressource 
+ 
+Cette ressource liste les grands domaines (gd), les domaines professionnels (dp), les métiers ainsi que 
+les appellations du référentiel ROME. 
+ 
+2.4.2. Description des données 
+ 
+Champ Description 
+code_grand_domaine 
+Identifiant fonctionnel du grand domaine (1 caractère) 
+Renseigné uniquement si l’enregistrement correspond à un grand 
+domaine (niveau 1). 
+code_domaine_professionnel 
+Identifiant fonctionnel du domaine professionnel (2 caractères) 
+Renseigné uniquement si l’enregistrement correspond à un 
+domaine professionnel (niveau 2). 
+numero_fiche_rome 
+Index du ROME dans le domaine professionnel (2 caractères) 
+Renseigné uniquement si l’enregistrement correspond à un métier 
+(niveau 3). 
+intitule 
+Intitulé du grand domaine, du domaine professionnel ou du métier 
+ROME. 
+Renseigné uniquement si l’enregistrement correspond à un grand 
+domaine, un domaine professionnel ou un métier (niveaux 1 à 3). 
+libelle_appellation_long Renseigné uniquement si l’enregistrement correspond à une 
+appellation (niveau 4). 
+libelle_appellation_court Renseigné uniquement si l’enregistrement correspond à une 
+appellation (niveau 4). 
+type_provenance 
+Indique si l’enregistrement correspond à un grand domaine, un 
+domaine professionnel, un métier ou une appellation : 
+1 (grand domaine) 
+2 (domaine professionnel) 
+3 (métier) 
+4 (appellation) 
+code_fiche 
+Identifiant technique de la fiche associé au métier 
+Renseigné uniquement si l’enregistrement correspond à une 
+appellation (niveau 4). 
+ogr_rome 
+Identifiant technique du métier 
+Renseigné uniquement si l’enregistrement correspond à une 
+appellation (niveau 4). 
+ogr_appellation 
+Identifiant technique de l’appellation du métier 
+Renseigné uniquement si l’enregistrement correspond à une 
+appellation (niveau 4). 
+  
+Description des exports de données du ROME 
+14 
+ 
+               C2 – Usage restreint 
+2.5. Ressource CSV « cr_gd_dp_v4_utf8.csv » 
+ 
+2.5.1. Description de la ressource 
+ 
+Cette ressource liste les métiers en indiquant le domaine professionnel et le grand  domaine auxquels 
+ils sont rattachés. 
+ 
+2.5.2. Description des données 
+ 
+Champ Description 
+code_rome Identifiant fonctionnel du métier (5 caractères) 
+libelle_rome Libellé du métier 
+code_grand_domaine Identifiant fonctionnel du grand domaine (1 caractère) 
+libelle_grand_domaine Libellé du grand domaine 
+code_domaine_professionel Identifiant fonctionnel du domaine professionnel (3 caractères) 
+libelle_domaine_professionnel Libellé du domaine professionnel 
+ 
+  
+Description des exports de données du ROME 
+15 
+ 
+               C2 – Usage restreint 
+2.6. Ressource CSV « descriptif_rubrique_v4_utf8.csv » 
+ 
+2.6.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des rubriques présentes par blocs dans une fiche métier. Cette 
+ressource est à mettre en lien avec la ressource CSV « composition_bloc_v4_utf8.csv ». 
+ 
+2.6.2. Description des données 
+ 
+Champ Description 
+code_rubrique Identifiant technique de la rubrique 
+code_compo_bloc Identifiant du bloc auquel est rattachée la rubrique 
+position_rubrique Position de la rubrique dans le bloc 
+libelle_rubrique Libellé de la rubrique 
+ 
+  
+Description des exports de données du ROME 
+16 
+ 
+               C2 – Usage restreint 
+2.7. Ressource CSV « domaine_professionnel_v4_utf8.csv » 
+ 
+2.7.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des domaines professionnels du référentiel ROME. Le domaine 
+professionnel a une granularité plus fine que le grand domaine. Un domaine professionnel regroupe 
+plusieurs métiers. 
+ 
+2.7.2. Description des données 
+ 
+Champ Description 
+code_domaine_professionel Identifiant fonctionnel du domaine professionnel 
+libelle_domaine_professionnel Libellé du domaine professionnel 
+ 
+  
+Description des exports de données du ROME 
+17 
+ 
+               C2 – Usage restreint 
+2.8. Ressource « grand_domaine_v4_utf8.csv » 
+ 
+2.8.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des grands domaines du référentiel ROME. Un grand domaine regroupe 
+plusieurs domaines professionnels. 
+ 
+2.8.2. Description des données 
+ 
+Champ Description 
+code_grand_domaine Identifiant fonctionnel du grand domaine 
+libelle_grand_domaine Libellé du grand domaine 
+ 
+  
+Description des exports de données du ROME 
+18 
+ 
+               C2 – Usage restreint 
+2.9. Ressource CSV « themes_v4_utf8.csv » 
+ 
+2.9.1. Description de la ressource 
+ 
+Cette ressource liste les différents thèmes auxquels des métiers peuvent être associés. 
+ 
+2.9.2. Description des données 
+ 
+Champ Description 
+code_theme Identifiant fonctionnel du thème 
+libelle_theme Libellé du thème 
+definition_theme Définition du thème 
+ 
+  
+Description des exports de données du ROME 
+19 
+ 
+               C2 – Usage restreint 
+2.10. Ressource CSV « item_v4_utf8.csv » 
+ 
+2.10.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des macro -compétences, compétences, savoirs et contextes de travail 
+avec leur code de rubrique.  Cette ressource est à mettre en lien avec la ressource CSV  
+« descriptif_rubrique_v4_utf8.csv ». 
+ 
+2.10.2. Description des données 
+ 
+Champ Description 
+code_ogr Identifiant technique des items (macro-compétence, compétence, 
+savoir, contexte de travail) 
+libelle Libellé de l’item 
+code_rubrique Code indiquant dans quelle rubrique se trouve l’item si une rubrique 
+est associée (sinon vide) 
+ 
+  
+Description des exports de données du ROME 
+20 
+ 
+               C2 – Usage restreint 
+2.11. Ressource CSV « liens_rome_referentiels_v4_utf8.csv » 
+ 
+2.11.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des liens et positions dans les fiches métier pour les items de type code 
+ROME, appellation, macro -compétence, compétence, savoir et contexte de travail.   Cette ressource 
+est à mettre en lien avec les ressources CSV « composition_bloc_v4_utf8.csv » et  
+« descriptif_rubrique_v4_utf8.csv ». 
+ 
+2.11.2. Description des données 
+ 
+Champ Description 
+code_rome Identifiant fonctionnel du métier 
+code_compo_bloc Code du bloc auquel est rattachée l’item du métier dans la fiche  
+code_rubrique Code de la rubrique à laquelle est rattaché l’item du métier dans la 
+fiche 
+code_ogr Identifiant technique de l’item (rattaché au métier) 
+ 
+  
+Description des exports de données du ROME 
+21 
+ 
+               C2 – Usage restreint 
+2.12. Ressource CSV « referentiel_macro_competence_riasec_v4_utf8.csv “  
+ 
+2.12.1. Description de la ressource 
+ 
+Cette ressource fournit les RIASEC associés aux macro-compétences. 
+ 
+2.12.2. Description des données 
+ 
+Champ Description 
+code_ogr Identifiant technique de la macro-compétence 
+riasec_majeur Code RIASEC de poids fort 
+riasec_mineur Code RIASEC de poids faible 
+ 
+  
+Description des exports de données du ROME 
+22 
+ 
+               C2 – Usage restreint 
+2.13. Ressource CSV « referentiel_competence_v4_utf8.csv » 
+ 
+2.13.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des macro-compétences et compétences du référentiel ROME. 
+ 
+2.13.2. Description des données 
+ 
+Champ Description 
+code_ogr Identifiant technique de l’item macro-compétence ou compétence 
+nature Indication si l’item est une « Macro-compétence » ou une 
+« Compétence » 
+libelle_competence Libellé de l’item 
+definition Description de l’item 
+code_ogr_macro_comp 
+Si l’item est une « Compétence », alors l’identifiant technique de 
+l’item macro-compétence auquel la compétence est rattachée, 
+sinon pas de valeur 
+code_macro_comp Si l’item est une « Macro-compétence », alors code fonctionnel de 
+la macro-compétence renseigné sinon pas de valeur 
+cat_comp Libellé de la catégorie de l’item 
+sous_cat_comp Libellé de la sous-catégorie de l’item 
+transition_eco Indication de si l’item est associé à la transition écologique 
+transition_num Indication de si l’item est associé à la notion de transition 
+numérique 
+libelle_heterogeneite Indication si l’item est hétérogène, homogène ou très homogène 
+libelle_origine Indication de l’origine de la compétence : Cléa, Cléa management 
+PIX, PIX emploi ou RECTEC 
+ 
+  
+Description des exports de données du ROME 
+23 
+ 
+               C2 – Usage restreint 
+2.14. Ressource CSV « referentiel_appellation_v4_utf8.csv » 
+ 
+2.14.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des appellations/emplois du référentiel ROME. 
+ 
+2.14.2. Description des données 
+ 
+Champ Description 
+code_ogr Identifiant technique de l’appellation/emploi 
+libelle_appellation_long Libellé long de l’appellation/emploi 
+libelle_appellation_court Libellé court de l’appellation/emploi 
+code_rome Identifiant fonctionnel du métier auquel est rattaché 
+l’appellation/emploi 
+transition_eco 
+Indication du niveau d’association à la transition écologique de 
+l’appellation/emploi 
+ 
+Valeurs possibles : Emploi stratégique pour la Transition 
+écologique, Emploi Vert, Emploi Blanc, Emploi Brun 
+transition_num Indication de si l’appellation/emploi est associé à la transition 
+numérique 
+transition_demo Indication de si l’appellation/emploi est associé à la transition 
+démographique 
+emploi_reglemente Indication de si l’appellation/emploi est un emploi réglementé 
+emploi_cadre Indication de si l’appellation/emploi est un emploi cadre 
+classification 
+Classification de l’appellation/emploi 
+ 
+Valeurs possibles : PRINCIPALE ou SYNONYME 
+origine 
+Nom de la structure/de l’organisme ayant défini cette 
+appellation/emploi 
+ 
+Valeurs possibles : Cléa, Cléa management, PIX, PIX emploi, RECTEC 
+code_rome_parent 
+Correspond au code ROME d’origine de l’appellation si elle existait 
+avant la version Iota (09/2023) du référentiel 
+Si l’appellation est nouvellement créée, alors correspond au code 
+parent du métier (lié via code_rome) auquel l’appellation est 
+rattachée 
+Description des exports de données du ROME 
+24 
+ 
+               C2 – Usage restreint 
+peu_usite 
+Indication de si l’appellation apparaitra ou non dans la fiche du 
+métier auquel l’appellation est associée via code_rome 
+ 
+Valeurs possibles : O ou N 
+ 
+  
+Description des exports de données du ROME 
+25 
+ 
+               C2 – Usage restreint 
+2.15. Ressource CSV « referentiel_code_rome_riasec_v4_utf8.csv » 
+ 
+2.15.1. Description de la ressource 
+ 
+Cette ressource fournit les RIASEC associés aux métiers. 
+ 
+2.15.2. Description des données 
+ 
+Champ Description 
+code_rome Identifiant fonctionnel du métier 
+riasec_majeur Code RIASEC de poids fort 
+riasec_mineur Code RIASEC de poids faible 
+ 
+  
+Description des exports de données du ROME 
+26 
+ 
+               C2 – Usage restreint 
+2.16. Ressource CSV « referentiel_code_rome_v4_utf8.csv » 
+ 
+2.16.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des métiers du référentiel ROME. 
+ 
+2.16.2. Description des données 
+ 
+Champ Description 
+code_rome Identifiant fonctionnel du métier 
+code_fiche_metier Identifiant technique de la fiche du métier 
+code_ogr Identifiant technique du métier 
+libelle_rome Libellé du métier 
+transition_eco 
+Indication du niveau d’association à la transition écologique du métier 
+ 
+Valeurs possibles : Emploi stratégique pour la Transition écologique, Emploi 
+Vert, Emploi Blanc, Emploi Brun 
+transition_num Indication de si le métier est associé à la transition numérique 
+transition_demo Indication de si le métier est associé à la transition démographique 
+emploi_reglemente Indication de si le métier est un métier réglementé 
+emploi_cadre Indication de si le métier est un métier cadre 
+code_rome_parent Identifiant fonctionnel du métier dont peut dériver/hériter le métier 
+ 
+  
+Description des exports de données du ROME 
+27 
+ 
+               C2 – Usage restreint 
+2.17. Ressource CSV « referentiel_savoir_v4_utf8.csv » 
+ 
+2.17.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des savoirs du référentiel ROME. 
+ 
+2.17.2. Description des données 
+ 
+Champ Description 
+code_ogr_savoir Identifiant technique du savoir 
+libelle_savoir Libellé du savoir 
+categorie_savoir Libellé de la catégorie du savoir 
+sous_categorie_savoir Libellé de la sous-catégorie du savoir 
+transition_eco Indication de si l’item est associé à la transition écologique 
+transition_num Indication de si l’item est associé à la notion de transition numérique 
+ 
+  
+Description des exports de données du ROME 
+28 
+ 
+               C2 – Usage restreint 
+2.18. Ressource CSV « referentiel_contexte_travail_v4_utf8.csv » 
+ 
+2.18.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des contextes de travail du référentiel ROME. 
+ 
+2.18.2. Description des données 
+ 
+Champ Description 
+code_ogr Identifiant technique du contexte de travail 
+libelle_cont_travail Libellé du contexte de travail 
+code_type_cont_trav Code du type de contexte de travail 
+libelle_type_cont_trav Libellé du type de contexte de travail 
+ 
+  
+Description des exports de données du ROME 
+29 
+ 
+               C2 – Usage restreint 
+2.19. Ressource CSV « rubrique_mobilite_v4_utf8.csv » 
+ 
+2.19.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des mobilités possibles entre un métier et un autre métier 
+ 
+2.19.2. Description des données 
+ 
+Champ Description 
+code_rome Identifiant fonctionnel du métier considéré 
+code_rome_cible Identifiant fonctionnel du métier ciblé par la mobilité 
+numero_ordre Index de tri des mobilités par pertinence 
+ 
+  
+Description des exports de données du ROME 
+30 
+ 
+               C2 – Usage restreint 
+2.20. Ressource CSV « texte_v4_utf8.csv » 
+ 
+2.20.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des textes présents sur une fiche métier. Cette ressource est à mettre 
+en lien avec la ressource CSV « composition_bloc_v4_utf8.csv ». 
+ 
+2.20.2. Description des données 
+ 
+Champ Description 
+code_rome  Identifiant fonctionnel du métier 
+code_compo_bloc Code du bloc auquel est rattachée l’item du métier dans la fiche 
+libelle_type_texte Libellé du type de texte 
+position_phrase Position de la phrase dans le texte 
+libelle_texte Libellé du texte divisé par phrase 
+ 
+  
+Description des exports de données du ROME 
+31 
+ 
+               C2 – Usage restreint 
+2.21. Ressource CSV « type_referentiel_v4_utf8.csv » 
+ 
+2.21.1. Description de la ressource 
+ 
+Cette ressource fournit la liste des types de référentiels. 
+Export vide pour des raison de simplification du contenu des exports. 
+ 
+2.21.2. Description des données 
+ 
+Champ Description 
+code_type_referentiel Identifiant technique du type de référentiel 
+libelle_type_referentiel Libellé du type de référentiel 
+ 
+  
+Description des exports de données du ROME 
+32 
+ 
+               C2 – Usage restreint 
+2.22. Ressource CSV « arborescence_competences_v4_utf8.csv » 
+ 
+2.22.1. Description de la ressource 
+ 
+Cette ressource fournit une organisation des items de compétences dans une arborescence avec 
+comme niveaux de regroupement  : domaine de compétence , enjeu, objectif, macro -compétence, 
+compétence. 
+Si aucune compétence n’est rattachée à une macro-compétence, cette macro-compétence est tout de 
+même affichée. Par conséquent, les colonnes «  code_ogr_competence » et «  libelle_competence » 
+peuvent être non remplies. 
+ 
+2.22.2. Description des données 
+ 
+Code champ Description 
+domaine_competence Premier niveau de regroupement des items compétences 
+enjeu Deuxième niveau de regroupement des items compétences 
+objectif Troisième niveau de regroupement des items compétences 
+code_ogr_macro_competence Identifiant technique de la macro-compétence 
+libelle_macro_competence Libellé de la macro-compétence 
+code_ogr_competence Identifiant technique de la compétence rattachée à la macro-
+compétence 
+libelle_competence Libellé de la compétence rattaché à la macro-compétence 
+ 
+  
+Description des exports de données du ROME 
+33 
+ 
+               C2 – Usage restreint 
+2.23. Ressource CSV « centre_interet_v4_utf8.csv » 
+ 
+2.23.1. Description de la ressource 
+ 
+Cette ressource les centres d’intérêt pouvant être associés à un métier. 
+ 
+2.23.2. Description des données 
+ 
+Champ Description 
+code_centre_interet Identifiant technique du centre d’intérêt 
+libelle_centre_interet Libellé du centre d’intérêt 
+definition_centre_interet Définition du centre d’intérêt 
+ 
+  
+Description des exports de données du ROME 
+34 
+ 
+               C2 – Usage restreint 
+2.24. Ressource CSV « arborescence_centre_interet_v4_utf8.csv » 
+ 
+2.24.1. Description de la ressource 
+ 
+Cette ressource décrit l’association de métiers avec des centres d’intérêt. 
+ 
+2.24.2. Description des données 
+ 
+Champ Description 
+code_centre_interet Identifiant technique du centre d’intérêt  
+libelle_centre_interet Libellé du centre d’intérêt  
+code_ogr_rome Identifiant technique du métier associé au centre d’intérêt 
+code_rome Identifiant fonctionnel du métier associé au centre d’intérêt 
+libelle_rome Libelle du métier associé au centre d’intérêt 
+principal Information de s’il s’agit du centre d’intérêt principal du métier 
+ 
+ 
+  
+Description des exports de données du ROME 
+35 
+ 
+               C2 – Usage restreint 
+2.25. Ressource CSV « arborescence_thematique_v4_utf8.csv » 
+ 
+2.25.1. Description de la ressource 
+ 
+Cette ressource décrit l’association de métiers avec des thèmes. 
+ 
+2.25.2. Description des données 
+ 
+Champ Description 
+code_theme Identifiant fonctionnel du thème  
+libelle_theme Libellé du thème 
+code_ogr_rome Identifiant technique du métier associé au thème 
+code_rome Identifiant fonctionnel du métier associé au thème 
+libelle_rome Libelle du métier associé au thème 
+ 
+ 
+  
+Description des exports de données du ROME 
+36 
+ 
+               C2 – Usage restreint 
+2.26. Ressource CSV « secteur_activite_v4_utf8.csv » 
+ 
+2.26.1. Description de la ressource 
+ 
+Cette ressource décrit les secteurs d’activité d’un métier. 
+ 
+2.26.2. Description des données 
+ 
+Champ Description 
+code_sect_activite Identifiant technique du secteur d’activité  
+libelle_sect_activite Libellé du secteur d’activité 
+definition_sect_activite Définition du secteur d’activité 
+ 
+  
+Description des exports de données du ROME 
+37 
+ 
+               C2 – Usage restreint 
+2.27. Ressource CSV « sous_secteur_activite_v4_utf8.csv » 
+ 
+2.27.1. Description de la ressource 
+ 
+Cette ressource décrit les sous-secteurs d’activité d’un secteur d’activité. 
+ 
+2.27.2. Description des données 
+ 
+Champ Description 
+code_ss_sect_activite Identifiant technique du sous-secteur d’activité  
+libelle_ss_sect_activite Libellé du sous-secteur d’activité 
+definition_ss_sect_activite Définition du sous-secteur d’activité 
+code_sect_activite Identifiant technique du secteur d’activité auquel est associé le sous-
+secteur 
+ 
+ 
+  
+Description des exports de données du ROME 
+38 
+ 
+               C2 – Usage restreint 
+2.28. Ressource CSV « arborescence_secteur_activite_v4_utf8.csv » 
+ 
+2.28.1. Description de la ressource 
+ 
+Cette ressource décrit l’association de métiers avec des secteurs ou des sous-secteurs d’activité. 
+ 
+2.28.2. Description des données 
+ 
+Champ Description 
+code_sect_activite Identifiant technique du secteur d’activité  
+libelle_sect_activite Libellé du secteur d’activité 
+code_ss_sect_activite Identifiant technique du sous-secteur d’activité  
+libelle_ss_sect_activite Libellé du sous-secteur d’activité 
+code_ogr_rome Identifiant technique du métier associé au secteur ou sous-secteur 
+d’activité 
+code_rome Identifiant fonctionnel du métier associé au secteur ou sous-secteur 
+d’activité 
+libelle_rome Libelle du métier associé au secteur ou sous-secteur d’activité 
+principal Information de s’il s’agit du secteur d’activité principal du métier 
+ 
+  
+Description des exports de données du ROME 
+39 
+ 
+               C2 – Usage restreint 
+2.29. Ressource CSV « secteur_naf_v4_utf8.csv » 
+ 
+2.29.1. Description de la ressource 
+ 
+Cette ressource décrit les secteurs NAF (Nomenclature d’Activité Française). 
+ 
+2.29.2. Description des données 
+ 
+Champ Description 
+code_tech_secteur_naf Identifiant technique du secteur NAF  
+code_secteur_naf Identifiant fonctionnel du secteur NAF 
+libelle_secteur_naf Libellé du secteur NAF  
+ 
+  
+Description des exports de données du ROME 
+40 
+ 
+               C2 – Usage restreint 
+2.30. Ressource CSV « arborescence_secteur_naf_v4_utf8.csv » 
+ 
+2.30.1. Description de la ressource 
+ 
+Cette ressource décrit les secteurs NAF (Nomenclature d’Activité Française). 
+ 
+2.30.2. Description des données 
+ 
+Champ Description 
+code_secteur_naf Identifiant fonctionnel du secteur NAF 
+libelle_secteur_naf Libellé du secteur NAF  
+code_ogr_rome Identifiant technique du métier  
+code_rome Identifiant fonctionnel du métier 
+libelle_rome Libellé du métier  
+ 
+  
+Description des exports de données du ROME 
+41 
+ 
+               C2 – Usage restreint 
+3. Description des exports XML 
+ 
+3.1. Ressource XML « arborescence_principale_v4_iso8859.xml » 
+ 
+3.1.1. Description de la ressource 
+ 
+Cette ressource décrit la composition de l’arborescence principale du ROME. 
+ 
+3.1.2. Description des données 
+  
+  
+<arbo_principale> (liste)
+<grand_domaine>
+<code_metier> <libelle> <liste_domaine_prof>
+<domaine_prof>
+<code_metier> <libelle> <liste_metier>
+<metier>
+<code_ogr_rome> <code_rome> <libelle_rome>
+Description des exports de données du ROME 
+42 
+ 
+               C2 – Usage restreint 
+ 
+3.2. Ressource XML « fiche_emploi_metier_v4_iso8859-15.xml » 
+ 
+3.2.1. Description de la ressource 
+ 
+Cette ressource liste les différents items des fiches métiers. 
+ 
+3.2.2. Description des données 
+ 
+Description des exports de données du ROME 
+43 
+ 
+               C2 – Usage restreint 
+3.2.2.1. Description des données en fonction des rubriques 
+ 
+  
+<fiches_metier> (liste) <fiche_metier>
+<numero>
+<rome>
+<appellations> (liste)
+<definition>
+<acces_metier>
+<competences>
+<contextes_travail> 
+(liste)
+<secteurs_activite>
+<mobilites>
+Description des exports de données du ROME 
+44 
+ 
+               C2 – Usage restreint 
+3.2.2.2. Description des données du bloc ROME 
+ 
+ 
+ 
+3.2.2.3. Description des données du bloc Appellations 
+ 
+ 
+  
+<rome>
+<code_rome>
+<intitule>
+<code_ogr>
+<appellations> (liste) <appellation>
+<libelle>
+<libelle_court>
+<code_ogr>
+Description des exports de données du ROME 
+45 
+ 
+               C2 – Usage restreint 
+3.2.2.4. Description des données du bloc Compétences 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+3.2.2.5. Description des données du bloc Contextes de travail 
+ 
+ 
+ 
+ 
+<contexte_travail> 
+(liste) <type_contexte>
+<libelle>
+<items> 
+(liste) <item>
+<libelle>
+<code_ogr>
+<competences>
+<savoir
+_faire>
+<enjeux>  
+(liste) <enjeu>
+<libelle>
+<items> 
+(liste) <item>
+<libelle>
+<code_ogr>
+<coeur_metier>
+<savoir
+_etre_
+profess
+ionel>
+<enjeux> 
+(liste) <enjeu>
+<libelle>
+<items> 
+(liste) <item>
+<libelle>
+<code_ogr>
+<coeur_metier>
+<savoirs> <categories> 
+(liste) <categorie>
+<libelle>
+<items> 
+(liste) <item>
+<libelle>
+<code_ogr>
+<coeur_metier>
+Description des exports de données du ROME 
+46 
+ 
+               C2 – Usage restreint 
+3.2.2.6. Description des données du bloc Secteur d’activité 
+ 
+ 
+ 
+3.2.2.7. Description des données du bloc Mobilités 
+ 
+ 
+ 
+ 
+  
+<secteurs_activite> <secteur_activite>
+<code>
+<libelle>
+<principal>
+<mobilites> <mobilite>
+<rome_cible>
+<code_ogr_rome_cible>
+<ordre_mobilite>
+Description des exports de données du ROME 
+47 
+ 
+               C2 – Usage restreint 
+3.3. Ressource XML « referentiel_competence_v4_iso8859-15.xml » 
+ 
+3.3.1. Description de la ressource 
+ 
+Cette ressource liste les différentes macro-compétences et compétences. 
+ 
+MC : Macro-compétence 
+comp. : Compétence 
+ 
+3.3.2. Description des données 
+ 
+ 
+<ogr> (liste) <Item_referentiel_competence>
+<code_ogr>
+<libelle>
+<libelle_categorie>
+<libelle_sous_categorie>
+<code_macro_comp>
+<code_ogr_macro_comp_rattachement>
+<libelle_nature>
+<definition_comp>
+<transition_eco>
+<transition_num>
+<libelle_heterogeneite>
+<libelle_origine>
+Description des exports de données du ROME 
+48 
+ 
+               C2 – Usage restreint 
+3.4. Resource XML « referentiel_appellation_v4_iso8859-15.xml » 
+ 
+3.4.1. Description de la ressource 
+ 
+Cette ressource liste les différentes appellations. 
+ 
+3.4.2. Description des données 
+ 
+ 
+ 
+<ogr> (liste) <item_referentiel_appellation>
+<code_ogr>
+<libelle>
+<libelle_court>
+<transition_eco>
+<transition_num>
+<transition_demo>
+<emploi_reglemente>
+<emploi_cadre>
+<classification>
+<origine>
+<code_rome_parent>
+<peu_usite>
+Description des exports de données du ROME 
+49 
+ 
+               C2 – Usage restreint 
+3.5. Ressource XML « referentiel_code_rome_v4_iso8859-15.xml » 
+ 
+3.5.1. Description de la ressource 
+ 
+Cette ressource liste les différents métiers (ROME). 
+ 
+3.5.2. Description des données 
+ 
+ 
+  
+<ogr> (liste) <item_referentiel_code_rome>
+<code_ogr>
+<code_rome>
+<libelle>
+<transition_eco>
+<transition_num>
+<transition_demo>
+<empoi_reglemente>
+<empoi_cadre>
+<code_rome_parent>
+Description des exports de données du ROME 
+50 
+ 
+               C2 – Usage restreint 
+3.6. Ressource XML « referentiel_savoir_v4_iso8859-15.xml » 
+ 
+3.6.1. Description de la ressource 
+ 
+Cette ressource liste les différents savoirs. 
+ 
+ 
+3.6.2. Description des données 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<ogr> (liste) <item_referentiel_savoir>
+<code_ogr>
+<libelle>
+<libelle_categorie>
+<libelle_sous_categorie>
+<libelle_nature>
+<transition_eco>
+<transition_num>
+Description des exports de données du ROME 
+51 
+ 
+               C2 – Usage restreint 
+3.7. Ressource XML « referentiel_contexte_travail_v4_iso8859-15.xml » 
+ 
+3.7.1. Description de la ressource 
+ 
+Cette ressource liste les différents contextes de travail. 
+ 
+ 
+3.7.2. Description des données 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<ogr> (liste) <item_referentiel_contexte_travail>
+<code_ogr>
+<libelle>
+<type_contexte>
+Description des exports de données du ROME 
+52 
+ 
+               C2 – Usage restreint 
+3.8. Ressource XML « arborescence_competence_v4_iso8859-15.xml » 
+ 
+3.8.1. Description de la ressource 
+ 
+Cette ressource fournit une organisation des items de compétences. 
+ 
+ 
+3.8.2. Description des données 
+  
+ 
+<ogr>
+<arborescence_competence> (liste)
+<domaine_competence>
+<liste_enjeux>
+<enjeu>
+<libelle_enjeu> <code_fonctionnel_enjeu> <liste_objectifs>
+<objectif>
+<liste_macro_competences>
+<macro_competence>
+<libelle_macro
+_competence> <code_fonctionnel_macro_competence> <liste_competences>
+<competence>
+<code_ogr_competence> <libelle_competence>
+<libelle_objectif> <code_fonctionnel_objectif>
+<libelle_domaine_
+competence>
+<code_fonctionnel_domaine
+_competence>
+Description des exports de données du ROME 
+53 
+ 
+               C2 – Usage restreint 
+3.9. Ressource XML « arborescence_centre_interet_v4_iso8859-15.xml » 
+ 
+3.9.1. Description de la ressource 
+ 
+Cette ressource décrit la composition de l’arborescence des centres d’intérêt. 
+ 
+3.9.2. Description des données 
+ 
+ 
+  
+<arbo_centre_interet> 
+(liste)
+<centre_interet>
+<libelle_centre_interet> <definition_centre_interet
+> <liste_metier>
+<metier>
+<code_ogr_rome> <code_rome> <libelle_rome> <principal>
+Description des exports de données du ROME 
+54 
+ 
+               C2 – Usage restreint 
+3.10. Ressource XML « arborescence_thematique_v4_iso8859-15.xml » 
+ 
+3.10.1. Description de la ressource 
+ 
+Cette ressource décrit la composition de l’arborescence thématique du ROME. 
+ 
+3.10.2. Description des données 
+ 
+ 
+  
+<arbo_thematique> 
+(liste) <theme>
+<code_theme>
+<libelle_theme>
+<definition_theme>
+<liste_metier> <metier>
+<code_ogr_rome>
+<code_rome>
+<libelle_rome>
+Description des exports de données du ROME 
+55 
+ 
+               C2 – Usage restreint 
+3.11. Ressource XML « arborescence_secteur_activite_v4_iso8859-15.xml » 
+ 
+3.11.1. Description de la ressource 
+ 
+Cette ressource décrit la composition de l’arborescence des secteurs d’activité du ROME. 
+ 
+3.11.2. Description des données 
+ 
+3.11.2.1. Racine de l’arborescence 
+ 
+ 
+ 
+3.11.2.2. Eléments métier 
+ 
+<arbo_secteur> (liste)
+<secteur>
+<code_secteur> <libelle> <definition>
+<liste_sous
+_secteur> 
+(liste)
+<sous_secteur>
+<code_sous
+_secteur> <libelle> <definition> <liste_metier> 
+(liste)
+<liste_metier> 
+(liste)
+<liste_
+metier>
+<metier>
+<code_ogr_rome>
+<code_rome>
+<libelle_rome>
+<principal>
+<liste_
+metier>
+<metier>
+<code_ogr_rome>
+<code_rome>
+<libelle_rome>
+Description des exports de données du ROME 
+56 
+ 
+               C2 – Usage restreint 
+3.12. Ressource XML « arborescence_secteur_naf_v4_iso8859-15.xml » 
+ 
+3.12.1. Description de la ressource 
+ 
+Cette ressource décrit la composition de l’arborescence des secteurs NAF. 
+ 
+3.12.2. Description des données 
+ 
+  
+<arbo_secteur_naf> (liste)
+<secteur_naf>
+<libelle_secteur_naf> <liste_metier>
+<metier>
+<code_ogr_rome> <code_rome> <libelle_rome>
+Description des exports de données du ROME 
+57 
+ 
+               C2 – Usage restreint 
+4. Description des exports JSON 
+ 
+4.1. Ressource JSON « arborescence_principale_v4.json » 
+ 
+4.1.1. Description de la ressource 
+ 
+Cette ressource décrit la composition des arborescences du ROME. 
+ 
+4.1.2. Description des données 
+ 
+   
+ 
+ 
+ 
+ 
+{
+arbo_principale []
+code_metier libelle liste_domaine_prof []
+code_metier libelle liste_metier []
+code_ogr code_metier libelle
+Description des exports de données du ROME 
+58 
+ 
+               C2 – Usage restreint 
+ 
+4.2. Ressource JSON « fiche_emploi_metier_v4.json » 
+ 
+4.2.1. Description de la ressource 
+ 
+Cette ressource liste les différents items des fiches métiers. 
+ 
+4.2.2. Description des données 
+ 
+4.2.2.1. Description des données en fonction des rubriques 
+ 
+ 
+[
+numero
+rome
+appelations (liste)
+definition
+acces_metier
+competences
+contexte_travail (liste)
+secteurs_activite
+mobilite
+Description des exports de données du ROME 
+59 
+ 
+               C2 – Usage restreint 
+  
+Description des exports de données du ROME 
+60 
+ 
+               C2 – Usage restreint 
+4.2.2.2. Description des données du bloc ROME 
+ 
+ 
+ 
+ 
+ 
+ 
+4.2.2.3. Description des données du bloc Appellations 
+ 
+ 
+ 
+ 
+rome
+code_rome
+intitule
+code_ogr
+appelations []
+libelle
+libelle_court
+code_ogr
+Description des exports de données du ROME 
+61 
+ 
+               C2 – Usage restreint 
+4.2.2.4. Description des données du bloc Compétences 
+ 
+ 
+ 
+4.2.2.5. Description des données du bloc Contextes de travail 
+ 
+  
+competences
+savoir_faire enjeux []
+libelle
+items []
+libelle
+code_ogr
+coeur_metier
+savoir_etre_
+professionel enjeux []
+libelle
+items []
+libelle
+code_ogr
+coeur_metier
+savoirs categories []
+libelle
+items []
+libelle
+code_ogr
+coeur_metier
+contextes_travail []
+libelle
+items []
+libelle
+code_ogr
+Description des exports de données du ROME 
+62 
+ 
+               C2 – Usage restreint 
+4.2.2.6. Description des données du bloc Secteurs d’activité 
+ 
+ 
+ 
+4.2.2.7. Description des données du bloc Mobilités 
+ 
+ 
+ 
+  
+secteurs_activite []
+code
+libelle
+principal
+mobilites []
+rome_cible
+code_org_rome_cible
+ordre_mobilite
+Description des exports de données du ROME 
+63 
+ 
+               C2 – Usage restreint 
+4.3. Ressource JSON « referentiel_competence_v4.json » 
+ 
+4.3.1. Description de la ressource 
+ 
+Cette ressource liste les différentes macro-compétences et compétences 
+ 
+4.3.2. Description des données 
+ 
+ 
+ 
+{ item_referentiel_competence []
+code_ogr
+libelle
+code_categorie
+libelle_sous_cate
+gorie
+code_macro_co
+mp
+libelle_nature
+definition_comp
+transition_eco
+transition_num
+libelle_heteroge
+neite
+libelle_origine
+Description des exports de données du ROME 
+64 
+ 
+               C2 – Usage restreint 
+4.4. Ressource JSON « referentiel_appellation_v4.json » 
+ 
+4.4.1. Description de la ressource 
+ 
+Cette ressource liste les différentes appellations. 
+ 
+ 
+4.4.2. Description des données 
+ 
+ 
+ 
+  
+[
+code_ogr
+libelle
+libelle_court
+transition_eco
+transtion_num
+transition_demo
+emploi_reglemente
+emploi_cadre
+classification
+origine
+code_rome_parent
+peu_usite
+Description des exports de données du ROME 
+65 
+ 
+               C2 – Usage restreint 
+4.5. Ressource JSON « referentiel_code_rome_v4.json » 
+ 
+4.5.1. Description de la ressource 
+ 
+Cette ressource liste les différents ROME. 
+ 
+ 
+4.5.2. Description des données 
+ 
+ 
+  
+[
+code_ogr
+code_rome
+libelle
+transition_eco
+transition_num
+transition_demo
+emploi_reglemente
+emploi_cadre
+code_rome_parent
+Description des exports de données du ROME 
+66 
+ 
+               C2 – Usage restreint 
+4.6. Ressource JSON « referentiel_savoir_v4.json » 
+ 
+4.6.1. Description de la ressource 
+ 
+Cette ressource liste les différents savoirs. 
+ 
+ 
+4.6.2. Description des données 
+ 
+ 
+ 
+  
+[
+code_ogr
+libelle
+libelle_categorie
+libelle_sous_categorie
+libelle_nature
+transition_eco
+transition_num
+Description des exports de données du ROME 
+67 
+ 
+               C2 – Usage restreint 
+4.7. Ressource JSON « referentiel_contexte_travail_v4.json » 
+ 
+4.7.1. Description de la ressource 
+ 
+Cette ressource liste les différents contextes de travail. 
+ 
+ 
+4.7.2. Description des données 
+ 
+  
+[
+code_ogr
+libelle
+type_contexte
+Description des exports de données du ROME 
+68 
+ 
+               C2 – Usage restreint 
+4.8. Ressource JSON « arborescence_competence_v4.json » 
+ 
+4.8.1. Description de la ressource 
+ 
+Cette ressource fournit une organisation des items de compétences. 
+ 
+4.8.2. Description des données 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+{
+arborescence_comp
+etence
+domaine_compete
+nce []
+libelle_dom
+aine_compe
+tence
+code_fonctionnel_do
+maine_competence
+liste_enje
+ux []
+liste_objecti
+fs []
+libelle_obje
+ctif
+code_fonctio
+nnel_enjeu
+liste_macro_competence 
+[]
+code_ogr_m
+acro_compet
+ence
+libelle_mac
+ro_compet
+ence
+code_fonctionnel_macro
+_competence
+liste_competence 
+[]
+code_ogr_competence libelle_competence
+libelle_en
+jeu
+code_fonctio
+nnel_enjeu
+Description des exports de données du ROME 
+69 
+ 
+               C2 – Usage restreint 
+4.9. Ressource JSON « arborescence_centre_interet_v4.json » 
+ 
+4.9.1. Description de la ressource 
+ 
+Cette ressource décrit la composition de l’arborescence des centres d’intérêt. 
+ 
+4.9.2. Description des données 
+ 
+ 
+  
+{ arbo_centre_interet []
+libelle_centre_inter
+et
+definition_centre_interet
+liste_metier []
+code_ogr_rome
+code_rome
+libelle_rome
+principal
+Description des exports de données du ROME 
+70 
+ 
+               C2 – Usage restreint 
+4.10. Ressource JSON « arborescence_thematique_v4.json » 
+ 
+4.10.1. Description de la ressource 
+ 
+Cette ressource décrit la composition de l’arborescence thématique. 
+ 
+4.10.2. Description des données 
+ 
+ 
+  
+{ arbo_thematique []
+code_theme
+libelle_theme
+definition_theme
+liste_metier []
+code_ogr_rome
+code_rome
+libelle_rome
+Description des exports de données du ROME 
+71 
+ 
+               C2 – Usage restreint 
+4.11. Ressource XML « arborescence_secteur_activite_v4.json » 
+ 
+4.11.1. Description de la ressource 
+ 
+Cette ressource décrit la composition de l’arborescence des secteurs d’activité du ROME. 
+ 
+4.11.2. Description des données 
+ 
+4.11.2.1. Racine de l’arborescence 
+ 
+ 
+ 
+4.11.2.2. Eléments métier 
+ 
+{
+arbo_secteur []
+code_secteur libelle definition
+liste_sous
+_secteur 
+[]
+code_sous
+_secteur libelle definition liste_metier []
+liste_metier 
+[]
+liste_metier []
+code_ogr_rome
+code_rome
+libelle_rome
+principal
+liste_metier []
+code_ogr_rome
+code_rome
+libelle_rome
+Description des exports de données du ROME 
+72 
+ 
+               C2 – Usage restreint 
+4.12. Ressource JSON « arborescence_secteur_naf_v4.json » 
+ 
+4.12.1. Description de la ressource 
+ 
+Cette ressource décrit la composition de l’arborescence des secteurs NAF. 
+ 
+4.12.2. Description des données 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+{ arbo_secteur_naf []
+libelle_secteur_naf
+liste_metier []
+code_ogr_rome
+code_rome
+libelle_rome
+Description des exports de données du ROME 
+73 
+ 
+               C2 – Usage restreint 
+Annexes 
+Figure 1: Schéma OPEN DATA CSV ....................................................................................................... 74 
+Figure 2: Schéma OPEN DATA XML ...................................................................................................... 75 
+Figure 3: Schéma OPEN DATA JSON ..................................................................................................... 76 
+  
+Description des exports de données du ROME 
+74 
+ 
+               C2 – Usage restreint 
+ 
+Figure 1: Schéma OPEN DATA CSV 
+
+Description des exports de données du ROME 
+75 
+ 
+               C2 – Usage restreint 
+ 
+ 
+Figure 2: Schéma OPEN DATA XML 
+
+Description des exports de données du ROME 
+76 
+ 
+               C2 – Usage restreint 
+ 
+ 
+Figure 3: Schéma OPEN DATA JSON 

@@ -1,0 +1,402 @@
+{
+  "_meta": {
+    "captured_at": "2026-09-08",
+    "base_url": "https://data.geopf.fr/geocodage",
+    "note": "Real responses captured with curl (trimmed to a few features). api-adresse.data.gouv.fr returned byte-identical bodies for the same requests but with Deprecation/Sunset headers (31 Jan 2026).",
+    "requests": {
+      "search": "GET https://data.geopf.fr/geocodage/search?q=8%20bd%20du%20port&limit=3",
+      "search_paris_arrondissement": "GET https://data.geopf.fr/geocodage/search?q=10%20rue%20de%20rivoli%20paris&limit=1",
+      "search_municipality": "GET https://data.geopf.fr/geocodage/search?q=lyon&type=municipality&limit=1",
+      "reverse": "GET https://data.geopf.fr/geocodage/reverse?lon=2.37&lat=48.357 (trimmed to 2 features)",
+      "error_400": "GET https://data.geopf.fr/geocodage/search?q=ab"
+    },
+    "response_headers_observed": {
+      "content-type": "application/json; charset=utf-8",
+      "access-control-allow-origin": "*",
+      "ratelimit-limit": "50",
+      "x-ratelimit-limit-second": "1"
+    },
+    "followup_2026_09_09": {
+      "captured_at": "2026-09-09",
+      "note": "Second capture. api-adresse.data.gouv.fr still answers HTTP 200 with the same body as data.geopf.fr but carries Deprecation/Sunset (31 Jan 2026) and x-api-* migration headers. cartes.gouv.fr news of 23 March 2026 announced the end of the redirection on 14 April 2026; still served on 2026-09-09.",
+      "legacy_response_headers_observed": {
+        "x-ratelimit-limit-second": "1",
+        "ratelimit-limit": "50",
+        "access-control-allow-origin": "*",
+        "location": "https://data.geopf.fr/geocodage/search/?q=8%20bd%20du%20port&limit=1",
+        "deprecation": "Sat, 31 Jan 2026 22:59:59 GMT",
+        "sunset": "Sat, 31 Jan 2026 22:59:59 GMT",
+        "x-api-deprecated": "true",
+        "x-api-new-host": "https://data.geopf.fr/geocodage/",
+        "x-api-old-host": "https://api-adresse.data.gouv.fr",
+        "x-api-migration": "permanent",
+        "x-api-notice": "L'URL api-adresse.data.gouv.fr va etre decommissionnee. Merci d'utiliser l'URL de la Geoplateforme https://data.geopf.fr/geocodage/"
+      },
+      "requests": {
+        "search_paris_municipality_postcode_filter": "GET https://data.geopf.fr/geocodage/search?q=paris&type=municipality&postcode=75004&limit=2",
+        "search_commune_nouvelle": "GET https://data.geopf.fr/geocodage/search?q=1 rue de la gare cran-gevrier&limit=1",
+        "error_400_limit": "GET https://data.geopf.fr/geocodage/search?q=rue de la paix&limit=51",
+        "completion": "GET https://data.geopf.fr/geocodage/completion?text=10 rue de rivoli paris&type=StreetAddress&maximumResponses=1"
+      }
+    }
+  },
+  "search": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            2.062821,
+            49.031624
+          ]
+        },
+        "properties": {
+          "label": "8 Boulevard du Port 95000 Cergy",
+          "score": 0.4924265550239234,
+          "housenumber": "8",
+          "id": "95127_1448_00008",
+          "banId": "8e6b04d7-f6fd-48a1-80be-4ec984a286e8",
+          "name": "8 Boulevard du Port",
+          "postcode": "95000",
+          "citycode": "95127",
+          "x": 631468.28,
+          "y": 6881710.34,
+          "city": "Cergy",
+          "context": "95, Val-d'Oise, Île-de-France",
+          "type": "housenumber",
+          "importance": 0.67985,
+          "depcode": "95",
+          "street": "Boulevard du Port",
+          "_type": "address"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            2.290084,
+            49.897442
+          ]
+        },
+        "properties": {
+          "label": "8 Boulevard du Port 80000 Amiens",
+          "score": 0.4922511004784689,
+          "housenumber": "8",
+          "id": "80021_6590_00008",
+          "banId": "f2633629-5541-4233-aa54-3c2eb58aa8b9",
+          "name": "8 Boulevard du Port",
+          "postcode": "80000",
+          "citycode": "80021",
+          "x": 648952.58,
+          "y": 6977867.14,
+          "city": "Amiens",
+          "context": "80, Somme, Hauts-de-France",
+          "type": "housenumber",
+          "importance": 0.67792,
+          "depcode": "80",
+          "street": "Boulevard du Port",
+          "_type": "address"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            3.605884,
+            43.425225
+          ]
+        },
+        "properties": {
+          "label": "8 Boulevard du Port 34140 Mèze",
+          "score": 0.4871038277511961,
+          "housenumber": "8",
+          "id": "34157_0770_00008",
+          "banId": "51e3370b-b791-41e1-89fc-11a2c2ea9519",
+          "name": "8 Boulevard du Port",
+          "postcode": "34140",
+          "citycode": "34157",
+          "x": 749085.29,
+          "y": 6258645.39,
+          "city": "Mèze",
+          "context": "34, Hérault, Occitanie",
+          "type": "housenumber",
+          "importance": 0.6213,
+          "depcode": "34",
+          "street": "Boulevard du Port",
+          "_type": "address"
+        }
+      }
+    ],
+    "query": "8 bd du port"
+  },
+  "search_paris_arrondissement": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            2.36041,
+            48.8555
+          ]
+        },
+        "properties": {
+          "label": "10 Rue de Rivoli 75004 Paris",
+          "score": 0.9701581818181818,
+          "housenumber": "10",
+          "id": "75104_8249_00010",
+          "banId": "10ee511a-2616-4186-948f-ab4ae0dffab4",
+          "name": "10 Rue de Rivoli",
+          "postcode": "75004",
+          "citycode": "75104",
+          "x": 653070.41,
+          "y": 6861908.04,
+          "city": "Paris",
+          "district": "Paris 4e Arrondissement",
+          "context": "75, Paris, Île-de-France",
+          "type": "housenumber",
+          "importance": 0.67174,
+          "depcode": "75",
+          "street": "Rue de Rivoli",
+          "_type": "address"
+        }
+      }
+    ],
+    "query": "10 rue de rivoli paris"
+  },
+  "search_municipality": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            4.835,
+            45.758
+          ]
+        },
+        "properties": {
+          "label": "Lyon",
+          "score": 0.9639145454545454,
+          "id": "69123",
+          "type": "municipality",
+          "name": "Lyon",
+          "postcode": "69001",
+          "citycode": "69123",
+          "x": 842627.75,
+          "y": 6519256.98,
+          "population": 519127,
+          "city": "Lyon",
+          "context": "69, Rhône, Auvergne-Rhône-Alpes",
+          "importance": 0.60306,
+          "depcode": "69",
+          "municipality": "Lyon",
+          "_type": "address"
+        }
+      }
+    ],
+    "query": "lyon"
+  },
+  "reverse": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            2.371203,
+            48.355924
+          ]
+        },
+        "properties": {
+          "type": "street",
+          "name": "Grande Rue",
+          "postcode": "91720",
+          "citycode": "91507",
+          "city": "Prunay-sur-Essonne",
+          "oldcitycode": null,
+          "oldcity": null,
+          "context": "91, Essonne, Île-de-France",
+          "importance": 0.26922,
+          "id": "91507_0100",
+          "banId": "38e11a52-1c7a-46f9-983c-0a2d7bd7f8db",
+          "x": 653420.06,
+          "y": 6806364.89,
+          "label": "Grande Rue 91720 Prunay-sur-Essonne",
+          "distance": 149,
+          "score": 0.9851,
+          "_type": "address"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            2.371203,
+            48.355924
+          ]
+        },
+        "properties": {
+          "type": "housenumber",
+          "name": "23 Grande Rue",
+          "label": "23 Grande Rue 91720 Prunay-sur-Essonne",
+          "street": "Grande Rue",
+          "postcode": "91720",
+          "citycode": "91507",
+          "city": "Prunay-sur-Essonne",
+          "oldcitycode": null,
+          "oldcity": null,
+          "context": "91, Essonne, Île-de-France",
+          "importance": 0.26922,
+          "housenumber": "23",
+          "id": "91507_0100_00023",
+          "banId": "b7f4c615-1356-4e73-87d0-acbe23125963",
+          "x": 653420.06,
+          "y": 6806364.89,
+          "distance": 149,
+          "score": 0.9851,
+          "_type": "address"
+        }
+      }
+    ]
+  },
+  "error_400": {
+    "code": 400,
+    "message": "Failed parsing query",
+    "detail": [
+      "q: must contain between 3 and 200 chars and start with a number or a letter"
+    ]
+  },
+  "search_paris_municipality_postcode_filter": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            2.347,
+            48.859
+          ]
+        },
+        "properties": {
+          "label": "Paris",
+          "score": 0.9702754545454544,
+          "id": "75056",
+          "type": "municipality",
+          "name": "Paris",
+          "postcode": "75001",
+          "citycode": "75056",
+          "x": 652089.7,
+          "y": 6862305.26,
+          "population": 2103778,
+          "city": "Paris",
+          "context": "75, Paris, Île-de-France",
+          "importance": 0.67303,
+          "depcode": "75",
+          "municipality": "Paris",
+          "_type": "address"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            2.356841,
+            48.854042
+          ]
+        },
+        "properties": {
+          "label": "Paris 4e Arrondissement",
+          "score": 0.8596245454545455,
+          "id": "75104",
+          "banId": "5780e7c0-909c-44ea-afe5-ad31405882de",
+          "type": "municipality",
+          "name": "Paris 4e Arrondissement",
+          "postcode": "75004",
+          "citycode": "75104",
+          "x": 652807.22,
+          "y": 6861748.05,
+          "population": 27332,
+          "city": "Paris 4e Arrondissement",
+          "context": "75, Paris, Île-de-France",
+          "importance": 0.45587,
+          "depcode": "75",
+          "municipality": "Paris 4e Arrondissement",
+          "_type": "address"
+        }
+      }
+    ],
+    "query": "paris"
+  },
+  "search_commune_nouvelle": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            6.109739,
+            45.910763
+          ]
+        },
+        "properties": {
+          "label": "Rue de la Crête 74960 Annecy",
+          "score": 0.6552063636363636,
+          "id": "74010_0672",
+          "banId": "c6c07663-56e7-4fda-b566-2e8adab1622e",
+          "name": "Rue de la Crête",
+          "postcode": "74960",
+          "citycode": "74010",
+          "oldcitycode": "74093",
+          "x": 940999.83,
+          "y": 6539310.26,
+          "city": "Annecy",
+          "oldcity": "Cran-Gevrier",
+          "context": "74, Haute-Savoie, Auvergne-Rhône-Alpes",
+          "type": "street",
+          "importance": 0.73852,
+          "depcode": "74",
+          "street": "Rue de la Crête",
+          "_type": "address"
+        }
+      }
+    ],
+    "query": "1 rue de la gare cran-gevrier"
+  },
+  "error_400_limit": {
+    "code": 400,
+    "message": "Failed parsing query",
+    "detail": [
+      "limit: must be an integer between 1 and 50"
+    ]
+  },
+  "completion": {
+    "status": "OK",
+    "results": [
+      {
+        "x": 2.36041,
+        "y": 48.8555,
+        "country": "StreetAddress",
+        "city": "Paris",
+        "oldcity": "",
+        "kind": "housenumber",
+        "zipcode": "75004",
+        "street": "Rue de Rivoli",
+        "metropole": true,
+        "fulltext": "10 Rue de Rivoli, 75004 Paris",
+        "classification": 7
+      }
+    ]
+  }
+}

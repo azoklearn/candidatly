@@ -1,0 +1,910 @@
+{
+  "_note": "Real responses captured 2026-09-09 from labonnealternance.apprentissage.beta.gouv.fr (undocumented internal routes, no auth). Trimmed.",
+  "GET /api/rome?title=informatique": {
+    "labelsAndRomes": [
+      {
+        "label": "Maintenance, installation et assistance informatique",
+        "romes": [
+          "H1101",
+          "H1106",
+          "H1107",
+          "H1108",
+          "I1102",
+          "I1305",
+          "I1401",
+          "I1403",
+          "I1404",
+          "F1134",
+          "I1322",
+          "I1327",
+          "I1329",
+          "I1330",
+          "I1406",
+          "I1407",
+          "I1409",
+          "M1866",
+          "M1869",
+          "M1871",
+          "M1874"
+        ],
+        "rncps": [
+          "RNCP13374",
+          "RNCP15238",
+          "RNCP16311",
+          "RNCP16895",
+          "RNCP19542",
+          "RNCP225",
+          "RNCP24514",
+          "RNCP24801",
+          "RNCP26755",
+          "RNCP31115",
+          "RNCP32158",
+          "RNCP34138",
+          "RNCP4631"
+        ],
+        "type": "job"
+      },
+      {
+        "label": "Gestion de projets informatiques",
+        "romes": [
+          "I1104",
+          "M1410",
+          "M1803",
+          "M1806",
+          "M1813",
+          "M1814",
+          "M1815",
+          "M1818",
+          "M1820",
+          "M1821",
+          "M1827",
+          "M1828",
+          "M1832",
+          "M1833",
+          "M1835",
+          "M1836",
+          "M1838",
+          "M1839",
+          "M1840",
+          "M1841",
+          "M1842",
+          "M1844",
+          "M1845",
+          "M1846",
+          "M1848",
+          "M1851",
+          "M1852",
+          "M1853",
+          "M1858",
+          "M1859",
+          "M1864",
+          "M1865",
+          "M1870",
+          "M1875",
+          "M1881",
+          "M1889",
+          "M1894",
+          "M1305",
+          "M1717"
+        ],
+        "rncps": [
+          "RNCP4378",
+          "RNCP10980",
+          "RNCP11230",
+          "RNCP13082",
+          "RNCP13981",
+          "RNCP15065",
+          "RNCP15638",
+          "RNCP15793",
+          "RNCP16240",
+          "RNCP16311",
+          "RNCP16642",
+          "RNCP17285",
+          "RNCP18243",
+          "RNCP19739",
+          "RNCP2164",
+          "RNCP21947",
+          "RNCP25554",
+          "RNCP26290",
+          "RNCP26841",
+          "RNCP27031",
+          "RNCP27057",
+          "RNCP27059",
+          "RNCP27307",
+          "RNCP27812",
+          "RNCP29276",
+          "RNCP29479",
+          "RNCP29562",
+          "RNCP29967",
+          "RNCP31187",
+          "RNCP34126",
+          "RNCP34394",
+          "RNCP34408",
+          "RNCP11554",
+          "RNCP4780",
+          "RNCP15314",
+          "RNCP13387",
+          "RNCP13388",
+          "RNCP16919",
+          "RNCP19449",
+          "RNCP26228",
+          "RNCP31471",
+          "RNCP34167",
+          "RNCP34091"
+        ],
+        "type": "job"
+      },
+      {
+        "label": "Electronique, informatique industrielle",
+        "romes": [
+          "H1208",
+          "H1209",
+          "H1516",
+          "H2501",
+          "K1717",
+          "H1227",
+          "H1228",
+          "H1236",
+          "H1239",
+          "M1892"
+        ],
+        "rncps": [
+          "RNCP15699",
+          "RNCP15701",
+          "RNCP15717",
+          "RNCP18235",
+          "RNCP18236",
+          "RNCP18250",
+          "RNCP18726",
+          "RNCP19732",
+          "RNCP19739",
+          "RNCP20174",
+          "RNCP20690",
+          "RNCP29276",
+          "RNCP29962",
+          "RNCP30090",
+          "RNCP26341",
+          "RNCP30119",
+          "RNCP34117",
+          "RNCP4286",
+          "RNCP4345",
+          "RNCP4379",
+          "RNCP1876",
+          "RNCP30701",
+          "RNCP34129",
+          "RNCP15314",
+          "RNCP22373",
+          "RNCP27307",
+          "RNCP25354",
+          "RNCP26334",
+          "RNCP26335",
+          "RNCP15638",
+          "RNCP29989"
+        ],
+        "type": "job"
+      }
+    ],
+    "labelsAndRomesForDiplomas": [
+      {
+        "label": "SERVICES INFORMATIQUES AUX ORGANISATIONS OPTION B SOLUTIONS LOGICIELLES ET APPLICATIONS METIERS",
+        "romes": [
+          "M1810",
+          "M1801",
+          "M1805",
+          "M1816",
+          "M1869",
+          "M1876",
+          "M1884",
+          "M1817",
+          "M1830",
+          "M1834",
+          "M1843",
+          "M1849",
+          "M1854",
+          "M1857",
+          "M1894",
+          "M1813",
+          "M1814",
+          "M1815",
+          "M1818",
+          "M1821",
+          "M1824",
+          "M1827",
+          "M1831",
+          "M1832",
+          "M1836",
+          "M1837",
+          "M1841",
+          "M1842",
+          "M1844",
+          "M1848",
+          "M1851",
+          "M1852",
+          "M1853",
+          "M1855",
+          "M1858",
+          "M1859",
+          "M1861",
+          "M1883",
+          "M1887",
+          "M1889",
+          "M1892"
+        ],
+        "rncps": [
+          "RNCP40792"
+        ],
+        "type": "diploma"
+      },
+      {
+        "label": "INGENIEUR DIPLOME DE L'ECOLE SUPERIEURE DE CHIMIE, PHYSIQUE, ELECTRONIQUE DE LYON, SPECIALITE INFORMATIQUE ET CYBERSECURITE",
+        "romes": [
+          "M1803",
+          "M1802",
+          "M1805",
+          "M1806",
+          "M1801",
+          "M1812",
+          "M1825",
+          "M1826",
+          "M1840",
+          "M1862",
+          "M1867",
+          "M1870",
+          "M1878",
+          "M1885",
+          "M1886",
+          "M1811",
+          "M1819",
+          "M1820",
+          "M1822",
+          "M1823",
+          "M1829",
+          "M1833",
+          "M1835",
+          "M1839",
+          "M1846",
+          "M1847",
+          "M1850",
+          "M1856",
+          "M1860",
+          "M1863",
+          "M1866",
+          "M1868",
+          "M1874",
+          "M1877",
+          "M1879",
+          "M1882",
+          "M1813",
+          "M1814",
+          "M1815",
+          "M1818",
+          "M1821",
+          "M1824",
+          "M1827",
+          "M1831",
+          "M1832",
+          "M1836",
+          "M1837",
+          "M1841",
+          "M1842",
+          "M1844",
+          "M1848",
+          "M1851",
+          "M1852",
+          "M1853",
+          "M1855",
+          "M1858",
+          "M1859",
+          "M1861",
+          "M1883",
+          "M1887",
+          "M1889",
+          "M1892",
+          "M1828",
+          "M1838",
+          "M1845",
+          "M1864",
+          "M1865",
+          "M1871",
+          "M1872",
+          "M1873",
+          "M1875",
+          "M1880",
+          "M1881",
+          "M1817",
+          "M1830",
+          "M1834",
+          "M1843",
+          "M1849",
+          "M1854",
+          "M1857",
+          "M1894"
+        ],
+        "rncps": [
+          "RNCP42547"
+        ],
+        "type": "diploma"
+      }
+    ]
+  },
+  "GET /api/rome?title=développeur&withRomeLabels=true": {
+    "labelsAndRomes": [
+      {
+        "label": "Maintenance, installation et assistance informatique",
+        "romes": [
+          "H1101",
+          "H1106",
+          "H1107",
+          "H1108",
+          "I1102",
+          "I1305",
+          "I1401",
+          "I1403",
+          "I1404",
+          "F1134",
+          "I1322",
+          "I1327",
+          "I1329",
+          "I1330",
+          "I1406",
+          "I1407",
+          "I1409",
+          "M1866",
+          "M1869",
+          "M1871",
+          "M1874"
+        ],
+        "rncps": [
+          "RNCP13374",
+          "RNCP15238",
+          "RNCP16311",
+          "RNCP16895",
+          "RNCP19542",
+          "RNCP225",
+          "RNCP24514",
+          "RNCP24801",
+          "RNCP26755",
+          "RNCP31115",
+          "RNCP32158",
+          "RNCP34138",
+          "RNCP4631"
+        ],
+        "type": "job",
+        "romeTitles": [
+          {
+            "codeRome": "H1101",
+            "intitule": "Ingénieur / Ingénieure support technique"
+          },
+          {
+            "codeRome": "H1106",
+            "intitule": "Responsable support technique clients"
+          },
+          {
+            "codeRome": "H1107",
+            "intitule": "Directeur / Directrice assistance technique"
+          },
+          {
+            "codeRome": "H1108",
+            "intitule": "Technicien / Technicienne support client en industrie"
+          },
+          {
+            "codeRome": "I1102",
+            "intitule": "Ingénieur / Ingénieure de maintenance industrielle"
+          },
+          {
+            "codeRome": "I1305",
+            "intitule": "Technicien / Technicienne installation et maintenance électronique"
+          },
+          {
+            "codeRome": "I1401",
+            "intitule": "Technicien / Technicienne de maintenance en informatique"
+          },
+          {
+            "codeRome": "I1403",
+            "intitule": "Technicien / Technicienne Datacenter"
+          },
+          {
+            "codeRome": "I1404",
+            "intitule": "Conseiller / Conseillère support technique informatique"
+          },
+          {
+            "codeRome": "F1134",
+            "intitule": "Domoticien / Domoticienne"
+          },
+          {
+            "codeRome": "I1322",
+            "intitule": "Technicien / Technicienne de maintenance des automates bancaires"
+          },
+          {
+            "codeRome": "I1327",
+            "intitule": "Technicien / Technicienne de maintenance en matériel biomédical"
+          },
+          {
+            "codeRome": "I1329",
+            "intitule": "Technicien / Technicienne de maintenance en audio-vidéo professionnelle"
+          },
+          {
+            "codeRome": "I1330",
+            "intitule": "Technicien / Technicienne d'installation de centrales téléphoniques"
+          },
+          {
+            "codeRome": "I1406",
+            "intitule": "Superviseur / Superviseuse hot line en informatique"
+          },
+          {
+            "codeRome": "I1407",
+            "intitule": "Réparateur / Réparatrice en produits de télécommunication et multimédia"
+          },
+          {
+            "codeRome": "I1409",
+            "intitule": "Agent / Agente de maintenance en bureautique"
+          },
+          {
+            "codeRome": "M1866",
+            "intitule": "Pentesteur / Pentesteuse"
+          },
+          {
+            "codeRome": "M1869",
+            "intitule": "Gestionnaire de parc informatique"
+          },
+          {
+            "codeRome": "M1871",
+            "intitule": "Gestionnaire d'applications système d'information"
+          },
+          {
+            "codeRome": "M1874",
+            "intitule": "Spécialiste support"
+          }
+        ]
+      },
+      {
+        "label": "Développement web, intégration",
+        "romes": [
+          "M1805",
+          "M1855",
+          "M1825",
+          "M1834",
+          "M1861",
+          "E1210",
+          "E1405",
+          "M1865",
+          "M1877",
+          "M1886",
+          "M1887"
+        ],
+        "rncps": [
+          "RNCP11543",
+          "RNCP25652",
+          "RNCP32173",
+          "RNCP32195",
+          "RNCP34129",
+          "RNCP34471",
+          "RNCP6601",
+          "RNCP11230",
+          "RNCP13082",
+          "RNCP13981",
+          "RNCP14506",
+          "RNCP15253",
+          "RNCP15314",
+          "RNCP15638",
+          "RNCP16240",
+          "RNCP16311",
+          "RNCP16919",
+          "RNCP17285",
+          "RNCP18243",
+          "RNCP20157",
+          "RNCP20650",
+          "RNCP20654",
+          "RNCP2164",
+          "RNCP21947",
+          "RNCP27934",
+          "RNCP28332",
+          "RNCP28669",
+          "RNCP28754",
+          "RNCP22373",
+          "RNCP23001",
+          "RNCP24514",
+          "RNCP26228",
+          "RNCP26602",
+          "RNCP26841",
+          "RNCP26858",
+          "RNCP27057",
+          "RNCP27099",
+          "RNCP27307",
+          "RNCP29276",
+          "RNCP29962",
+          "RNCP29965",
+          "RNCP30714",
+          "RNCP31114",
+          "RNCP31291",
+          "RNCP31678",
+          "RNCP31973",
+          "RNCP32042",
+          "RNCP34126",
+          "RNCP4345",
+          "RNCP4378"
+        ],
+        "type": "job",
+        "romeTitles": [
+          {
+            "codeRome": "M1805",
+            "intitule": "Développeur / Développeuse informatique"
+          },
+          {
+            "codeRome": "M1855",
+            "intitule": "Développeur / Développeuse web"
+          },
+          {
+            "codeRome": "M1825",
+            "intitule": "Coordinateur / Coordinatrice de production web"
+          },
+          {
+            "codeRome": "M1834",
+            "intitule": "Administrateur / Administratrice de site internet"
+          },
+          {
+            "codeRome": "M1861",
+            "intitule": "Développeur / Développeuse logiciel ou d'application"
+          },
+          {
+            "codeRome": "E1210",
+            "intitule": "Web designer"
+          },
+          {
+            "codeRome": "E1405",
+            "intitule": "Référenceur / Référenceuse web"
+          },
+          {
+            "codeRome": "M1865",
+            "intitule": "Ingénieur / Ingénieure blockchain"
+          },
+          {
+            "codeRome": "M1877",
+            "intitule": "Développeur / Développeuse blockchain"
+          },
+          {
+            "codeRome": "M1886",
+            "intitule": "Chef / Cheffe de projet Web"
+          },
+          {
+            "codeRome": "M1887",
+            "intitule": "Product builder no code"
+          }
+        ]
+      },
+      {
+        "label": "Analyse de données, data",
+        "romes": [
+          "H1215",
+          "H1501",
+          "K1906",
+          "M1201",
+          "M1401",
+          "M1403",
+          "M1404",
+          "M1405",
+          "M1411",
+          "M1414",
+          "M1806",
+          "M1811",
+          "M1824",
+          "M1851",
+          "M1856",
+          "M1863",
+          "H1531",
+          "H1534",
+          "M1419",
+          "M1420",
+          "M1421",
+          "M1422",
+          "M1423",
+          "M1424",
+          "M1425",
+          "M1426",
+          "M1868",
+          "M1872",
+          "M1873",
+          "M1888",
+          "M1889",
+          "M1890",
+          "M1891",
+          "M1893",
+          "M1894"
+        ],
+        "rncps": [
+          "RNCP20650",
+          "RNCP31973",
+          "RNCP31291",
+          "RNCP34039",
+          "RNCP34428",
+          "RNCP24518",
+          "RNCP4780",
+          "RNCP12735",
+          "RNCP34408",
+          "RNCP5301",
+          "RNCP29961",
+          "RNCP12112"
+        ],
+        "type": "job",
+        "romeTitles": [
+          {
+            "codeRome": "H1215",
+            "intitule": "Bioinformaticien / Bioinformaticienne en études, recherche et développement"
+          },
+          {
+            "codeRome": "H1501",
+            "intitule": "Responsable de laboratoire d'analyse industrielle"
+          },
+          {
+            "codeRome": "K1906",
+            "intitule": "Délégué / Déléguée à la protection des données - Data Protection Officer"
+          },
+          {
+            "codeRome": "M1201",
+            "intitule": "Analyste financier / Analyste financière"
+          },
+          {
+            "codeRome": "M1401",
+            "intitule": "Enquêteur / Enquêtrice sondage"
+          },
+          {
+            "codeRome": "M1403",
+            "intitule": "Chargé / Chargée d'études socio-économiques"
+          },
+          {
+            "codeRome": "M1404",
+            "intitule": "Responsable d'enquêtes terrain"
+          },
+          {
+            "codeRome": "M1405",
+            "intitule": "Data scientist"
+          },
+          {
+            "codeRome": "M1411",
+            "intitule": "Consultant / Consultante en énergie renouvelable"
+          },
+          {
+            "codeRome": "M1414",
+            "intitule": "Ingénieur statisticien / Ingénieure statisticienne"
+          },
+          {
+            "codeRome": "M1806",
+            "intitule": "Consultant fonctionnel / Consultante fonctionnelle des systèmes d'information"
+          },
+          {
+            "codeRome": "M1811",
+            "intitule": "Data engineer"
+          },
+          {
+            "codeRome": "M1824",
+            "intitule": "Développeur / Développeuse décisionnel - Business Intelligence"
+          },
+          {
+            "codeRome": "M1851",
+            "intitule": "Analyste décisionnel - Business Intelligence"
+          },
+          {
+            "codeRome": "M1856",
+            "intitule": "Expert / Experte en cybersécurité"
+          },
+          {
+            "codeRome": "M1863",
+            "intitule": "Evaluateur / Evaluatrice sécurité des systèmes et produits informatiques"
+          },
+          {
+            "codeRome": "H1531",
+            "intitule": "Opérateur / Opératrice de laboratoire d'analyse industrielle"
+          },
+          {
+            "codeRome": "H1534",
+            "intitule": "Ingénieur / Ingénieure d'analyse industrielle"
+          },
+          {
+            "codeRome": "M1419",
+            "intitule": "Data analyst"
+          },
+          {
+            "codeRome": "M1420",
+            "intitule": "Responsable en intelligence économique"
+          },
+          {
+            "codeRome": "M1421",
+            "intitule": "Panéliste"
+          },
+          {
+            "codeRome": "M1422",
+            "intitule": "Directeur / Directrice d'études socio-économiques"
+          },
+          {
+            "codeRome": "M1423",
+            "intitule": "Chief Data Officer"
+          },
+          {
+            "codeRome": "M1424",
+            "intitule": "Consultant / Consultante en intelligence économique"
+          },
+          {
+            "codeRome": "M1425",
+            "intitule": "Agent recenseur / Agente recenseuse"
+          },
+          {
+            "codeRome": "M1426",
+            "intitule": "Chief digital officer - Responsable de la transformation digitale"
+          },
+          {
+            "codeRome": "M1868",
+            "intitule": "Architecte base de données"
+          },
+          {
+            "codeRome": "M1872",
+            "intitule": "Consultant décisionnel / Consultante décisionnelle - Business Intelligence"
+          },
+          {
+            "codeRome": "M1873",
+            "intitule": "Spécialiste IA embarquée"
+          },
+          {
+            "codeRome": "M1888",
+            "intitule": "Spécialiste en modélisation climatique"
+          },
+          {
+            "codeRome": "M1889",
+            "intitule": "Ingénieur / Ingénieure en Intelligence Artificielle (IA)"
+          },
+          {
+            "codeRome": "M1890",
+            "intitule": "Responsable d'opérations en station météorologique"
+          },
+          {
+            "codeRome": "M1891",
+            "intitule": "Ingénieur / Ingénieure prévisionniste météorologue"
+          },
+          {
+            "codeRome": "M1893",
+            "intitule": "Technicien / Technicienne de la météorologie"
+          },
+          {
+            "codeRome": "M1894",
+            "intitule": "Gestionnaire de base de données"
+          }
+        ]
+      }
+    ],
+    "labelsAndRomesForDiplomas": [
+      {
+        "label": "CONCEPTEUR DEVELOPPEUR D'APPLICATIONS",
+        "romes": [
+          "M1805",
+          "M1802",
+          "M1813",
+          "M1814",
+          "M1815",
+          "M1818",
+          "M1821",
+          "M1824",
+          "M1827",
+          "M1831",
+          "M1832",
+          "M1836",
+          "M1837",
+          "M1841",
+          "M1842",
+          "M1844",
+          "M1848",
+          "M1851",
+          "M1852",
+          "M1853",
+          "M1855",
+          "M1858",
+          "M1859",
+          "M1861",
+          "M1883",
+          "M1887",
+          "M1889",
+          "M1892",
+          "M1811",
+          "M1819",
+          "M1820",
+          "M1822",
+          "M1823",
+          "M1829",
+          "M1833",
+          "M1835",
+          "M1839",
+          "M1846",
+          "M1847",
+          "M1850",
+          "M1856",
+          "M1860",
+          "M1863",
+          "M1866",
+          "M1868",
+          "M1874",
+          "M1877",
+          "M1879",
+          "M1882"
+        ],
+        "rncps": [
+          "RNCP36490"
+        ],
+        "type": "diploma"
+      },
+      {
+        "label": "DEVELOPPEUR EN INTELLIGENCE ARTIFICIELLE",
+        "romes": [
+          "M1805",
+          "M1813",
+          "M1814",
+          "M1815",
+          "M1818",
+          "M1821",
+          "M1824",
+          "M1827",
+          "M1831",
+          "M1832",
+          "M1836",
+          "M1837",
+          "M1841",
+          "M1842",
+          "M1844",
+          "M1848",
+          "M1851",
+          "M1852",
+          "M1853",
+          "M1855",
+          "M1858",
+          "M1859",
+          "M1861",
+          "M1883",
+          "M1887",
+          "M1889",
+          "M1892"
+        ],
+        "rncps": [
+          "RNCP34757",
+          "RNCP37827"
+        ],
+        "type": "diploma"
+      }
+    ]
+  },
+  "GET /api/_private/metiers/intitule?label=développeur web": {
+    "coupleAppellationRomeMetier": [
+      {
+        "code_rome": "M1855",
+        "intitule": "Développeur / Développeuse web",
+        "appellation": "Webmaster développeur / Webmaster développeuse"
+      },
+      {
+        "code_rome": "M1855",
+        "intitule": "Développeur / Développeuse web",
+        "appellation": "Développeur / Développeuse web mobile"
+      },
+      {
+        "code_rome": "M1855",
+        "intitule": "Développeur / Développeuse web",
+        "appellation": "Développeur / Développeuse back-end"
+      },
+      {
+        "code_rome": "M1855",
+        "intitule": "Développeur / Développeuse web",
+        "appellation": "Développeur / Développeuse front-end"
+      },
+      {
+        "code_rome": "M1855",
+        "intitule": "Développeur / Développeuse web",
+        "appellation": "Développeur / Développeuse full-stack"
+      },
+      {
+        "code_rome": "M1855",
+        "intitule": "Développeur / Développeuse web",
+        "appellation": "Développeur / Développeuse no code"
+      },
+      {
+        "code_rome": "M1855",
+        "intitule": "Développeur / Développeuse web",
+        "appellation": "Intégrateur / Intégratrice web"
+      }
+    ]
+  }
+}

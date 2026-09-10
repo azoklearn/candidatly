@@ -1,0 +1,88 @@
+ 1 
+ 
+ 
+LICENCE OUVERTE 
+ROME 
+ 
+ 
+ 
+Le réutilisateur (toute personne physique ou morale  qui réutilise « l’Information » conformément aux 
+conditions de cette licence) peut réutiliser tout o u partie des données (arborescences, fiches métiers , 
+fichiers de données, tables de correspondance ROME/ NAF et ROME/ISCO) du ROME (Répertoire 
+Opérationnel des Métiers et des Emplois), ci-après dénommées « l’Information » rendue disponible 
+par Pôle emploi dans les conditions prévues ci-après par la présente licence. 
+ 
+De manière générale, Pôle emploi cède à titre graci eux et non exclusif le droit au réutilisateur de 
+réutiliser « l’Information » soumise à la présente licence, dans le monde entier et pour une durée 
+illimitée.  
+ 
+Les droits accordés au réutilisateur sont les suivants :  
+• Le doit de reproduire, copier, publier et transmet tre « l’Information » ; 
+• Le droit de diffuser et redistribuer « l’Informati on » ; 
+• Le droit d’adapter, modifier, extraire et transfor mer « l’Information », pour notamment créer 
+des « Informations dérivées » (sont des information s dérivées, les nouvelles données ou 
+informations qui ont été créées, soit directement à partir de « l’Information », soit à partir d’une 
+combinaison de « l’Information » et d’autres donnée s ou informations qui ne sont pas 
+soumises à la présente licence) ;  
+• Le droit d’exploiter « l’Information » à titre com mercial, par exemple, en la combinant avec 
+d’autres  informations, ou en l’incluant dans son propre produit ou application. 
+ 
+La seule obligation du réutilisateur est de mention ner la paternité de « l’Information », c’est-à-dire sa 
+source, laquelle comprend a minima  le nom de Pôle emploi et la date de la dernière ac tualisation de 
+« l’Information ».  
+ 
+Cette mention de paternité ne confère ni un caractè re officiel à la réutilisation de « l’Information » par 
+le réutilisateur, ni ne suggère une quelconque reco nnaissance ou caution par Pôle emploi du  
+réutilisateur.  
+ 
+Responsabilité 
+ 
+« L’Information » est mise à disposition par Pôle emploi telle que produite ou reçue par lui sans autr e 
+garantie expresse ou tacite qui n’est pas prévue par la présente licence.  
+ 
+Pôle emploi garantit au réutilisateur qu’il met gra tuitement à sa disposition « l’Information » dans l es 
+conditions définies par la présente licence. Pôle e mploi ne peut garantir l’absence d’inexactitudes   
+éventuellement contenues dans « l’Information ». Pô le emploi ne garantit pas non plus la fourniture 
+continue de « l’Information ».  
+ 
+En aucun cas, Pôle emploi ne peut être tenu pour re sponsable de toute perte, préjudice ou dommage 
+de quelque sorte que ce soit causé à des tiers du f ait de la réutilisation par le réutilisateur de 
+« l’Information ».  
+ 
+En conséquence, le réutilisateur » est le seul resp onsable de la réutilisation de « l’Information », étant 
+précisé que la réutilisation de « l’information » ne doit pas induire en erreur les tiers quant au con tenu 
+de « l’Information », sa source et sa date de dernière actualisation. 
+ 
+ 
+ 2 
+Droits de propriété intellectuelle 
+ 
+Les droits de propriété intellectuelle s’entendent des droits identifiés comme tels par le Code de la 
+propriété intellectuelle (droit d’auteur, droits vo isins au droit d’auteur, droit relatif aux bases de  
+données). 
+ 
+En conséquence, Pôle emploi garantit que « l’Inform ation » ne contient pas de droits de propriété 
+intellectuelle appartenant à des tiers. 
+ 
+Les éventuels « Droits de propriété intellectuelle » détenus par Pôle emploi sur des documents 
+contenant « l’Information » ne font pas obstacle à la libre réutilisation de « l’Information ».  
+ 
+Tables de correspondance ROME/Formacode et FAP/PCS/ROME 
+ 
+Le réutilisateur est parfaitement informé de ce que  l’utilisation des tables de correspondance 
+ROME/Formacode et FAP/PCS/ROME, accessibles au travers des liens 
+ 
+http://formacode.centre-inffo.fr/actualisations-des-correspondances.html?  
+et 
+http://travail-emploi.gouv.fr/etudes-recherches-statistiques-de,76/statistiques,78/metiers-et-
+qualifications,83/la-nomenclature-des-familles,231/la-nomenclature-des-familles,10961.html  
+ 
+est soumise aux conditions de réutilisation du Cent re Inffo et de la DARES, disponibles sur leur site 
+respectif. 
+ 
+Droit applicable 
+ 
+La présente licence est régie par le droit français.  
+ 
+ 
+ 

@@ -1,0 +1,415 @@
+Numero de version : 61
+
+Date de publication : 15/06/2026
+
+Date de validation : 27/04/2026
+
+Titre/commentaire : ROME 4.0 version 61 - 26M06
+
+Description : Démarrée fin 2023, l’évolution du ROME 4.0 (Répertoire Opérationnel des Métiers et des Emplois) se poursuit en lien avec nos partenaires avec une nouvelle publication importante de plus de 327 fiches.
+
+Dans la continuité de la version majeure précédente de juin 2025, ces nouvelles fiches qui ont été relues par nos partenaires, principalement des OPCO et des branches professionnelles mais aussi des services de l’état et des agents spécialisés du réseau France Travail.
+
+
+
+Cette version de juin 2026 permet de livrer :
+
+351 nouvelles fiches métier (Nouveaux codes et reprises de codes existants)
+
+166 fiches issues du V3 et enrichies
+
+280 fiches du V4 améliorées
+
+
+
+
+
+Le ROME passe ainsi à 1911 fiches métier, consultables sur MétierScope dès le 15 juin 2026.
+
+
+
+Cette nouvelle version de juin 2026 représente la dernière version du ROME 4.0 avec autant de nouvelles fiches. A partir de juin, le ROME poursuit son dynamisme avec l’aide des partenaires, dans une logique de 2 versions par an, afin de continuer à refléter la réalité des métiers et des compétences du marché du travail.
+
+
+Nombre de nouveaux codes ROME par grand domaine du ROME :
+
+A - Agriculture et Pêche, Espaces naturels et Espaces verts, Soins aux animaux     20
+
+B - Arts et Façonnage d'ouvrages d'art      5
+
+C - Banque, Assurance, Immobilier     32
+
+D - Commerce, Vente et Grande distribution       25        
+
+E - Communication, Média et Multimédia       9
+
+F - Construction, Bâtiment et Travaux publics        10
+
+G - Hôtellerie-Restauration, Tourisme, Loisirs et Animation   11
+
+H - Industrie      59
+
+I - Installation et Maintenance     22
+
+J - Santé        8    
+
+K - Services à la personne et à la collectivité     57   
+
+L - Spectacle     17
+
+M - Support à l'entreprise       14
+
+N - Transport et Logistique     38
+
+
+
+
+
+
+
+Présentation des évolutions sur cette version :
+
+ 
+
+Evolutions de structure :
+
+
+
+Mise à disposition d’un ChangeLog
+
+Un nouveau fichier, appelé ChangeLog, est disponible sur l’opendata du ROME. Ce fichier a pour objectif de permettre aux consommateurs de visualiser les différences entre la version en production et la version précédente, du point de vue des référentiels et non des fiches. Les différences visibles sont les renommages, les ré-indexations, créations, suppressions, substitutions et réactivation.
+
+
+
+La substitution :
+
+Une nouvelle mécanique est mise en place : la substitution. La substitution (ou remplacement) est une alternative à la suppression d’objets des référentiels du ROME 4.0, elle consiste à supprimer un objet indésirable du référentiel, parce que doublon ou non conforme aux normes d’écriture et à proposer un autre objet, avec un sens métier équivalent ou proche, comme alternative. La substitution concerne les référentiels suivants : appellations, macro-compétences, compétences, savoirs et contextes de travail.
+
+
+
+Un exemple de substitution :
+
+L’appellation « Nourrice » est Obsolète, et est à substituer
+
+L’appellation « Nounou » est Non conforme et est à substituer
+
+L’appellation « Assistant maternel / Assistante maternelle » est Conforme et a un sens métier similaire, elle est donc la substituante
+
+
+
+La mécanique de substitution est disponible :
+
+dans les fichiers opendata du ROME, via le nouveau fichier ChangeLog
+
+dans les API du ROME, via un service dédié
+
+
+
+Suppression du tag « émergent(e) » 
+
+Par fichier, la valeur « émergent(e) » de l’attribut « cœur_metier » ne sera plus utilisée
+
+Par API, le champ « competencesmobiliseesemergentes » ne sera plus valorisé
+
+
+
+Evolutions des données :
+
+
+
+Evolution des 3 arborescences des Compétences, Savoirs et Contextes de travail :
+
+Création de nombreux objets en lien avec le volume de fiches créées
+
+Substitution pour en améliorer la qualité (suppression de doublons, etc.)
+
+Revue d’indexations de compétences dans le cadre de l’homogénéisation des macro-compétences
+
+
+
+
+
+Mouvements d’appellations et transformation de certaines fiches publiées :
+
+
+
+Fiche H1233
+
+Libellé 25M09 : Chef de projet / Cheffe de projet design
+
+Libellé 26M06 : Technicien / Technicienne en design
+
+Détail : Appellations déplacées vers la fiche H1204
+
+
+
+Fiche H2427
+
+Libellé 25M09 : Effileur / Effileuse en dentelles
+
+Libellé 26M06 : Applicateur / Applicatrice en tannerie-mégisserie
+
+Détail : Appellations déplacées vers la fiche H2410
+
+
+
+Fiche K1411
+
+Libellé 25M09 : Médecin conseil en santé publique
+
+Libellé 26M06 : Inspecteur / Inspectrice vétérinaire
+
+Détail : Appellations déplacées vers la fiche K1402
+
+
+
+
+
+Fiche K1703
+
+Libellé 25M09 : Responsable Opérationnel / Opérationnelle de la défense
+
+Libellé 26M06 : Responsable de l’emploi des forces armées
+
+Détail : Pas de mouvement d’appellations
+
+
+
+Fiche K1710
+
+Libellé 25M09 : Officier de police judiciaire / Officière de police judiciaire
+
+Libellé 26M06 : Pilote de drones aériens militaires
+
+Détail : Appellations déplacées vers la fiche K1708
+
+
+
+Fiche K1712
+
+Libellé 25M09 : Conducteur / Conductrice de véhicule de combat
+
+Libellé 26M06 : Pilote d'aéronef militaire
+
+Détail : Pas de mouvement d’appellations
+
+
+
+Fiche K1713
+
+Libellé 25M09 : Tireur / Tireuse d'engin blindé
+
+Libellé 26M06 : Pilote de chasse
+
+Détail : l’appellation « 20334 » a été déplacée vers la fiche K1701 et les autres appellations ont été gardée dans la fiche K1713
+
+
+
+Fiche K1714
+
+Libellé 25M09 : Missilier / Missilière artillerie
+
+Libellé 26M06 : Expert / Experte en assurance de la qualité des fournitures spécifiques des armées
+
+Détail : l’appellation « 12208 » a été déplacée vers la fiche K1703 et les autres appellations ont été gardée dans la fiche K1714
+
+
+
+Fiche K1715
+
+Libellé 25M09 : Officier / Officière des forces armées
+
+Libellé 26M06 : Pilote d’hélicoptère des forces armées
+
+Détail : Pas de mouvements d’appellations
+
+
+
+Fiche K1717
+
+Libellé 25M09 : Technicien électronicien / Technicienne électronicienne des armées
+
+Libellé 26M06 : Opérateur / Opératrice de surveillance aérienne militaire
+
+Détail : Pas de mouvements d’appellations
+
+
+
+Fiche K1718
+
+Libellé 25M09 : Mécanicien / Mécanicienne de systèmes d'armes
+
+Libellé 26M06 : Chargé / Chargée de navigation maritime sur navire militaire
+
+Détail : Pas de mouvements d’appellations
+
+
+
+Fiche K1722
+
+Libellé 25M09 : Conducteur / Conductrice d'autorité de l'armée
+
+Libellé 26M06 : Plongeur démineur / Plongeuse démineuse militaire dans les fonds marins
+
+Détail : Appellations déplacées vers la fiche K1701
+
+
+
+Fiche K1723
+
+Libellé 25M09 : Conducteur / Conductrice Véhicule Léger de l'armée
+
+Libellé 26M06 : Opérateur / Opératrice d'exploitation et de maintenance pétrolières de l'Armée
+
+Détail : Appellations déplacées vers la fiche K1701
+
+
+
+Fiche K1724
+
+Libellé 25M09 : Mécanicien / Mécanicienne d'engins blindés
+
+Libellé 26M06 : Spécialiste en radioprotection au sein du Ministère des Armées
+
+Détail : Pas de mouvements d’appellations
+
+
+
+Fiche K1815
+
+Libellé 25M09 : Chargé / Chargée de mission emploi formation
+
+Libellé 26M06 : Chargé / Chargée de mission "Villes et Territoires Durables"
+
+Détail : Appellations déplacées vers la fiche K1812
+
+
+
+Fiche K2129
+
+Libellé 25M09 : Professeur / Professeure en soutien scolaire
+
+Libellé 26M06 : Professeur / Professeure documentaliste
+
+Détail : Appellations déplacées vers la fiche K2122
+
+
+
+Fiche M1620
+
+Libellé 25M09 : Superviseur / Superviseuse de distributeurs d'imprimés
+
+Libellé 26M06 : Assistant / Assistante marketing
+
+Détail : Appellations déplacées dans la fiche M1615
+
+
+
+Fiche M1621
+
+Libellé 25M09 : Assistant / Assistante de gestion administrative
+
+Libellé 26M06 : Assistant administratif / Assistante administrative multilingue
+
+Détail : Appellations déplacées dans la fiche M1607
+
+
+
+Fiche M1819
+
+Libellé 25M09 : Ingénieur / Ingénieure sécurité informatique
+
+Libellé 26M06 : Technicien / Technicienne en cybersécurité
+
+Détail : Appellations déplacées vers la fiche M1856
+
+
+
+Fiche M1822
+
+Libellé 25M09 : Ingénieur / Ingénieure systèmes et réseaux informatiques
+
+Libellé 26M06 : Spécialiste Jumeau Numérique
+
+Détail : Appellations déplacées vers la fiche M1802
+
+
+
+Fiche M1844
+
+Libellé 25M09 : Analyste en cybersécurité
+
+Libellé 26M06 : Responsable des études et applications informatiques
+
+Détail : Appellations déplacées vers la fiche m1856
+
+
+
+Fiche M1854
+
+Libellé 25M09 : Administrateur / Administratrice réseau informatique
+
+Libellé 26M06 : Chef / Cheffe de projet réseau fixe et mobile
+
+Détail : Appellations déplacées vers la fiche M1802
+
+
+
+Fiche N1106
+
+Libellé 25M09 : Agent / Agente de quai manutentionnaire
+
+Libellé 26M06 : Déménageur / Déménageuse d'œuvres d'art
+
+Détail : Appellations déplacées vers la fiche N1105
+
+
+
+Fiche N1116
+
+Libellé 25M09 : Agent / Agente de quai de messagerie
+
+Libellé 26M06 : Inventoriste
+
+Détail : Appellations déplacées vers la fiche N1105
+
+
+
+
+
+Pour refléter au mieux les évolutions du marché du travail, et prendre en compte les travaux menés par les branches sur les emplois et compétences, de nouveaux métiers apparaissent dans le ROME dans tous les secteurs d’activité. De nouvelles appellations sont ainsi intégrées aux fiches existantes et de nouvelles fiches sont créées. Quelques exemples :
+
+
+
+Agriculture et environnement : A1319 Ingénieur / Ingénieure écologue - A1215 Agent / Agente d’aires marines protégées - A1219 Directeur / Directrice espaces verts et biodiversité - A1325 Chargé / Chargée de projet Biodiversité
+
+
+
+Communication et Publicité : E1212 Restaurateur / Restauratrice image - E1133 Attaché / Attachée parlementaire - E1132 Directeur éditorial / Directrice éditoriale
+
+
+
+Services à la personne :  K1114 Psychologue scolaire – K1229 Médiateur administratif / Médiatrice administrative - K1230 Coordonnateur / Coordonnatrice de service social
+
+
+
+BTP : F1506 Ouvrier / Ouvrière de la construction modulaire hors-site - F1212 Ingénieur / Ingénieure d'exploitation de gisements – F1146 Géomètre expert / Géomètre experte
+
+
+
+Industrie :  H2712 Technicien / Technicienne d'exploitation en centrale hydroélectrique - H3306 Responsable de silo- H2713 Responsable de production d’énergie.
+
+Dans le cadre d’une collaboration avec l’UIMM, nous avons travaillé sur des fiches dites “métiers cœurs” du partenaire comme H2903 Usineur / Usineuse- H2913 Soudeur / Soudeuse et à la création de fiches I1212 Opérateur / Opératrice d’installation ou maintenance industrielle et H2924 Conducteur / Conductrice de ligne de production en industrie métallurgique.
+
+Avec la branche NSE (Nouveaux Systèmes Energétiques) de l’OPCO2i, nous avons mis en avant dans certaines fiches la transition écologique F1124 Hydrologue-F1114 Conseiller / Conseillère en rénovation énergétique
+
+
+
+Métiers du spectacle : L1317 Directeur / Directrice de casting- L1320 Directeur / Directrice de label-L1216 Acteur / Actrice de complément
+
+
+
+Métiers de l’armée en coopération avec le Ministère des Armées : K1748 Garde républicain / Garde républicaine-K1724 Spécialiste en radioprotection au sein du Ministère des Armées- K1718 Chargé / Chargée de navigation maritime sur navire militaire
+
+
+

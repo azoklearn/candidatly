@@ -1,0 +1,645 @@
+{
+  "_meta": {
+    "note": "Réponses réelles de https://recherche-entreprises.api.gouv.fr, tronquées (nombre de résultats, dirigeants et matching_etablissements limités). Aucun champ renommé. Schéma complet : docs/reference/recherche-entreprises.openapi.json (copie de https://recherche-entreprises.api.gouv.fr/openapi.json).",
+    "fetched_at": "2026-09-09",
+    "user_agent": "candidatly-research/0.1"
+  },
+  "samples": [
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=boulangerie&code_postal=75011&per_page=2",
+      "fetched_at": "2026-09-08",
+      "note": "Réponse réelle, tronquée : 1 seul résultat conservé (sur 2 renvoyés) et matching_etablissements limité à 1 élément. Aucun champ renommé.",
+      "status": 200,
+      "response": {
+        "total_results": 57,
+        "page": 1,
+        "per_page": 2,
+        "total_pages": 29,
+        "results": [
+          {
+            "siren": "812809234",
+            "nom_complet": "BOULANGERIE DU NIL",
+            "nom_raison_sociale": "BOULANGERIE DU NIL",
+            "sigle": null,
+            "nombre_etablissements": 6,
+            "nombre_etablissements_ouverts": 5,
+            "siege": {
+              "activite_principale": "70.10Z",
+              "activite_principale_naf25": "70.10Y",
+              "activite_principale_registre_metier": null,
+              "annee_tranche_effectif_salarie": "2023",
+              "adresse": "7 RUE DU NIL 75002 PARIS",
+              "caractere_employeur": "O",
+              "cedex": null,
+              "code_pays_etranger": null,
+              "code_postal": "75002",
+              "commune": "75102",
+              "complement_adresse": null,
+              "coordonnees": "48.867702377,2.3478165515",
+              "date_creation": "2015-07-02",
+              "date_debut_activite": "2015-07-02",
+              "date_fermeture": null,
+              "date_mise_a_jour": null,
+              "date_mise_a_jour_insee": "2025-12-06T04:08:31",
+              "departement": "75",
+              "distribution_speciale": null,
+              "epci": "200054781",
+              "est_siege": true,
+              "etat_administratif": "A",
+              "geo_adresse": null,
+              "geo_id": null,
+              "indice_repetition": null,
+              "latitude": "48.867702377",
+              "libelle_cedex": null,
+              "libelle_commune": "PARIS",
+              "libelle_commune_etranger": null,
+              "libelle_pays_etranger": null,
+              "libelle_voie": "DU NIL",
+              "liste_enseignes": null,
+              "liste_finess": null,
+              "liste_id_bio": null,
+              "liste_idcc": [
+                "0843"
+              ],
+              "liste_id_organisme_formation": null,
+              "liste_rge": null,
+              "liste_uai": null,
+              "longitude": "2.3478165515",
+              "nom_commercial": null,
+              "numero_voie": "7",
+              "dernier_numero_voie": null,
+              "region": "11",
+              "siret": "81280923400014",
+              "statut_diffusion_etablissement": "O",
+              "tranche_effectif_salarie": "12",
+              "type_voie": "RUE"
+            },
+            "activite_principale": "10.71C",
+            "activite_principale_naf25": "10.71H",
+            "categorie_entreprise": "PME",
+            "caractere_employeur": null,
+            "annee_categorie_entreprise": "2023",
+            "date_creation": "2015-07-02",
+            "date_fermeture": null,
+            "date_mise_a_jour": "2026-09-08T10:15:13",
+            "date_mise_a_jour_insee": "2025-12-06T11:15:45",
+            "date_mise_a_jour_rne": "2026-08-25T16:36:54",
+            "dirigeants": [
+              {
+                "nom": "DROUARD",
+                "prenoms": "ALEXANDRE",
+                "annee_de_naissance": "1983",
+                "date_de_naissance": "1983-05",
+                "qualite": "Gérant",
+                "nationalite": null,
+                "type_dirigeant": "personne physique"
+              }
+            ],
+            "etat_administratif": "A",
+            "nature_juridique": "5499",
+            "section_activite_principale": "C",
+            "tranche_effectif_salarie": "12",
+            "annee_tranche_effectif_salarie": "2023",
+            "statut_diffusion": "O",
+            "matching_etablissements": [
+              {
+                "activite_principale": "10.71C",
+                "activite_principale_naf25": "10.71H",
+                "ancien_siege": false,
+                "annee_tranche_effectif_salarie": null,
+                "adresse": "8 RUE PAUL BERT 75011 PARIS",
+                "caractere_employeur": "N",
+                "code_postal": "75011",
+                "commune": "75111",
+                "date_creation": "2019-10-01",
+                "date_debut_activite": "2019-10-01",
+                "date_fermeture": null,
+                "epci": "200054781",
+                "est_siege": false,
+                "etat_administratif": "A",
+                "geo_id": null,
+                "latitude": "48.851471801",
+                "libelle_commune": "PARIS",
+                "liste_enseignes": null,
+                "liste_finess": null,
+                "liste_id_bio": null,
+                "liste_idcc": null,
+                "liste_id_organisme_formation": null,
+                "liste_rge": null,
+                "liste_uai": null,
+                "longitude": "2.3846570761",
+                "nom_commercial": null,
+                "region": "11",
+                "siret": "81280923400030",
+                "statut_diffusion_etablissement": "O",
+                "tranche_effectif_salarie": "NN"
+              }
+            ],
+            "finances": {
+              "2023": {
+                "ca": 0,
+                "resultat_net": 437133
+              }
+            },
+            "complements": {
+              "collectivite_territoriale": null,
+              "convention_collective_renseignee": true,
+              "liste_idcc": [
+                "0843"
+              ],
+              "liste_finess_juridique": null,
+              "numero_rnf": null,
+              "egapro_renseignee": false,
+              "est_achats_responsables": false,
+              "est_alim_confiance": true,
+              "est_association": false,
+              "est_avocat": false,
+              "est_bio": false,
+              "est_entrepreneur_individuel": false,
+              "est_entrepreneur_spectacle": false,
+              "est_ess": false,
+              "est_finess": false,
+              "est_organisme_formation": false,
+              "est_qualiopi": false,
+              "liste_id_organisme_formation": null,
+              "est_rge": false,
+              "est_siae": false,
+              "est_societe_mission": false,
+              "est_uai": false,
+              "est_patrimoine_vivant": false,
+              "bilan_ges_renseigne": false,
+              "identifiant_association": null,
+              "statut_entrepreneur_spectacle": null,
+              "type_siae": null,
+              "a_aide_minimis": false,
+              "a_aide_ademe": false,
+              "est_administration": false,
+              "est_service_public": null,
+              "est_l100_3": null
+            },
+            "tva": [
+              "FR04812809234"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=81280923400030",
+      "note": "Recherche directe par SIRET (14 chiffres) : 1 résultat, matching_etablissements ne contient que le SIRET demandé, siege = siège de l'unité légale (autre SIRET). dirigeants tronqué à 2.",
+      "status": 200,
+      "response": {
+        "results": [
+          {
+            "siren": "812809234",
+            "nom_complet": "BOULANGERIE DU NIL",
+            "nom_raison_sociale": "BOULANGERIE DU NIL",
+            "sigle": null,
+            "nombre_etablissements": 6,
+            "nombre_etablissements_ouverts": 5,
+            "siege": {
+              "activite_principale": "70.10Z",
+              "activite_principale_naf25": "70.10Y",
+              "activite_principale_registre_metier": null,
+              "annee_tranche_effectif_salarie": "2023",
+              "adresse": "7 RUE DU NIL 75002 PARIS",
+              "caractere_employeur": "O",
+              "cedex": null,
+              "code_pays_etranger": null,
+              "code_postal": "75002",
+              "commune": "75102",
+              "complement_adresse": null,
+              "coordonnees": "48.867702377,2.3478165515",
+              "date_creation": "2015-07-02",
+              "date_debut_activite": "2015-07-02",
+              "date_fermeture": null,
+              "date_mise_a_jour": null,
+              "date_mise_a_jour_insee": "2025-12-06T04:08:31",
+              "departement": "75",
+              "distribution_speciale": null,
+              "epci": "200054781",
+              "est_siege": true,
+              "etat_administratif": "A",
+              "geo_adresse": null,
+              "geo_id": null,
+              "indice_repetition": null,
+              "latitude": "48.867702377",
+              "libelle_cedex": null,
+              "libelle_commune": "PARIS",
+              "libelle_commune_etranger": null,
+              "libelle_pays_etranger": null,
+              "libelle_voie": "DU NIL",
+              "liste_enseignes": null,
+              "liste_finess": null,
+              "liste_id_bio": null,
+              "liste_idcc": [
+                "0843"
+              ],
+              "liste_id_organisme_formation": null,
+              "liste_rge": null,
+              "liste_uai": null,
+              "longitude": "2.3478165515",
+              "nom_commercial": null,
+              "numero_voie": "7",
+              "dernier_numero_voie": null,
+              "region": "11",
+              "siret": "81280923400014",
+              "statut_diffusion_etablissement": "O",
+              "tranche_effectif_salarie": "12",
+              "type_voie": "RUE"
+            },
+            "activite_principale": "10.71C",
+            "activite_principale_naf25": "10.71H",
+            "categorie_entreprise": "PME",
+            "caractere_employeur": null,
+            "annee_categorie_entreprise": "2023",
+            "date_creation": "2015-07-02",
+            "date_fermeture": null,
+            "date_mise_a_jour": "2026-09-08T10:15:13",
+            "date_mise_a_jour_insee": "2025-12-06T11:15:45",
+            "date_mise_a_jour_rne": "2026-08-25T16:36:54",
+            "dirigeants": [
+              {
+                "nom": "DROUARD",
+                "prenoms": "ALEXANDRE",
+                "annee_de_naissance": "1983",
+                "date_de_naissance": "1983-05",
+                "qualite": "Gérant",
+                "nationalite": null,
+                "type_dirigeant": "personne physique"
+              }
+            ],
+            "etat_administratif": "A",
+            "nature_juridique": "5499",
+            "section_activite_principale": "C",
+            "tranche_effectif_salarie": "12",
+            "annee_tranche_effectif_salarie": "2023",
+            "statut_diffusion": "O",
+            "matching_etablissements": [
+              {
+                "activite_principale": "10.71C",
+                "activite_principale_naf25": "10.71H",
+                "ancien_siege": false,
+                "annee_tranche_effectif_salarie": null,
+                "adresse": "8 RUE PAUL BERT 75011 PARIS",
+                "caractere_employeur": "N",
+                "code_postal": "75011",
+                "commune": "75111",
+                "date_creation": "2019-10-01",
+                "date_debut_activite": "2019-10-01",
+                "date_fermeture": null,
+                "epci": "200054781",
+                "est_siege": false,
+                "etat_administratif": "A",
+                "geo_id": null,
+                "latitude": "48.851471801",
+                "libelle_commune": "PARIS",
+                "liste_enseignes": null,
+                "liste_finess": null,
+                "liste_id_bio": null,
+                "liste_idcc": null,
+                "liste_id_organisme_formation": null,
+                "liste_rge": null,
+                "liste_uai": null,
+                "longitude": "2.3846570761",
+                "nom_commercial": null,
+                "region": "11",
+                "siret": "81280923400030",
+                "statut_diffusion_etablissement": "O",
+                "tranche_effectif_salarie": "NN"
+              }
+            ],
+            "finances": {
+              "2023": {
+                "ca": 0,
+                "resultat_net": 437133
+              }
+            },
+            "complements": {
+              "collectivite_territoriale": null,
+              "convention_collective_renseignee": true,
+              "liste_idcc": [
+                "0843"
+              ],
+              "liste_finess_juridique": null,
+              "numero_rnf": null,
+              "egapro_renseignee": false,
+              "est_achats_responsables": false,
+              "est_alim_confiance": true,
+              "est_association": false,
+              "est_avocat": false,
+              "est_bio": false,
+              "est_entrepreneur_individuel": false,
+              "est_entrepreneur_spectacle": false,
+              "est_ess": false,
+              "est_finess": false,
+              "est_organisme_formation": false,
+              "est_qualiopi": false,
+              "liste_id_organisme_formation": null,
+              "est_rge": false,
+              "est_siae": false,
+              "est_societe_mission": false,
+              "est_uai": false,
+              "est_patrimoine_vivant": false,
+              "bilan_ges_renseigne": false,
+              "identifiant_association": null,
+              "statut_entrepreneur_spectacle": null,
+              "type_siae": null,
+              "a_aide_minimis": false,
+              "a_aide_ademe": false,
+              "est_administration": false,
+              "est_service_public": null,
+              "est_l100_3": null
+            },
+            "tva": [
+              "FR04812809234"
+            ]
+          }
+        ],
+        "total_results": 1,
+        "page": 1,
+        "per_page": 10,
+        "total_pages": 1
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=812809234",
+      "note": "Recherche directe par SIREN (9 chiffres) : matching_etablissements est toujours vide. Champs siege/finances/complements/tva retirés ici pour la lisibilité (identiques à l'exemple SIRET).",
+      "status": 200,
+      "response": {
+        "results": [
+          {
+            "siren": "812809234",
+            "nom_complet": "BOULANGERIE DU NIL",
+            "nom_raison_sociale": "BOULANGERIE DU NIL",
+            "sigle": null,
+            "nombre_etablissements": 6,
+            "nombre_etablissements_ouverts": 5,
+            "activite_principale": "10.71C",
+            "activite_principale_naf25": "10.71H",
+            "categorie_entreprise": "PME",
+            "caractere_employeur": null,
+            "annee_categorie_entreprise": "2023",
+            "date_creation": "2015-07-02",
+            "date_fermeture": null,
+            "date_mise_a_jour": "2026-09-08T10:15:13",
+            "date_mise_a_jour_insee": "2025-12-06T11:15:45",
+            "date_mise_a_jour_rne": "2026-08-25T16:36:54",
+            "dirigeants": [
+              {
+                "nom": "DROUARD",
+                "prenoms": "ALEXANDRE",
+                "annee_de_naissance": "1983",
+                "date_de_naissance": "1983-05",
+                "qualite": "Gérant",
+                "nationalite": null,
+                "type_dirigeant": "personne physique"
+              }
+            ],
+            "etat_administratif": "A",
+            "nature_juridique": "5499",
+            "section_activite_principale": "C",
+            "tranche_effectif_salarie": "12",
+            "annee_tranche_effectif_salarie": "2023",
+            "statut_diffusion": "O",
+            "matching_etablissements": []
+          }
+        ],
+        "total_results": 1,
+        "page": 1,
+        "per_page": 10,
+        "total_pages": 1
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=Capgemini&code_postal=92130&per_page=2&minimal=true&include=score",
+      "note": "Réponse minimale avec score Elasticsearch brut (non normalisé).",
+      "status": 200,
+      "response": {
+        "results": [
+          {
+            "siren": "479766842",
+            "nom_complet": "CAPGEMINI TECHNOLOGY SERVICES",
+            "nom_raison_sociale": "CAPGEMINI TECHNOLOGY SERVICES",
+            "sigle": null,
+            "nombre_etablissements": 112,
+            "nombre_etablissements_ouverts": 59,
+            "activite_principale": "62.02A",
+            "activite_principale_naf25": "62.20G",
+            "categorie_entreprise": "GE",
+            "caractere_employeur": null,
+            "annee_categorie_entreprise": "2023",
+            "date_creation": "2004-11-16",
+            "date_fermeture": null,
+            "date_mise_a_jour": "2026-09-08T09:13:40",
+            "date_mise_a_jour_insee": "2026-07-14T13:14:37",
+            "date_mise_a_jour_rne": "2026-08-28T13:07:10",
+            "etat_administratif": "A",
+            "nature_juridique": "5710",
+            "section_activite_principale": "J",
+            "tranche_effectif_salarie": "53",
+            "annee_tranche_effectif_salarie": "2023",
+            "statut_diffusion": "O",
+            "score": 1944.792
+          },
+          {
+            "siren": "479766800",
+            "nom_complet": "CAPGEMINI CONSULTING ()",
+            "nom_raison_sociale": "CAPGEMINI CONSULTING",
+            "sigle": null,
+            "nombre_etablissements": 13,
+            "nombre_etablissements_ouverts": 7,
+            "activite_principale": "62.02A",
+            "activite_principale_naf25": "62.20G",
+            "categorie_entreprise": "GE",
+            "caractere_employeur": null,
+            "annee_categorie_entreprise": "2023",
+            "date_creation": "2004-11-16",
+            "date_fermeture": null,
+            "date_mise_a_jour": "2026-09-08T09:13:40",
+            "date_mise_a_jour_insee": "2025-12-06T09:35:39",
+            "date_mise_a_jour_rne": "2026-08-25T16:25:01",
+            "etat_administratif": "A",
+            "nature_juridique": "5710",
+            "section_activite_principale": "J",
+            "tranche_effectif_salarie": "51",
+            "annee_tranche_effectif_salarie": "2023",
+            "statut_diffusion": "O",
+            "score": 1510.7189
+          }
+        ],
+        "total_results": 9,
+        "page": 1,
+        "per_page": 2,
+        "total_pages": 5
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/near_point?lat=48.8566&long=2.3522&radius=0.5&per_page=2",
+      "note": "Recherche géographique, 1 seul résultat conservé, champs lourds retirés.",
+      "status": 200,
+      "response": {
+        "results": [
+          {
+            "siren": "356000000",
+            "nom_complet": "LA POSTE",
+            "nom_raison_sociale": "LA POSTE",
+            "sigle": null,
+            "nombre_etablissements": 13130,
+            "nombre_etablissements_ouverts": 8862,
+            "activite_principale": "53.10Z",
+            "activite_principale_naf25": "53.10Y",
+            "categorie_entreprise": "GE",
+            "caractere_employeur": null,
+            "annee_categorie_entreprise": "2023",
+            "date_creation": "1991-01-01",
+            "date_fermeture": null,
+            "date_mise_a_jour": "2026-09-08T08:26:37",
+            "date_mise_a_jour_insee": "2026-07-10T10:25:02",
+            "date_mise_a_jour_rne": "2026-03-04T16:22:49",
+            "dirigeants": [
+              {
+                "nom": "BAUDRY",
+                "prenoms": "IRENE",
+                "annee_de_naissance": "1976",
+                "date_de_naissance": "1976-05",
+                "qualite": "Autre",
+                "nationalite": null,
+                "type_dirigeant": "personne physique"
+              },
+              {
+                "nom": "CHEVET-DEHAIL",
+                "prenoms": "STEPHANE",
+                "annee_de_naissance": "1975",
+                "date_de_naissance": "1975-06",
+                "qualite": "Autre",
+                "nationalite": null,
+                "type_dirigeant": "personne physique"
+              }
+            ],
+            "etat_administratif": "A",
+            "nature_juridique": "5510",
+            "section_activite_principale": "H",
+            "tranche_effectif_salarie": "53",
+            "annee_tranche_effectif_salarie": "2023",
+            "statut_diffusion": "O",
+            "matching_etablissements": [
+              {
+                "activite_principale": "53.10Z",
+                "activite_principale_naf25": null,
+                "ancien_siege": false,
+                "annee_tranche_effectif_salarie": null,
+                "adresse": "1 BOULEVARD DU PALAIS 75004 PARIS",
+                "caractere_employeur": "N",
+                "code_postal": "75004",
+                "commune": "75104",
+                "date_creation": "2012-01-01",
+                "date_debut_activite": "2018-12-31",
+                "date_fermeture": "2018-12-31",
+                "epci": "200054781",
+                "est_siege": false,
+                "etat_administratif": "F",
+                "geo_id": null,
+                "latitude": "48.855674442",
+                "libelle_commune": "PARIS",
+                "liste_enseignes": [
+                  "LA POSTE"
+                ],
+                "liste_finess": null,
+                "liste_id_bio": null,
+                "liste_idcc": null,
+                "liste_id_organisme_formation": null,
+                "liste_rge": null,
+                "liste_uai": null,
+                "longitude": "2.3468157199",
+                "nom_commercial": null,
+                "region": "11",
+                "siret": "35600000037240",
+                "statut_diffusion_etablissement": "O",
+                "tranche_effectif_salarie": "NN"
+              }
+            ]
+          }
+        ],
+        "total_results": 10000,
+        "page": 1,
+        "per_page": 2,
+        "total_pages": 5000
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search",
+      "status": 400,
+      "response": {
+        "erreur": "Veuillez indiquer au moins un paramètre de recherche."
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=a",
+      "status": 400,
+      "response": {
+        "erreur": "3 caractères minimum pour les termes de la requête (ou utilisez au moins un filtre)"
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=Capgemini&per_page=26",
+      "status": 400,
+      "response": {
+        "erreur": "Veuillez indiquer un paramètre `per_page` entre `1` et `25`, par défaut `10`."
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=boulangerie&per_page=25&page=401",
+      "status": 400,
+      "response": {
+        "erreur": "Le nombre total de résultats est restreint à 10 000. Pour garantir cela, le produit du numéro de page (par défaut, page = 1) et du nombre de résultats par page (par défaut, per_page = 10), c'est-à-dire `page * per_page`, ne doit pas excéder 10 000."
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=test&code_postal=ABC",
+      "status": 400,
+      "response": {
+        "erreur": "Au moins une valeur du paramètre code_postal est non valide."
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=boulangerie&include=siege",
+      "status": 400,
+      "response": {
+        "erreur": "Veuillez indiquer si vous souhaitez une réponse minimale avec le filtre `minimal=True`` avant de préciser les champs à inclure."
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=Capgemini&include=foo&minimal=true",
+      "status": 400,
+      "response": {
+        "erreur": "Au moins un champ à inclure est non valide. Les champs valides : ['complements', 'dirigeants', 'finances', 'score', 'siege', 'matching_etablissements', 'tva']."
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=00000000000000",
+      "status": 200,
+      "note": "SIRET inconnu : 200 avec results vide.",
+      "response": {
+        "results": [],
+        "total_results": 0,
+        "page": 1,
+        "per_page": 10,
+        "total_pages": 0
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/nope",
+      "status": 404,
+      "response": {
+        "erreur": "Ressource non trouvée."
+      }
+    },
+    {
+      "request": "GET https://recherche-entreprises.api.gouv.fr/search?q=boulangerie&per_page=1&minimal=true&page=12 (rafale de 20 requêtes parallèles)",
+      "status": 429,
+      "note": "Corps HTML nginx, content-type text/html, aucun en-tête Retry-After observé malgré la documentation.",
+      "response": "<html>\r\n<head><title>429 Too Many Requests</title></head>\r\n<body>\r\n<center><h1>429 Too Many Requests</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>"
+    }
+  ]
+}

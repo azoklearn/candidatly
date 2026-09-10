@@ -1,0 +1,13 @@
+# Compréhension du projet (phase 0)
+
+1. **Le produit.** Candidatly aide un étudiant français (Bac+2 à Bac+5) à trouver les offres d'alternance publiées qui correspondent à son domaine (codes ROME), son niveau et sa zone, puis à candidater vite et bien.
+2. Pour chaque offre, il construit une fiche employeur (API Recherche d'entreprises + site public de l'entreprise, résumé par Haiku) et adapte la lettre de motivation de l'étudiant à l'offre (Sonnet) en gardant sa voix et sans inventer de faits.
+3. L'étudiant relit le diff, modifie, valide explicitement, puis la candidature (CV + lettre) part par la route de candidature de l'API Alternance ; il suit ensuite ses réponses (statuts mis à jour à la main) et reçoit des propositions de relance à J+5.
+4. Modèle économique : 1 crédit débité par envoi (pas par génération), 5 crédits offerts, packs Stripe sans abonnement ni expiration.
+5. Sources exclusivement officielles : API Alternance (offres), API Recherche d'entreprises (fiche), API Adresse (géolocalisation), site web de l'entreprise dans le respect de robots.txt. Jamais de scraping de job boards.
+6. **Hors MVP.** Pas d'offres de stage (V2 via Adzuna et France Travail), mais l'abstraction `OfferProvider` est posée dès le MVP pour les brancher sans refonte.
+7. Pas de candidature spontanée, pas d'envoi ni de relance par Gmail, pas de suivi automatique des réponses, pas d'enrichissement d'emails de contacts, pas de carte obligatoire.
+8. Jamais d'envoi silencieux : chaque candidature passe par une confirmation explicite de l'étudiant, et toute sortie LLM est validée par Zod puis post-traitée (longueur, passages modifiés retrouvés dans la lettre de base).
+9. **Risque 1, les conditions de l'API Alternance et le canal d'envoi.** Ses pages officielles la réservent « à des usages non lucratifs » et interdisent « la facturation de l'accès pour des tiers comme des candidats », et l'habilitation de production pour candidater est accordée à la main ; de plus une partie des offres (France Travail notamment) n'est pas candidatable par l'API. Sans accord écrit du support, le modèle à crédits du brief n'est pas applicable tel quel (voir `docs/QUESTIONS.md`, A1 et A2).
+10. **Risque 2, la qualité de la lettre.** Sonnet doit adapter sans inventer ni lisser la voix de l'étudiant ; les garde-fous (diff vérifié, longueur 90 à 110 %, une seule régénération automatique, 3 régénérations manuelles) doivent être testés sur de vraies lettres avant la bêta.
+11. **Risque 3, le mapping ROME et la fraîcheur des offres.** Des codes ROME hallucinés ou trop larges vident ou polluent la recherche : validation contre la nomenclature officielle stockée en base. Le cache des offres (TTL 6 h) doit gérer expiration, doublons entre partenaires et quotas de l'API.
