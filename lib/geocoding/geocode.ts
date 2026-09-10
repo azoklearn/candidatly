@@ -103,7 +103,14 @@ export async function searchPlaces(
     fetchImpl: options.fetchImpl,
     retry: { maxRetries: 1 },
   });
-  return data.features.flatMap(toPlace);
+  // The geocoder sometimes returns the same place twice (seen with "Lyon").
+  const seen = new Set<string>();
+  return data.features.flatMap(toPlace).filter((place) => {
+    const key = `${place.label}|${place.citycode ?? ""}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /**

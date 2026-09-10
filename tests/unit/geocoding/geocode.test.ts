@@ -89,3 +89,18 @@ describe("resolvePlace", () => {
     ).toBeNull();
   });
 });
+
+describe("searchPlaces duplicates", () => {
+  it("drops a place returned twice by the geocoder", async () => {
+    const body = JSON.parse(
+      readFileSync(new URL("../../fixtures/geocoding/search.json", import.meta.url), "utf8"),
+    );
+    body.features = [body.features[0], body.features[0]];
+    const fetchImpl = async () =>
+      new Response(JSON.stringify(body), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    expect(await searchPlaces("lyon", { baseUrl: BASE_URL, fetchImpl })).toHaveLength(1);
+  });
+});
