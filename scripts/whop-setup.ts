@@ -1,24 +1,24 @@
 /**
- * Sets up payments on Whop (docs/RUNBOOK.md, "Paiements Whop"): one product, the six plans
- * of lib/pricing.ts (three plans, monthly and yearly, in euros) and the webhook, then records
- * the plans in Supabase. Safe to run again: recorded plans and an existing webhook secret are
- * kept. Prints ids only, never a secret; the webhook secret is appended to .env.local.
- * Usage: npm run whop:setup [-- --site=https://www.candidatly.app]
+ * Links the plans created on Whop to our six plans (docs/RUNBOOK.md, "Paiements Whop"): lists
+ * the company's plans, pairs them with lib/pricing.ts by billing period and price in euros,
+ * records the pairs in billing_plans, then creates the webhook. Safe to run again: pairs are
+ * updated and an existing webhook secret is kept. Prints ids and prices only, never a secret;
+ * the webhook secret is appended to .env.local.
+ * Usage: npm run whop:setup -- [--dry-run] [--map=basic:monthly=plan_x,...] [--site=https://...]
  */
 import { appendFileSync } from "node:fs";
 
 import { createClient } from "@supabase/supabase-js";
 
-import { ANNUAL_MONTHS_CHARGED, BILLINGS, PLANS, type Billing } from "../lib/pricing.ts";
+import { matchWhopPlans, parsePlanMap, type WhopPlanListing } from "../lib/billing/match-plans.ts";
+import { ANNUAL_MONTHS_CHARGED, BILLINGS, PLANS } from "../lib/pricing.ts";
 import type { Database } from "../lib/supabase/database.types.ts";
 
+const option = (name: string) =>
+  process.argv.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
+const DRY_RUN = process.argv.includes("--dry-run");
 const API = (process.env.WHOP_API_BASE_URL || "https://api.whop.com/api/v1").replace(/\/+$/, "");
-const SITE = (
-  process.argv.find((arg) => arg.startsWith("--site="))?.slice("--site=".length) ||
-  "https://www.candidatly.app"
-).replace(/\/+$/, "");
-const PERIOD_DAYS: Record<Billing, number> = { monthly: 30, annual: 365 };
-const PERIOD_LABEL: Record<Billing, string> = { monthly: "mensuel", annual: "annuel" };
+const SITE = (option("site") || "https://www.candidatly.app").replace(/\/+$/, "");
 const WEBHOOK_EVENTS = [
   "membership.activated",
   "membership.deactivated",
@@ -49,57 +49,88 @@ async function whop<T>(path: string, body?: unknown): Promise<T> {
   return JSON.parse(text) as T;
 }
 
+type PlanPage = {
+  data: WhopPlanListing[];
+  page_info?: { has_next_page?: boolean; end_cursor?: string | null };
+};
+
+async function listPlans(companyId: string): Promise<WhopPlanListing[]> {
+  const plans: WhopPlanListing[] = [];
+  let after: string | null = null;
+  do {
+    const query = new URLSearchParams({ company_id: companyId });
+    if (after) query.set("after", after);
+    const page: PlanPage = await whop<PlanPage>(`/plans?${query}`);
+    plans.push(...page.data);
+    after = page.page_info?.has_next_page ? (page.page_info.end_cursor ?? null) : null;
+  } while (after);
+  return plans;
+}
+
+const euros = (value: number | null | undefined) =>
+  typeof value === "number" ? value.toFixed(2) : "?";
+
 async function main() {
+  const account = await whop<{ id: string; title?: string }>("/accounts/me");
+  console.log(`Whop account: ${account.id}${account.title ? ` (${account.title})` : ""}`);
+
+  const listings = await listPlans(account.id);
+  console.log(`${listings.length} plan(s) on Whop:`);
+  for (const plan of listings) {
+    const first =
+      plan.initial_price !== plan.renewal_price
+        ? `, first payment ${euros(plan.initial_price)}`
+        : "";
+    console.log(
+      `  ${plan.id}  ${plan.title ?? ""}  ${euros(plan.renewal_price ?? plan.initial_price)} ${(plan.currency ?? "?").toUpperCase()} every ${plan.billing_period ?? "?"} days (${plan.plan_type ?? "?"}${first})`,
+    );
+  }
+
+  const result = matchWhopPlans({
+    plans: PLANS,
+    billings: BILLINGS,
+    annualMonths: ANNUAL_MONTHS_CHARGED,
+    listings,
+    explicit: parsePlanMap(option("map")),
+  });
+  for (const link of result.links) {
+    console.log(
+      `Linked ${link.plan} ${link.billing} -> ${link.providerPlanId} (${euros(link.priceCents / 100)} EUR)`,
+    );
+  }
+  if (result.missing.length > 0 || result.ambiguous.length > 0) {
+    if (result.missing.length > 0)
+      console.log(`No Whop plan at our price for: ${result.missing.join(", ")}`);
+    if (result.ambiguous.length > 0)
+      console.log(`Several Whop plans fit: ${result.ambiguous.join(", ")}`);
+    console.log(
+      "Nothing written. Align the price and period in Whop, or name the plans: --map=basic:monthly=plan_...",
+    );
+    process.exitCode = 1;
+    return;
+  }
+  if (DRY_RUN) {
+    console.log("Dry run: nothing written.");
+    return;
+  }
+
   const db = createClient<Database>(
     required("NEXT_PUBLIC_SUPABASE_URL"),
     required("SUPABASE_SECRET_KEY"),
     { auth: { persistSession: false } },
   );
-  const account = await whop<{ id: string; title?: string }>("/accounts/me");
-  console.log(`Whop account: ${account.id}${account.title ? ` (${account.title})` : ""}`);
-
-  const existing = await db.from("billing_plans").select("plan, billing").eq("provider", "whop");
-  if (existing.error) throw new Error(`billing_plans: ${existing.error.message}`);
-  const recorded = new Set(existing.data.map((row) => `${row.plan}:${row.billing}`));
-  const missing = PLANS.flatMap((plan) => BILLINGS.map((billing) => ({ plan, billing }))).filter(
-    ({ plan, billing }) => !recorded.has(`${plan.id}:${billing}`),
+  const saved = await db.from("billing_plans").upsert(
+    result.links.map((link) => ({
+      provider: "whop",
+      plan: link.plan,
+      billing: link.billing,
+      provider_plan_id: link.providerPlanId,
+      price_cents: link.priceCents,
+    })),
+    { onConflict: "provider,plan,billing" },
   );
-
-  if (missing.length > 0) {
-    const product = await whop<{ id: string }>("/products", {
-      account_id: account.id,
-      title: "Candidatly",
-      description:
-        "Les offres d’alternance près de chez vous et une lettre adaptée à chaque entreprise.",
-    });
-    console.log(`Product: ${product.id}`);
-    for (const { plan, billing } of missing) {
-      const cents =
-        billing === "monthly" ? plan.monthlyCents : plan.monthlyCents * ANNUAL_MONTHS_CHARGED;
-      const price = cents / 100;
-      const created = await whop<{ id: string }>("/plans", {
-        company_id: account.id,
-        product_id: product.id,
-        title: `${plan.name} (${PERIOD_LABEL[billing]})`,
-        plan_type: "renewal",
-        billing_period: PERIOD_DAYS[billing],
-        initial_price: price,
-        renewal_price: price,
-        currency: "eur",
-      });
-      const saved = await db.from("billing_plans").insert({
-        provider: "whop",
-        plan: plan.id,
-        billing,
-        provider_plan_id: created.id,
-        price_cents: cents,
-      });
-      if (saved.error) throw new Error(`billing_plans insert: ${saved.error.message}`);
-      console.log(`Plan ${plan.id} ${billing}: ${created.id} (${price.toFixed(2)} EUR)`);
-    }
-  } else {
-    console.log("The six plans are already recorded.");
-  }
+  if (saved.error) throw new Error(`billing_plans: ${saved.error.message}`);
+  console.log("The six plans are recorded in Supabase.");
 
   if (process.env.WHOP_WEBHOOK_SECRET) {
     console.log("WHOP_WEBHOOK_SECRET is already set: webhook left as it is.");
