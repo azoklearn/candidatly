@@ -16,8 +16,8 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 |---|---|---|
 | 0 | Cadrage, lecture des API, questions ouvertes, ce fichier | Validée le 10 septembre 2026 |
 | 1 | Init Next.js, Supabase (migrations, RLS, bucket), auth, `OfferProvider` + tests | Validée le 11 septembre 2026, fusionnée dans `main` |
-| 2 | Onboarding 6 étapes, mapping ROME, extraction CV/lettre, jobs `sync-offers` / `compute-matches`, écrans offres | Livrée sur la branche `phase-2`, en attente de validation |
-| 3 | `enrich-company`, résumé entreprise, génération de lettre + diff | À faire |
+| 2 | Onboarding 6 étapes, mapping ROME, extraction CV/lettre, jobs `sync-offers` / `compute-matches`, écrans offres | Validée le 11 septembre 2026, fusionnée dans `main` |
+| 3 | `enrich-company`, résumé entreprise, génération de lettre + diff | En cours sur la branche `phase-3` |
 | 4 | Envoi, suivi, facturation (crédits ou abonnement selon A5), compte / export / suppression, Playwright | À faire |
 | 5 | Landing, légal, rate limiting, Sentry, coûts LLM, `docs/RUNBOOK.md` complet | À faire |
 
@@ -202,3 +202,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-10 : projet Supabase cloud de développement « candidatly » créé par l'owner (région Paris, ref `ylupsjydkbmryctfrfte`) et lié à la CLI. Les six migrations y sont appliquées ; les types viennent désormais de la CLI officielle. Vérifié sur la base réelle : création du profil et du solde à l'inscription, RLS (profil, crédits, historique, tables de service), stockage privé par dossier et types de fichiers.
 - 2026-09-11 : phase 2 livrée sur `phase-2`. Onboarding en 6 étapes, choix des métiers ROME (repli sur le classement de la nomenclature tant que la clé Anthropic manque), lecture des CV PDF et des lettres PDF, Word ou collées, recherche des offres et calcul des correspondances en ligne faute de compte Trigger.dev, écrans liste et détail des offres. Deux corrections après test réel : classement ROME (C55) et doublons du géocodeur (C58). Parcours complet vérifié sur le projet cloud avec un utilisateur de test.
 - 2026-09-11 : l'owner se passe de l'API Anthropic pour l'instant et remplace Trigger.dev par Supabase Cron (B10). Trigger.dev est retiré du projet ; une migration planifie l'appel de `/api/cron/sync-offers` toutes les 15 minutes, l'adresse du site et le secret étant rangés dans Vault. Correction après test réel : une offre renvoyée deux fois par l'API faisait échouer l'enregistrement (C61).
+- 2026-09-11 : phase 2 validée par l'owner (« je valide tout, lance tout ») et fusionnée dans `main`. Phase 3 démarrée sur `phase-3`, sans API Anthropic : fiche entreprise et lettre construites sans IA, avec un point d'entrée prévu pour un modèle plus tard.
