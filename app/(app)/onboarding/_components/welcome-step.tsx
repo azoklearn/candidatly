@@ -1,25 +1,34 @@
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
-import { ONBOARDING_STEPS } from "@/lib/onboarding/state";
+
+const QUESTIONS = [
+  "Qui vous êtes et ce que vous étudiez",
+  "Le métier qui vous attire",
+  "Où vous voulez travailler",
+  "Votre CV et votre lettre de motivation",
+];
 
 export function WelcomeStep({ firstName }: { firstName: string | null }) {
   return (
     <div className="grid gap-6">
-      <p className="text-muted-foreground">
-        {firstName ? `Bienvenue ${firstName}, votre` : "Votre"} compte est créé. Quelques minutes
-        suffisent pour configurer votre recherche d’alternance.
+      <p className="text-lg text-muted-foreground">
+        {firstName ? `Bonjour ${firstName} ! ` : ""}Quelques questions rapides, et nous vous
+        montrons les offres faites pour vous.
       </p>
-      <ol className="grid gap-2 text-sm">
-        {ONBOARDING_STEPS.slice(1).map((item) => (
-          <li key={item.step} className="flex gap-3">
-            <span className="w-5 text-muted-foreground">{item.step}.</span>
-            {item.title}
+      <ul className="grid gap-2 text-sm">
+        {QUESTIONS.map((question) => (
+          <li key={question} className="flex items-center gap-3">
+            <span aria-hidden className="size-1.5 rounded-full bg-primary" />
+            {question}
           </li>
         ))}
-      </ol>
-      <Link href="/onboarding/2" className={buttonVariants({ size: "lg" }) + " w-fit"}>
-        Commencer
+      </ul>
+      <Link
+        href="/onboarding/2"
+        className={`${buttonVariants({ size: "lg" })} h-12 w-fit px-6 text-base`}
+      >
+        C’est parti
       </Link>
     </div>
   );

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { saveLocation, type FormState } from "../actions";
-import { FieldHint, selectClassName } from "./fields";
+import { ChoiceGroup, FieldHint } from "./fields";
 
 const PlaceSchema = z.object({
   label: z.string(),
@@ -79,7 +79,7 @@ export function LocationStep({
     <ActionForm action={action} className="grid gap-5">
       <input type="hidden" name="mode" value={mode} />
       <div className="grid gap-2">
-        <Label htmlFor="place">Ville ou adresse autour de laquelle chercher</Label>
+        <Label htmlFor="place">Votre ville ou votre adresse</Label>
         <Input
           id="place"
           value={query}
@@ -123,19 +123,16 @@ export function LocationStep({
       <input type="hidden" name="label" value={chosen?.label ?? ""} />
       <input type="hidden" name="citycode" value={chosen?.citycode ?? ""} />
       <div className="grid gap-2">
-        <Label htmlFor="radius">Rayon de recherche</Label>
-        <select
-          id="radius"
+        <ChoiceGroup
           name="radius"
-          defaultValue={radiusDefault}
-          className={selectClassName + " sm:w-48"}
-        >
-          {RADIUS_OPTIONS.map((radius) => (
-            <option key={radius} value={radius}>
-              {radius} km
-            </option>
-          ))}
-        </select>
+          legend="Jusqu’à quelle distance ?"
+          options={RADIUS_OPTIONS.map((radius) => ({
+            value: String(radius),
+            label: `${radius} km`,
+          }))}
+          defaultValue={String(radiusDefault)}
+          gridClassName="grid-cols-3 sm:grid-cols-5"
+        />
         <FieldHint>Vous pourrez l’élargir si vous trouvez peu d’offres.</FieldHint>
       </div>
       {state.error ? (

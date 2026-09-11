@@ -11,7 +11,7 @@ export function StepHeader({ step }: { step: number }) {
         </span>
         {step > 1 ? (
           <Link href={`/onboarding/${step - 1}`} className="underline underline-offset-4">
-            Étape précédente
+            Retour
           </Link>
         ) : null}
       </div>
@@ -21,7 +21,7 @@ export function StepHeader({ step }: { step: number }) {
           style={{ width: `${(step / LAST_STEP) * 100}%` }}
         />
       </div>
-      <h1 className="text-2xl font-semibold tracking-tight">{stepTitle(step)}</h1>
+      <h1 className="text-3xl font-semibold tracking-tight">{stepTitle(step)}</h1>
     </header>
   );
 }

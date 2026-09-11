@@ -13,9 +13,9 @@ export default function SignUpPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Créer un compte</CardTitle>
+        <CardTitle>Créez votre espace</CardTitle>
         <CardDescription>
-          Quelques minutes pour configurer votre recherche d’alternance.
+          Ensuite, quelques questions rapides et vos offres s’affichent.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">

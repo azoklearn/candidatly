@@ -3,12 +3,12 @@ import type { Tables } from "@/lib/supabase/database.types";
 /** Onboarding steps (brief section 5.1) and progress rules. Step 1, the account, is done at sign-up. */
 
 export const ONBOARDING_STEPS = [
-  { step: 1, title: "Création du compte" },
-  { step: 2, title: "Votre profil" },
-  { step: 3, title: "Domaine recherché" },
-  { step: 4, title: "Localisation" },
-  { step: 5, title: "CV et lettre de motivation" },
-  { step: 6, title: "Tout est prêt" },
+  { step: 1, title: "Bienvenue !" },
+  { step: 2, title: "Parlons de vous" },
+  { step: 3, title: "Quel métier vous attire ?" },
+  { step: 4, title: "Où voulez-vous travailler ?" },
+  { step: 5, title: "Votre CV et votre lettre" },
+  { step: 6, title: "C’est prêt !" },
 ] as const;
 
 export const LAST_STEP = ONBOARDING_STEPS.length;

@@ -42,7 +42,7 @@ export function RomeStep({
   return (
     <div className="grid gap-8">
       <ActionForm action={suggestAction} className="grid gap-3">
-        <Label htmlFor="domain_free_text">Quel domaine visez-vous ?</Label>
+        <Label htmlFor="domain_free_text">Votre domaine, en quelques mots</Label>
         <textarea
           id="domain_free_text"
           name="domain_free_text"
@@ -65,7 +65,7 @@ export function RomeStep({
           </Alert>
         ) : null}
         <Button type="submit" variant="outline" disabled={suggesting} className="w-fit">
-          {suggesting ? "Recherche des métiers…" : "Proposer des métiers"}
+          {suggesting ? "Recherche des métiers…" : "Voir les métiers qui correspondent"}
         </Button>
       </ActionForm>
 
