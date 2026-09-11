@@ -3,9 +3,7 @@ import { expect, test } from "@playwright/test";
 test("the landing page and the legal pages are public", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: "Trouver mon stage ou mon alternance" }),
-  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Trouver mon opportunité" })).toBeVisible();
   await expect(
     page.getByRole("link", { name: "Trouver les offres qui me correspondent" }),
   ).toBeVisible();
