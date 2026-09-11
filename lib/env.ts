@@ -103,6 +103,17 @@ export function parseGeocodingEnv(source: EnvSource): GeocodingEnv {
 
 export const getGeocodingEnv = memoize(() => parseGeocodingEnv(process.env));
 
+const RechercheEntreprisesEnvSchema = z.object({
+  RECHERCHE_ENTREPRISES_BASE_URL: z.url().default("https://recherche-entreprises.api.gouv.fr"),
+});
+export type RechercheEntreprisesEnv = z.output<typeof RechercheEntreprisesEnvSchema>;
+
+export function parseRechercheEntreprisesEnv(source: EnvSource): RechercheEntreprisesEnv {
+  return parseGroup("recherche-entreprises", RechercheEntreprisesEnvSchema, source);
+}
+
+export const getRechercheEntreprisesEnv = memoize(() => parseRechercheEntreprisesEnv(process.env));
+
 const AnthropicEnvSchema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1),
   ANTHROPIC_MODEL_LETTER: z.string().min(1).default("claude-sonnet-5"),
