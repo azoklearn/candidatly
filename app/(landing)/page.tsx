@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { RotatingWord } from "@/components/rotating-word";
 import { TrackedLink } from "@/components/tracked-link";
 import { EVENTS } from "@/lib/analytics";
 import { socialProofMessage, type LandingStats } from "@/lib/social-proof";
@@ -87,7 +88,7 @@ export default async function HomePage({
               <span>{proof}</span>
             </div>
             <h1>
-              Trouve ton alternance
+              Trouve ton <RotatingWord words={["alternance", "stage"]} />
               <br />
               en quelques <em>clics.</em>
             </h1>

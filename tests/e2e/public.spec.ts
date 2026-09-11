@@ -2,7 +2,13 @@ import { expect, test } from "@playwright/test";
 
 test("the landing page and the legal pages are public", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  const headline = page.getByRole("heading", { level: 1 });
+  await expect(headline).toBeVisible();
+  // The headline types "alternance", erases it and types "stage", over and over. The
+  // check targets the animated span: the sibling text is there for screen readers.
+  const typed = headline.locator("[aria-hidden='true']");
+  await expect(typed).toHaveText("stage", { timeout: 15_000 });
+  await expect(typed).toHaveText("alternance", { timeout: 15_000 });
   await expect(page.getByRole("link", { name: "Décrocher mon alternance" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Trouver mon stage\/alternance/ })).toBeVisible();
   // No beta or price wording on the landing page (C81).
