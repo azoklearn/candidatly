@@ -24,7 +24,7 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 ## 3. Stack
 
 - **Next.js 16** App Router, TypeScript `strict` (TypeScript 6.0), Turbopack. Le fichier de session s'appelle `proxy.ts` (runtime Node.js), pas `middleware.ts`.
-- **Tailwind CSS 4** (configuration en CSS, pas de `tailwind.config.js`) et **shadcn/ui** (style `base-nova`, composants Base UI, variables CSS, police Geist via `--font-sans`).
+- **Tailwind CSS 4** (configuration en CSS, pas de `tailwind.config.js`) et **shadcn/ui** (style `base-nova`, composants Base UI, variables CSS aux couleurs de la page d'accueil dans `app/globals.css`, polices DM Sans, DM Mono et Instrument Serif chargées par `app/fonts.ts`).
 - **Supabase** : Auth (email + mot de passe et Google), Postgres avec RLS sur toutes les tables, Storage bucket privé `documents`. Clés « publishable » et « secret » (les clés `anon` / `service_role` sont dépréciées fin 2026).
 - **Supabase Cron** (`pg_cron` + `pg_net`) pour les tâches planifiées : il appelle une route protégée du site. Trigger.dev, prévu par le brief, est retiré (B10).
 - **Anthropic SDK** `@anthropic-ai/sdk` : `claude-sonnet-5` (lettres), `claude-haiku-4-5-20251001` (ROME, résumé entreprise, extraction). Sorties JSON par « structured outputs » (`client.messages.parse` + `zodOutputFormat`). Installé ; pas de clé pour l'instant (décision de l'owner du 11 septembre 2026) : le choix des métiers utilise alors le classement de la nomenclature.
@@ -212,3 +212,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-11 : page d'accueil de l'owner intégrée dans `app/(landing)` (C77) : design, animations et CTA brillant conservés, contenus rendus exacts (pas de faux avis ni de fonctions absentes), boutons vers le questionnaire.
 - 2026-09-11 : l'owner réactive la confirmation de l'email (C78). Configuration locale alignée, messages d'inscription et de retour de lien clarifiés ; un serveur d'envoi reste nécessaire pour que les étudiants reçoivent l'email.
 - 2026-09-11 : vérification de l'email supprimée définitivement (C79) : l'inscription connecte directement l'étudiant, avec confirmation côté serveur si Supabase la réclame encore ; test de bout en bout de l'inscription ajouté.
+- 2026-09-11 : interface de l'application alignée sur la page d'accueil (palette et classes partagées dans `app/globals.css`, polices de `app/fonts.ts`, boutons pilule, CTA brillant `variant="shiny"`, grain) ; écrans de chargement (`loading.tsx` par page, squelettes, `PendingOverlay` pendant les actions longues) ; entreprises à fort potentiel d'embauche de l'API Alternance stockées dans `hiring_companies` et proposées en candidature spontanée sous 10 offres (C80).
