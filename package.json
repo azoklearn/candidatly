@@ -20,7 +20,8 @@
     "db:types": "supabase gen types typescript --linked --schema public > lib/supabase/database.types.ts",
     "db:types:local": "supabase gen types typescript --local > lib/supabase/database.types.ts",
     "db:push": "supabase db push",
-    "rome:import": "node --env-file=.env.local scripts/import-rome.ts"
+    "rome:import": "node --env-file=.env.local scripts/import-rome.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24",
     "@types/react": "^19",
