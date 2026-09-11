@@ -180,7 +180,8 @@ export function DocumentsStep({
         <h2 className="font-medium">Votre lettre de motivation de base</h2>
         <FieldHint>
           C’est elle que nous adapterons à chaque offre, en gardant votre style. PDF, Word ou texte
-          collé.
+          collé. Astuce : écrivez [entreprise] et [poste] là où ils doivent apparaître, nous les
+          remplirons pour chaque offre.
         </FieldHint>
         <CurrentDocument document={letter} />
         <FileUpload

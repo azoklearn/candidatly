@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { CompanyCardLoader, CompanyCardSkeleton } from "@/components/company-card";
+import { SubmitButton } from "@/components/submit-button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireUserId } from "@/lib/auth/session";
 import {
@@ -18,6 +21,8 @@ import { readScoreReasons } from "@/lib/matching/reasons";
 import { JobOfferReadSchema } from "@/lib/providers/api-alternance";
 import { createClient } from "@/lib/supabase/server";
 import { toPlainText } from "@/lib/text/html";
+
+import { prepareApplication } from "../../applications/actions";
 
 export const metadata: Metadata = { title: "Offre" };
 
@@ -55,20 +60,19 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
 
   const { data: offer } = await supabase.from("offers").select("*").eq("id", id).maybeSingle();
   if (!offer) notFound();
-  const [{ data: match }, company] = await Promise.all([
+  const [{ data: match }, { data: application }] = await Promise.all([
     supabase
       .from("matches")
       .select("score, score_reasons")
       .eq("user_id", userId)
       .eq("offer_id", id)
       .maybeSingle(),
-    offer.company_siret
-      ? supabase
-          .from("companies")
-          .select("legal_name, brand_name, naf_label, headcount_range, city, website")
-          .eq("siret", offer.company_siret)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
+    supabase
+      .from("applications")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("offer_id", id)
+      .maybeSingle(),
   ]);
   const parsed = JobOfferReadSchema.safeParse(offer.raw);
   const job = parsed.success ? parsed.data : null;
@@ -125,11 +129,22 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
             <CardHeader>
               <CardTitle>Candidater</CardTitle>
               <CardDescription>
-                La préparation de votre lettre adaptée à cette offre arrive prochainement.
+                Nous adaptons votre lettre de motivation à cette offre. Aucun crédit n’est utilisé
+                avant l’envoi.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3">
-              <Button disabled>Préparer ma candidature</Button>
+              {application ? (
+                <Link href={`/applications/${application.id}`} className={buttonVariants()}>
+                  Reprendre ma candidature
+                </Link>
+              ) : (
+                <form action={prepareApplication.bind(null, offer.id)}>
+                  <SubmitButton className="w-full" pendingLabel="Préparation de votre lettre…">
+                    Préparer ma candidature
+                  </SubmitButton>
+                </form>
+              )}
               {job?.apply.url ? (
                 <a
                   href={job.apply.url}
@@ -162,50 +177,9 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
               </CardContent>
             </Card>
           ) : null}
-          <Card>
-            <CardHeader>
-              <CardTitle>L’employeur</CardTitle>
-              <CardDescription>
-                {offer.is_delegated
-                  ? "Cette offre est gérée par un établissement de formation : les informations ci-dessous le concernent."
-                  : "La fiche détaillée de l’employeur arrive prochainement."}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-2 text-sm">
-              <p className="font-medium">
-                {company.data?.brand_name ??
-                  company.data?.legal_name ??
-                  job?.workplace.name ??
-                  offer.company_name ??
-                  "Employeur non précisé"}
-              </p>
-              {job?.workplace.domain.naf?.label ? (
-                <p className="text-muted-foreground">{job.workplace.domain.naf.label}</p>
-              ) : null}
-              {job?.workplace.size ? (
-                <p className="text-muted-foreground">
-                  {/salari/i.test(job.workplace.size)
-                    ? job.workplace.size
-                    : `${job.workplace.size} salariés`}
-                </p>
-              ) : null}
-              {job?.workplace.description ? (
-                <p className="whitespace-pre-line text-muted-foreground">
-                  {toPlainText(job.workplace.description)}
-                </p>
-              ) : null}
-              {offer.company_website ? (
-                <a
-                  href={offer.company_website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline underline-offset-4"
-                >
-                  Site de l’entreprise
-                </a>
-              ) : null}
-            </CardContent>
-          </Card>
+          <Suspense fallback={<CompanyCardSkeleton />}>
+            <CompanyCardLoader offer={offer} />
+          </Suspense>
           <p className="text-xs text-muted-foreground">
             Source : La bonne alternance, via l’API Alternance. Données mises à jour le{" "}
             {formatDate(offer.last_seen_at)}.
