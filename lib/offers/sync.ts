@@ -2,8 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError, ExternalApiError } from "@/lib/errors";
 import { logger as defaultLogger, type Logger } from "@/lib/logger";
+import { toHiringCompanyRow } from "@/lib/providers/to-hiring-company-row";
 import { toOfferRow } from "@/lib/providers/to-offer-row";
-import type { OfferProvider } from "@/lib/providers/types";
+import type { NormalizedHiringCompany, OfferProvider, OfferSource } from "@/lib/providers/types";
 import type { Database, Json } from "@/lib/supabase/database.types";
 
 import type { SearchKey } from "./search-keys";
@@ -40,7 +41,50 @@ export function uniqueByExternalId<T extends { external_id: string }>(rows: T[])
   });
 }
 
-export type SyncResult = { key: string; skipped: boolean; offers: number; invalidItems: number };
+export type SyncResult = {
+  key: string;
+  skipped: boolean;
+  offers: number;
+  hiringCompanies: number;
+  invalidItems: number;
+};
+
+/**
+ * Replaces the hiring companies of one search key. Never fails the sync: the offers are
+ * already stored and the companies only complete them (docs/QUESTIONS.md C80).
+ */
+async function storeHiringCompanies(options: {
+  db: Db;
+  source: OfferSource;
+  key: string;
+  companies: NormalizedHiringCompany[];
+  now: Date;
+  log: Logger;
+}): Promise<number> {
+  const { db, source, key, now } = options;
+  const rows = uniqueByExternalId(
+    options.companies.map((company) => toHiringCompanyRow(company, source, key, now)),
+  );
+  try {
+    for (let i = 0; i < rows.length; i += UPSERT_CHUNK) {
+      const { error } = await db
+        .from("hiring_companies")
+        .upsert(rows.slice(i, i + UPSERT_CHUNK), { onConflict: "source,query_key,external_id" });
+      if (error) throw new DatabaseError("hiring_companies.upsert", error);
+    }
+    const gone = await db
+      .from("hiring_companies")
+      .delete()
+      .eq("source", source)
+      .eq("query_key", key)
+      .lt("last_seen_at", now.toISOString());
+    if (gone.error) throw new DatabaseError("hiring_companies.delete", gone.error);
+    return rows.length;
+  } catch (error) {
+    options.log.warn("hiring_companies_store_failed", { error });
+    return 0;
+  }
+}
 
 export async function syncSearchKey(options: {
   db: Db;
@@ -63,7 +107,7 @@ export async function syncSearchKey(options: {
     .maybeSingle();
   if (last.error) throw new DatabaseError("offer_search_runs.select", last.error);
   if (!options.force && isRunFresh(last.data, now)) {
-    return { key: searchKey.key, skipped: true, offers: 0, invalidItems: 0 };
+    return { key: searchKey.key, skipped: true, offers: 0, hiringCompanies: 0, invalidItems: 0 };
   }
 
   const run = {
@@ -88,6 +132,14 @@ export async function syncSearchKey(options: {
       .upsert(rows.slice(i, i + UPSERT_CHUNK), { onConflict: "source,external_id" });
     if (error) throw new DatabaseError("offers.upsert", error);
   }
+  const hiringCompanies = await storeHiringCompanies({
+    db,
+    source: provider.source,
+    key: searchKey.key,
+    companies: result.hiringCompanies,
+    now,
+    log,
+  });
   const inserted = await db.from("offer_search_runs").insert({
     ...run,
     status_code: 200,
@@ -99,9 +151,23 @@ export async function syncSearchKey(options: {
   log.info("search_synced", {
     offers: rows.length,
     duplicates: result.offers.length - rows.length,
+    hiringCompanies,
     invalidItems: result.skipped,
   });
-  return { key: searchKey.key, skipped: false, offers: rows.length, invalidItems: result.skipped };
+  return {
+    key: searchKey.key,
+    skipped: false,
+    offers: rows.length,
+    hiringCompanies,
+    invalidItems: result.skipped,
+  };
+}
+
+/** Drops the hiring companies of searches nobody has run for STALE_AFTER_MS. */
+export async function purgeStaleHiringCompanies(db: Db, now: Date): Promise<void> {
+  const staleBefore = new Date(now.getTime() - STALE_AFTER_MS).toISOString();
+  const { error } = await db.from("hiring_companies").delete().lt("last_seen_at", staleBefore);
+  if (error) throw new DatabaseError("hiring_companies.purge", error);
 }
 
 /** Marks expired offers, and offers not seen for STALE_AFTER_MS, as removed. */

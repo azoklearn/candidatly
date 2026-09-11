@@ -10,6 +10,7 @@ import type { Json } from "@/lib/supabase/database.types";
 import {
   OfferSearchParamsSchema,
   ROME_CODE_PATTERN,
+  type NormalizedHiringCompany,
   type NormalizedOffer,
   type OfferProvider,
   type OfferSearchParams,
@@ -84,6 +85,14 @@ export const JobOfferReadSchema = z.object({
   is_delegated: z.boolean(),
 });
 export type JobOfferRead = z.infer<typeof JobOfferReadSchema>;
+
+/** A company without a published offer (docs/API_ALTERNANCE.md section 7.8). */
+export const JobRecruiterReadSchema = z.object({
+  identifier: z.object({ id: z.string().min(1) }),
+  workplace: JobOfferReadSchema.shape.workplace,
+  apply: JobOfferReadSchema.shape.apply,
+});
+export type JobRecruiterRead = z.infer<typeof JobRecruiterReadSchema>;
 
 const SearchResponseSchema = z.object({
   jobs: z.array(z.unknown()),
@@ -174,6 +183,32 @@ export function normalizeJobOffer(job: JobOfferRead, raw: Json): NormalizedOffer
   };
 }
 
+/** Null when the company has no usable name. */
+export function normalizeHiringCompany(
+  recruiter: JobRecruiterRead,
+): NormalizedHiringCompany | null {
+  const { workplace } = recruiter;
+  const name =
+    emptyToNull(workplace.name) ??
+    emptyToNull(workplace.legal_name) ??
+    emptyToNull(workplace.brand);
+  if (!name) return null;
+  const [lng, lat] = workplace.location.geopoint.coordinates;
+  const hasValidPoint = lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+  return {
+    externalId: recruiter.identifier.id,
+    siret: cleanSiret(workplace.siret),
+    name,
+    nafCode: emptyToNull(workplace.domain.naf?.code ?? null),
+    nafLabel: emptyToNull(workplace.domain.naf?.label ?? null),
+    headcount: emptyToNull(workplace.size),
+    address: emptyToNull(workplace.location.address),
+    lat: hasValidPoint ? lat : null,
+    lng: hasValidPoint ? lng : null,
+    applyUrl: cleanHttpUrl(recruiter.apply.url),
+  };
+}
+
 export type ApiAlternanceProviderOptions = {
   apiKey: string;
   baseUrl?: string;
@@ -234,15 +269,25 @@ export class ApiAlternanceProvider implements OfferProvider {
       offers.push(normalizeJobOffer(job.data, item as Json));
     }
 
+    const hiringCompanies: NormalizedHiringCompany[] = [];
+    let skippedCompanies = 0;
+    for (const item of data.recruiters) {
+      const recruiter = JobRecruiterReadSchema.safeParse(item);
+      const company = recruiter.success ? normalizeHiringCompany(recruiter.data) : null;
+      if (company) hiringCompanies.push(company);
+      else skippedCompanies++;
+    }
+
     this.log.info("search_completed", {
       romeCodes: romeCodes.length,
       radiusKm,
       offers: offers.length,
       skipped,
-      recruiters: data.recruiters.length,
+      hiringCompanies: hiringCompanies.length,
+      skippedCompanies,
       warnings: data.warnings.map((warning) => warning.code),
     });
-    return { offers, warnings: data.warnings, skipped };
+    return { offers, hiringCompanies, warnings: data.warnings, skipped };
   }
 
   async getOffer(

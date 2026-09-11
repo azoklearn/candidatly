@@ -280,7 +280,7 @@ Objet à trois champs, tous `required` (spec) :
 | Champ | Type | Contenu |
 |---|---|---|
 | `jobs` | `JobOfferRead[]` | Offres publiées (§7). Au MVP, seule source de `offers` |
-| `recruiters` | `JobRecruiter[]` | Entreprises sans offre publiée « susceptibles de recruter des apprentis dans le domaine », limitées à 150, impossible de tout récupérer. Ignorées au MVP (brief : offres publiées uniquement) mais le schéma Zod doit accepter le champ |
+| `recruiters` | `JobRecruiter[]` | Entreprises sans offre publiée « susceptibles de recruter des apprentis dans le domaine », limitées à 150, impossible de tout récupérer. Stockées depuis le 11 septembre 2026 dans `hiring_companies` et proposées en candidature spontanée quand l'étudiant a peu d'offres (`docs/QUESTIONS.md` C80) |
 | `warnings` | `{ code: string, message: string }[]` | Avertissements non bloquants |
 
 Codes de `warnings` (code, `job-opportunity-request-context.ts`) : `FRANCE_TRAVAIL_API_ERROR` (« Unable to retrieve job offers from France Travail API »), `JOB_OFFER_FORMATING_ERROR` (« Some job offers are invalid and have been excluded… »), `JOB_NOT_FOUND`, `RECRUITERS_FORMATING_ERROR`. Les codes sont stables, les messages ne le sont pas. Logger les warnings dans `sync-offers`.

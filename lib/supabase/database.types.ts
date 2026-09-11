@@ -340,6 +340,63 @@ export type Database = {
         }
         Relationships: []
       }
+      hiring_companies: {
+        Row: {
+          address: string | null
+          apply_url: string | null
+          created_at: string
+          external_id: string
+          headcount: string | null
+          id: string
+          last_seen_at: string
+          lat: number | null
+          lng: number | null
+          naf_code: string | null
+          naf_label: string | null
+          name: string
+          query_key: string
+          siret: string | null
+          source: Database["public"]["Enums"]["offers_source"]
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          apply_url?: string | null
+          created_at?: string
+          external_id: string
+          headcount?: string | null
+          id?: string
+          last_seen_at?: string
+          lat?: number | null
+          lng?: number | null
+          naf_code?: string | null
+          naf_label?: string | null
+          name: string
+          query_key: string
+          siret?: string | null
+          source: Database["public"]["Enums"]["offers_source"]
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          apply_url?: string | null
+          created_at?: string
+          external_id?: string
+          headcount?: string | null
+          id?: string
+          last_seen_at?: string
+          lat?: number | null
+          lng?: number | null
+          naf_code?: string | null
+          naf_label?: string | null
+          name?: string
+          query_key?: string
+          siret?: string | null
+          source?: Database["public"]["Enums"]["offers_source"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           created_at: string

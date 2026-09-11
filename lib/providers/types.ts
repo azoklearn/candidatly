@@ -53,10 +53,31 @@ export type NormalizedOffer = {
   raw: Json;
 };
 
+/**
+ * A company the source flags as likely to hire apprentices in the searched trades, without
+ * a published offer (API Alternance `recruiters`, docs/API_ALTERNANCE.md section 7.8).
+ */
+export type NormalizedHiringCompany = {
+  /** Stable unique key within the source. */
+  externalId: string;
+  siret: string | null;
+  name: string;
+  nafCode: string | null;
+  nafLabel: string | null;
+  /** Headcount range as sent by the source, for example "10-19". */
+  headcount: string | null;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
+  /** Page where the student can send an unsolicited application. */
+  applyUrl: string | null;
+};
+
 export type ProviderWarning = { code: string; message: string };
 
 export type OfferSearchResult = {
   offers: NormalizedOffer[];
+  hiringCompanies: NormalizedHiringCompany[];
   warnings: ProviderWarning[];
   /** Items dropped because they did not match the expected shape. */
   skipped: number;

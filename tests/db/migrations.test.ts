@@ -43,6 +43,8 @@ beforeAll(async () => {
     insert into public.matches (user_id, offer_id, score) values ('${USER_A}', '${OFFER}', 80), ('${USER_B}', '${OFFER}', 60);
     insert into public.applications (id, user_id, offer_id) values ('${APPLICATION_A}', '${USER_A}', '${OFFER}');
     insert into public.credit_transactions (user_id, delta, reason) values ('${USER_A}', 5, 'signup_bonus');
+    insert into public.hiring_companies (source, query_key, external_id, name, apply_url)
+      values ('api_alternance', 'rome=M1805|lat=48.85|lng=2.35|r=30|level=any', '6a003c399a6be614e48abba9', 'Atelier numérique', 'https://labonnealternance.apprentissage.beta.gouv.fr/emploi/recruteurs_lba/x');
     insert into public.rome_versions (version) values (61);
     insert into public.rome_grand_domaines (code, label) values ('M', 'Support à l''entreprise');
     insert into public.rome_domaines_professionnels (code, grand_domaine, label) values ('M18', 'M', 'Systèmes d''information');
@@ -141,6 +143,28 @@ describe("row level security for a signed-in user", () => {
       expect(
         await errorOf(`update public.applications set status = 'sent' where user_id = '${USER_A}'`),
       ).toMatch(/permission denied/);
+    });
+  });
+
+  it("serves hiring companies read-only, to signed-in users only", async () => {
+    expect(
+      await errorOf(
+        `insert into public.hiring_companies (source, query_key, external_id, name, apply_url) values ('api_alternance', 'k', 'y', 'n', 'javascript:alert(1)')`,
+      ),
+    ).toMatch(/hiring_companies_apply_url_format/);
+    await as("authenticated", USER_A, async () => {
+      expect(await count(`select 1 from public.hiring_companies`)).toBe(1);
+      expect(
+        await errorOf(
+          `insert into public.hiring_companies (source, query_key, external_id, name) values ('api_alternance', 'k', 'x', 'n')`,
+        ),
+      ).toMatch(/permission denied/);
+      expect(await errorOf(`update public.hiring_companies set name = 'n'`)).toMatch(
+        /permission denied/,
+      );
+    });
+    await as("anon", null, async () => {
+      expect(await errorOf(`select 1 from public.hiring_companies`)).toMatch(/permission denied/);
     });
   });
 

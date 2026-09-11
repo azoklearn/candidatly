@@ -5,7 +5,13 @@ import { computeMatchesForUser } from "@/lib/matching/compute";
 import type { OfferProvider } from "@/lib/providers/types";
 
 import { groupSearchKeys } from "./search-keys";
-import { SEARCH_TTL_MS, markStaleOffers, syncSearchKey, type Db } from "./sync";
+import {
+  SEARCH_TTL_MS,
+  markStaleOffers,
+  purgeStaleHiringCompanies,
+  syncSearchKey,
+  type Db,
+} from "./sync";
 
 /**
  * Background offer sync (brief section 6, docs/QUESTIONS.md B10). Supabase Cron calls
@@ -140,6 +146,11 @@ export async function runScheduledSync(options: {
   }
 
   const stale = await markStaleOffers(db, now);
+  try {
+    await purgeStaleHiringCompanies(db, now);
+  } catch (error) {
+    log.warn("hiring_companies_purge_failed", { error });
+  }
   let companies = 0;
   try {
     companies = await enrichPendingCompanies({

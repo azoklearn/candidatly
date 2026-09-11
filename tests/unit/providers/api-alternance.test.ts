@@ -96,6 +96,59 @@ const SPEC_JOB = {
   is_delegated: false,
 };
 
+/** A company without a published offer, shaped like the `recruiters` items of a real search. */
+const SPEC_RECRUITER = {
+  identifier: { id: "6a003c399a6be614e48abba9" },
+  workplace: {
+    ...SPEC_JOB.workplace,
+    name: null,
+    legal_name: "ATELIER NUMERIQUE SAS",
+    brand: "Atelier numérique",
+    description: null,
+    website: null,
+    siret: "12345678901234",
+    size: "10-19",
+  },
+  apply: {
+    phone: null,
+    url: "https://labonnealternance.apprentissage.beta.gouv.fr/emploi/recruteurs_lba/12345678901234/atelier",
+    recipient_id: null,
+  },
+};
+
+describe("hiring companies", () => {
+  it("returns the companies without a published offer next to the offers", async () => {
+    const nameless = {
+      ...SPEC_RECRUITER,
+      identifier: { id: "nameless" },
+      workplace: { ...SPEC_RECRUITER.workplace, legal_name: " ", brand: null },
+    };
+    const { provider } = setup(
+      json(200, {
+        jobs: [SPEC_JOB],
+        recruiters: [SPEC_RECRUITER, { identifier: {} }, nameless],
+        warnings: [],
+      }),
+    );
+    const result = await provider.search({ ...PARIS, romeCodes: ["M1805"] });
+    expect(result.offers).toHaveLength(1);
+    expect(result.hiringCompanies).toEqual([
+      {
+        externalId: "6a003c399a6be614e48abba9",
+        siret: "12345678901234",
+        name: "ATELIER NUMERIQUE SAS",
+        nafCode: "8411Z",
+        nafLabel: "Administration publique générale",
+        headcount: "10-19",
+        address: "20 AVENUE DE SEGUR 75007 PARIS",
+        lat: 48.850699,
+        lng: 2.308628,
+        applyUrl: SPEC_RECRUITER.apply.url,
+      },
+    ]);
+  });
+});
+
 describe("ApiAlternanceProvider.search", () => {
   it("sends the documented parameters with a bearer token", async () => {
     const { provider, calls } = setup(json(200, { jobs: [], recruiters: [], warnings: [] }));
