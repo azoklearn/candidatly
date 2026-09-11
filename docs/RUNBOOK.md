@@ -49,6 +49,8 @@ curl -X POST http://localhost:3000/api/cron/sync-offers -H "Authorization: Beare
 
 ## Mettre le MVP en ligne
 
+Adresse publique depuis le 11 septembre 2026 : https://candidatly.app (DNS chez Vercel). L'adresse https://candidatly.vercel.app reste active ; gardez ses deux URL de retour dans Supabase tant qu'elle sert.
+
 1. **Vercel.** Créer le projet depuis le dépôt, Node 24. Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL` (adresse publique du site), `SUPABASE_SECRET_KEY`, `API_ALTERNANCE_KEY`, `CRON_SECRET`. Facultatives : `LOG_LEVEL`, `GEOCODING_API_BASE_URL`, `RECHERCHE_ENTREPRISES_BASE_URL`.
 2. **Supabase, authentification.** Dans Authentication > URL Configuration : Site URL égale à l'adresse publique ; ajouter `<site>/auth/callback` et `<site>/auth/confirm` aux Redirect URLs. Recopier le modèle d'email de `supabase/templates/confirmation.html`. Activer Google seulement avec un client OAuth configuré.
 3. **Supabase, base.** Les migrations sont déjà appliquées au projet lié (`npm run db:push` pour les suivantes). Enregistrer dans Vault l'adresse du site et le secret de la synchronisation (section précédente).
