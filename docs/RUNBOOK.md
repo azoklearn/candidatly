@@ -70,13 +70,6 @@ Ce message signifie que `NEXT_PUBLIC_SUPABASE_URL` ou `NEXT_PUBLIC_SUPABASE_PUBL
 
 ## Confirmation des emails à l'inscription
 
-Active : l'owner l'a réactivée le 11 septembre 2026 (réglage « Confirm email » de Supabase), après l'avoir coupée le même jour faute d'emails reçus (C76, C78). Après l'inscription, l'étudiant reçoit un email ; le lien le connecte et l'envoie au questionnaire (`/auth/callback`). S'il ouvre le lien dans un autre navigateur ou sur un autre appareil, son adresse est tout de même confirmée : il se connecte avec son email et son mot de passe.
+Supprimée définitivement le 11 septembre 2026 (C79). L'inscription connecte directement l'étudiant et l'envoie au questionnaire, sans email. Le code ne dépend pas du réglage Supabase : si « Confirm email » est coché, le serveur confirme lui-même chaque nouveau compte. Le décocher reste conseillé (Authentication > Sign In / Providers > Email) pour que Supabase n'essaie pas d'envoyer d'email.
 
-La messagerie intégrée de Supabase n'envoie qu'aux membres de l'équipe du projet, à quelques emails par heure. Pour de vrais étudiants, configurer un serveur d'envoi :
-
-1. Créer un compte chez un service d'envoi (Resend, Brevo, Postmark…) et vérifier le domaine d'envoi.
-2. Supabase : Project Settings > Authentication > SMTP Settings : saisir l'hôte, le port, l'identifiant et le mot de passe du service.
-3. Supabase : Authentication > Emails : recopier le modèle `supabase/templates/confirmation.html` (lien vers `/auth/confirm`, qui fonctionne quel que soit l'appareil). L'offre gratuite n'autorise ce changement qu'avec un serveur d'envoi.
-4. Tester une inscription avec une adresse extérieure à l'équipe.
-
-Pour couper de nouveau la confirmation : Authentication > Sign In / Providers > Email > décocher « Confirm email ». Ne pas utiliser `supabase config push` pour ces réglages (voir la section précédente de ce document dans l'historique git).
+Un compte resté non confirmé d'avant cette décision se débloque dans Authentication > Users, ou par l'API d'administration.
