@@ -17,9 +17,6 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
             <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
               Se connecter
             </Link>
-            <Link href="/signup" className={buttonVariants({ size: "sm" })}>
-              Créer un compte
-            </Link>
           </nav>
         </div>
       </header>
