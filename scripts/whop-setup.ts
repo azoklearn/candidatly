@@ -142,8 +142,8 @@ async function main() {
   }
   const webhook = await whop<{ id: string; webhook_secret?: string }>("/webhooks", {
     url: `${SITE}/api/whop/webhook`,
+    // New Whop webhooks always send v1 events; api_version is refused since 2026.
     resource_id: accountId,
-    api_version: "v1",
     enabled: true,
     events: WEBHOOK_EVENTS,
   });
