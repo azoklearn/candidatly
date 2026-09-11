@@ -49,7 +49,7 @@ curl -X POST http://localhost:3000/api/cron/sync-offers -H "Authorization: Beare
 
 ## Mettre le MVP en ligne
 
-Adresse publique depuis le 11 septembre 2026 : https://candidatly.app (DNS chez Vercel). L'adresse https://candidatly.vercel.app reste active ; gardez ses deux URL de retour dans Supabase tant qu'elle sert.
+Adresse publique depuis le 11 septembre 2026 : https://candidatly.app (DNS chez Vercel), qui redirige vers https://www.candidatly.app. Utilisez l'adresse `www` partout où une adresse est demandée : `NEXT_PUBLIC_SITE_URL`, Site URL de Supabase, secret Vault `candidatly_site_url`. Les Redirect URLs de Supabase doivent lister `/auth/callback` et `/auth/confirm` pour `https://www.candidatly.app` et pour `https://candidatly.vercel.app`, qui reste active.
 
 1. **Vercel.** Créer le projet depuis le dépôt, Node 24. Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL` (adresse publique du site), `SUPABASE_SECRET_KEY`, `API_ALTERNANCE_KEY`, `CRON_SECRET`. Facultatives : `LOG_LEVEL`, `GEOCODING_API_BASE_URL`, `RECHERCHE_ENTREPRISES_BASE_URL`.
 2. **Supabase, authentification.** Dans Authentication > URL Configuration : Site URL égale à l'adresse publique ; ajouter `<site>/auth/callback` et `<site>/auth/confirm` aux Redirect URLs. Recopier le modèle d'email de `supabase/templates/confirmation.html`. Activer Google seulement avec un client OAuth configuré.
