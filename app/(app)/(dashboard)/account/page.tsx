@@ -9,6 +9,9 @@ import { RomeStep } from "@/app/(app)/onboarding/_components/rome-step";
 import { loadOnboarding } from "@/app/(app)/onboarding/data";
 import { buttonVariants } from "@/components/ui/button";
 import { requireUserId } from "@/lib/auth/session";
+import { loadAccess } from "@/lib/billing/access";
+import { formatDate } from "@/lib/format";
+import { PLANS } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
 
 import { DeleteAccountForm } from "./delete-account-form";
@@ -38,10 +41,14 @@ function Section({
 export default async function AccountPage() {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
-  const [{ data: claims }, data] = await Promise.all([
+  const [{ data: claims }, data, access] = await Promise.all([
     supabase.auth.getClaims(),
     loadOnboarding(supabase, userId),
+    loadAccess(supabase, userId),
   ]);
+  const subscription = access.subscription;
+  const planName = PLANS.find((plan) => plan.id === subscription?.plan)?.name;
+  const periodEnd = formatDate(subscription?.current_period_end);
   const email = typeof claims?.claims.email === "string" ? claims.claims.email : null;
   const codes =
     data.profile.rome_codes.length > 0
@@ -57,6 +64,40 @@ export default async function AccountPage() {
         </h1>
         {email ? <p className="text-sm text-muted-foreground">Connecté avec {email}</p> : null}
       </header>
+      {access.paywall || subscription ? (
+        <Section title="Votre forfait">
+          {subscription ? (
+            <div className="grid gap-2 text-sm">
+              <p>
+                Forfait <strong>{planName}</strong>
+                {subscription.billing === "annual" ? ", facturé à l’année" : ", facturé au mois"}.
+              </p>
+              {periodEnd ? (
+                <p className="text-muted-foreground">
+                  {subscription.cancel_at_period_end ? "Se termine le " : "Renouvellement le "}
+                  {periodEnd}.
+                </p>
+              ) : null}
+              {subscription.manage_url ? (
+                <a
+                  href={subscription.manage_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonVariants({ variant: "outline" }) + " w-fit"}
+                >
+                  Gérer mon abonnement sur Whop
+                </a>
+              ) : null}
+            </div>
+          ) : access.exempt ? (
+            <p className="text-sm text-muted-foreground">Accès complet offert à ce compte.</p>
+          ) : (
+            <Link href="/forfait" className={buttonVariants() + " w-fit"}>
+              Choisir un forfait
+            </Link>
+          )}
+        </Section>
+      ) : null}
       <Section title="Profil">
         <ProfileForm profile={data.profile} mode="account" />
       </Section>

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { requireUserId } from "@/lib/auth/session";
+import { dailySearchAction, requirePaidAccess } from "@/lib/billing/access";
 import { requestOffersRefresh } from "@/lib/offers/request-refresh";
 import { logger } from "@/lib/logger";
 import { allowAction } from "@/lib/rate-limit";
@@ -32,7 +33,10 @@ export async function setMatchStatus(matchId: string, status: string): Promise<v
 export async function refreshMyOffers(): Promise<void> {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  const access = await requirePaidAccess(supabase, userId);
   if (!(await allowAction(supabase, "refresh_offers"))) return;
+  const daily = dailySearchAction(access);
+  if (daily && !(await allowAction(supabase, daily))) return;
   await requestOffersRefresh(userId);
   revalidatePath("/offers");
 }

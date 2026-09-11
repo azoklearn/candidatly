@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PendingOverlay } from "@/components/pending-overlay";
 import { Button } from "@/components/ui/button";
 import { requireUserId } from "@/lib/auth/session";
+import { requirePaidAccess } from "@/lib/billing/access";
 import { DatabaseError } from "@/lib/errors";
 import { readScoreReasons } from "@/lib/matching/reasons";
 import { applyOfferFilters, parseOfferFilters } from "@/lib/offers/filters";
@@ -31,6 +32,7 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
   };
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  await requirePaidAccess(supabase, userId);
 
   const [matches, profile] = await Promise.all([
     supabase

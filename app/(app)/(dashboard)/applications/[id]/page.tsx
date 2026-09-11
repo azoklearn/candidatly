@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { CompanyCardLoader, CompanyCardSkeleton } from "@/components/company-card";
 import { requireUserId } from "@/lib/auth/session";
+import { requirePaidAccess } from "@/lib/billing/access";
 import { cityFromAddress, formatDate } from "@/lib/format";
 import { annotateSegments, diffWords } from "@/lib/letters/diff";
 import { followUpMessage, isFollowUpDue } from "@/lib/letters/follow-up";
@@ -25,6 +26,7 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
   if (!z.uuid().safeParse(id).success) notFound();
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  await requirePaidAccess(supabase, userId);
   const [{ data: application }, { data: profile }] = await Promise.all([
     supabase
       .from("applications")

@@ -23,6 +23,8 @@ export default defineConfig({
     url: `http://localhost:${PORT}`,
     reuseExistingServer: false,
     timeout: 300_000,
+    // No paywall and no call to Whop during the tests (lib/env.ts, isBillingConfigured).
+    env: { BILLING_DISABLED: "1" },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

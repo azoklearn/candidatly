@@ -7,7 +7,9 @@ const SECURITY_HEADERS = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
   {
     key: "Content-Security-Policy",
-    value: "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'",
+    // Whop: the plan form redirects to its checkout (docs/QUESTIONS.md C83).
+    value:
+      "frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://whop.com; object-src 'none'",
   },
 ];
 

@@ -146,6 +146,37 @@ describe("row level security for a signed-in user", () => {
     });
   });
 
+  it("shows students their own subscription, written by the service role only", async () => {
+    await db.exec(`
+      insert into public.subscriptions (user_id, provider_subscription_id, plan, status, billing) values
+        ('${USER_A}', 'mem_a', 'plus', 'active', 'annual'),
+        ('${USER_B}', 'mem_b', 'basic', 'canceled', 'monthly');
+    `);
+    expect(
+      await errorOf(
+        `insert into public.subscriptions (user_id, provider_subscription_id, plan, status) values ('${USER_A}', 'mem_c', 'gold', 'active')`,
+      ),
+    ).toMatch(/subscriptions_plan_values/);
+    expect(
+      await errorOf(
+        `insert into public.subscriptions (user_id, provider_subscription_id, plan, status) values ('${USER_A}', 'mem_d', 'plus', 'paid')`,
+      ),
+    ).toMatch(/subscriptions_status_values/);
+    await as("authenticated", USER_A, async () => {
+      expect(await count(`select 1 from public.subscriptions`)).toBe(1);
+      expect(
+        await errorOf(
+          `update public.subscriptions set status = 'active' where user_id = '${USER_A}'`,
+        ),
+      ).toMatch(/permission denied/);
+      expect(
+        await errorOf(
+          `update public.profiles set billing_exempt = true where user_id = '${USER_A}'`,
+        ),
+      ).toMatch(/permission denied/);
+    });
+  });
+
   it("keeps the chosen plan out of the client's reach", async () => {
     expect(
       await errorOf(`update public.profiles set chosen_plan = 'gold' where user_id = '${USER_B}'`),
@@ -221,7 +252,8 @@ describe("row level security for a signed-in user", () => {
         /permission denied/,
       );
       expect(await errorOf(`select 1 from public.offer_search_runs`)).toMatch(/permission denied/);
-      expect(await errorOf(`select 1 from public.stripe_events`)).toMatch(/permission denied/);
+      expect(await errorOf(`select 1 from public.billing_events`)).toMatch(/permission denied/);
+      expect(await errorOf(`select 1 from public.billing_plans`)).toMatch(/permission denied/);
     });
   });
 });

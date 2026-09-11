@@ -10,6 +10,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireUserId } from "@/lib/auth/session";
+import { canPrepareLetters, requirePaidAccess } from "@/lib/billing/access";
 import {
   DIPLOMA_LABELS,
   REMOTE_LABELS,
@@ -58,6 +59,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
   if (!z.uuid().safeParse(id).success) notFound();
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  const access = await requirePaidAccess(supabase, userId);
 
   const { data: offer } = await supabase.from("offers").select("*").eq("id", id).maybeSingle();
   if (!offer) notFound();
@@ -145,6 +147,27 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                 <Link href={`/applications/${application.id}`} className={buttonVariants()}>
                   Reprendre ma candidature
                 </Link>
+              ) : !canPrepareLetters(access) ? (
+                <div className="grid gap-3 rounded-2xl border border-dashed border-foreground/20 p-4 text-sm">
+                  <p>
+                    La lettre adaptée à chaque entreprise est incluse dans les forfaits Plus et
+                    Premium.
+                  </p>
+                  {access.subscription?.manage_url ? (
+                    <a
+                      href={access.subscription.manage_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={buttonVariants({ variant: "shiny" })}
+                    >
+                      Passer au forfait Plus
+                    </a>
+                  ) : (
+                    <Link href="/forfait" className={buttonVariants({ variant: "shiny" })}>
+                      Voir les forfaits
+                    </Link>
+                  )}
+                </div>
               ) : (
                 <form action={prepareApplication.bind(null, offer.id)}>
                   <SubmitButton

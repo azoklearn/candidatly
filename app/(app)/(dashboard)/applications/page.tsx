@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { requireUserId } from "@/lib/auth/session";
+import { requirePaidAccess } from "@/lib/billing/access";
 import { DatabaseError } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 import { isFollowUpDue } from "@/lib/letters/follow-up";
@@ -30,6 +31,7 @@ const GROUPS = [
 export default async function ApplicationsPage() {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  await requirePaidAccess(supabase, userId);
   const { data, error } = await supabase
     .from("applications")
     .select("id, status, updated_at, sent_at, next_follow_up_at, offer:offers(title, company_name)")

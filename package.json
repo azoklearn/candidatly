@@ -21,6 +21,7 @@
     "db:types:local": "supabase gen types typescript --local > lib/supabase/database.types.ts",
     "db:push": "supabase db push",
     "rome:import": "node --env-file=.env.local scripts/import-rome.ts",
+    "whop:setup": "node --env-file=.env.local scripts/whop-setup.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

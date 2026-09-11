@@ -6,6 +6,10 @@ import type { Database } from "@/lib/supabase/database.types";
 /** Per-user limits [requests, window in seconds] for the costly actions (docs/QUESTIONS.md C68). */
 export const RATE_LIMITS = {
   refresh_offers: [6, 600],
+  // Daily searches of the plans (docs/QUESTIONS.md C82); Premium has no daily cap.
+  refresh_offers_basic: [3, 86_400],
+  refresh_offers_plus: [10, 86_400],
+  start_checkout: [10, 3600],
   suggest_rome: [20, 600],
   prepare_application: [30, 3600],
   upload_document: [20, 3600],

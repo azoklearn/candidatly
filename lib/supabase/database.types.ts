@@ -89,6 +89,72 @@ export type Database = {
           },
         ]
       }
+      billing_events: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          provider: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          payload: Json
+          processed_at?: string | null
+          provider?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          provider?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      billing_plans: {
+        Row: {
+          billing: string
+          created_at: string
+          id: string
+          plan: string
+          price_cents: number
+          provider: string
+          provider_plan_id: string
+          updated_at: string
+        }
+        Insert: {
+          billing: string
+          created_at?: string
+          id?: string
+          plan: string
+          price_cents: number
+          provider?: string
+          provider_plan_id: string
+          updated_at?: string
+        }
+        Update: {
+          billing?: string
+          created_at?: string
+          id?: string
+          plan?: string
+          price_cents?: number
+          provider?: string
+          provider_plan_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           address: string | null
@@ -567,6 +633,7 @@ export type Database = {
       profiles: {
         Row: {
           availability_date: string | null
+          billing_exempt: boolean
           chosen_billing: string | null
           chosen_plan: string | null
           created_at: string
@@ -596,6 +663,7 @@ export type Database = {
         }
         Insert: {
           availability_date?: string | null
+          billing_exempt?: boolean
           chosen_billing?: string | null
           chosen_plan?: string | null
           created_at?: string
@@ -625,6 +693,7 @@ export type Database = {
         }
         Update: {
           availability_date?: string | null
+          billing_exempt?: boolean
           chosen_billing?: string | null
           chosen_plan?: string | null
           created_at?: string
@@ -902,70 +971,49 @@ export type Database = {
         }
         Relationships: []
       }
-      stripe_events: {
-        Row: {
-          created_at: string
-          id: string
-          payload: Json
-          processed_at: string | null
-          stripe_event_id: string
-          type: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          payload: Json
-          processed_at?: string | null
-          stripe_event_id: string
-          type: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          payload?: Json
-          processed_at?: string | null
-          stripe_event_id?: string
-          type?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       subscriptions: {
         Row: {
+          billing: string | null
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
           id: string
+          manage_url: string | null
           plan: string
-          status: Database["public"]["Enums"]["subscriptions_status"]
-          stripe_customer_id: string
-          stripe_subscription_id: string
+          provider: string
+          provider_customer_id: string | null
+          provider_subscription_id: string
+          status: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          billing?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
           id?: string
+          manage_url?: string | null
           plan: string
-          status: Database["public"]["Enums"]["subscriptions_status"]
-          stripe_customer_id: string
-          stripe_subscription_id: string
+          provider?: string
+          provider_customer_id?: string | null
+          provider_subscription_id: string
+          status: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          billing?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
           id?: string
+          manage_url?: string | null
           plan?: string
-          status?: Database["public"]["Enums"]["subscriptions_status"]
-          stripe_customer_id?: string
-          stripe_subscription_id?: string
+          provider?: string
+          provider_customer_id?: string | null
+          provider_subscription_id?: string
+          status?: string
           updated_at?: string
           user_id?: string
         }
@@ -1030,15 +1078,6 @@ export type Database = {
       offers_source: "api_alternance" | "adzuna" | "france_travail"
       profiles_diploma_level: "bac" | "bac+2" | "bac+3" | "bac+4" | "bac+5"
       profiles_target_contract: "alternance" | "stage" | "both"
-      subscriptions_status:
-        | "incomplete"
-        | "incomplete_expired"
-        | "trialing"
-        | "active"
-        | "past_due"
-        | "canceled"
-        | "unpaid"
-        | "paused"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1195,16 +1234,6 @@ export const Constants = {
       offers_source: ["api_alternance", "adzuna", "france_travail"],
       profiles_diploma_level: ["bac", "bac+2", "bac+3", "bac+4", "bac+5"],
       profiles_target_contract: ["alternance", "stage", "both"],
-      subscriptions_status: [
-        "incomplete",
-        "incomplete_expired",
-        "trialing",
-        "active",
-        "past_due",
-        "canceled",
-        "unpaid",
-        "paused",
-      ],
     },
   },
 } as const

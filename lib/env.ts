@@ -148,6 +148,35 @@ export function parseCronEnv(source: EnvSource): CronEnv {
 
 export const getCronEnv = memoize(() => parseCronEnv(process.env));
 
+/** Payments through Whop (docs/QUESTIONS.md C83, docs/RUNBOOK.md). */
+const WhopEnvSchema = z.object({
+  WHOP_API_KEY: z.string().min(20),
+  WHOP_WEBHOOK_SECRET: z.string().min(20),
+  WHOP_API_BASE_URL: z.url().default("https://api.whop.com/api/v1"),
+  WHOP_CHECKOUT_BASE_URL: z.url().default("https://whop.com"),
+});
+export type WhopEnv = z.output<typeof WhopEnvSchema>;
+
+export function parseWhopEnv(source: EnvSource): WhopEnv {
+  return parseGroup("whop", WhopEnvSchema, source);
+}
+
+export const getWhopEnv = memoize(() => parseWhopEnv(process.env));
+
+/**
+ * The paywall is on once Whop is configured, never with BILLING_DISABLED=1 (end-to-end
+ * tests, which must not call Whop).
+ */
+export function isBillingConfigured(): boolean {
+  if (process.env.BILLING_DISABLED === "1") return false;
+  try {
+    getWhopEnv();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const LOG_LEVELS = ["debug", "info", "warn", "error"] as const;
 export type LogLevelName = (typeof LOG_LEVELS)[number];
 

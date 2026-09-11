@@ -6,6 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 
 import { requireUserId } from "@/lib/auth/session";
+import { canPrepareLetters, requirePaidAccess } from "@/lib/billing/access";
 import { loadCompanyForOffer } from "@/lib/enrichment/company-for-offer";
 import { DatabaseError } from "@/lib/errors";
 import { cityFromAddress } from "@/lib/format";
@@ -76,6 +77,8 @@ export async function prepareApplication(offerId: string): Promise<void> {
   if (!z.uuid().safeParse(offerId).success) notFound();
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  // The tailored letter comes with the Plus and Premium plans (C82, C83).
+  if (!canPrepareLetters(await requirePaidAccess(supabase, userId))) redirect(`/offers/${offerId}`);
   const existing = await supabase
     .from("applications")
     .select("id")
