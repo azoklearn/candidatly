@@ -7,7 +7,7 @@ import { socialProofMessage, type LandingStats } from "@/lib/social-proof";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
-  title: { absolute: "Candidatly · Décroche ton alternance" },
+  title: { absolute: "Candidatly · Trouve ton alternance en quelques clics" },
   description:
     "Candidatly traque les offres d’alternance qui collent à ton profil, te dit lesquelles valent le coup et prépare ta lettre pour chacune.",
 };
@@ -87,11 +87,9 @@ export default async function HomePage({
               <span>{proof}</span>
             </div>
             <h1>
-              Arrête de postuler
+              Trouve ton alternance
               <br />
-              dans le vide.
-              <br />
-              <em>Décroche.</em>
+              en quelques <em>clics.</em>
             </h1>
             <p className="hero-copy">
               Des offres d’alternance sortent tous les jours et disparaissent aussi vite. Candidatly
