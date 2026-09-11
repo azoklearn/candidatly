@@ -20,8 +20,8 @@ export function BonusStep({ failed }: { failed: boolean }) {
   return (
     <form action={finishOnboarding} className="grid gap-6">
       <p className="text-muted-foreground">
-        Votre profil est prêt. 5 crédits vous sont offerts pour vos premières candidatures. Nous
-        lançons maintenant la recherche des offres d’alternance qui vous correspondent.
+        Votre profil est prêt. Nous lançons maintenant la recherche des offres d’alternance qui vous
+        correspondent.
       </p>
       {failed ? (
         <Alert variant="destructive">

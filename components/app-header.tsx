@@ -7,7 +7,6 @@ import { APP_NAME } from "@/lib/brand";
 const NAVIGATION = [
   { href: "/offers", label: "Offres" },
   { href: "/applications", label: "Candidatures" },
-  { href: "/credits", label: "Crédits" },
   { href: "/account", label: "Compte" },
 ] as const;
 

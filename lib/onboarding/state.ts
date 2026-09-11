@@ -8,7 +8,7 @@ export const ONBOARDING_STEPS = [
   { step: 3, title: "Domaine recherché" },
   { step: 4, title: "Localisation" },
   { step: 5, title: "CV et lettre de motivation" },
-  { step: 6, title: "Vos crédits offerts" },
+  { step: 6, title: "Tout est prêt" },
 ] as const;
 
 export const LAST_STEP = ONBOARDING_STEPS.length;
