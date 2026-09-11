@@ -151,7 +151,7 @@ Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`
 - Depuis le 11 septembre 2026, l'owner demande de pousser tout le temps : chaque changement vérifié (typage, lint, tests) est fusionné dans `main` et poussé sur https://github.com/azoklearn/candidatly, avec les identifiants déjà enregistrés sur le poste. Jamais de jeton collé dans la conversation ; contrôle des secrets avant chaque push.
 
 ### Librairies hors stack
-- Avant d'ajouter une librairie non listée dans le brief : justification en une phrase dans `docs/QUESTIONS.md` et accord de l'owner. Validées : `unpdf`, `mammoth` (phase 0), `@electric-sql/pglite` en développement (B9, 11 septembre 2026). Les dépendances installées par shadcn/ui (`@base-ui/react`, `class-variance-authority`, `cn`, `lucide-react`, `tw-animate-css`, `shadcn`) font partie de shadcn/ui.
+- Avant d'ajouter une librairie non listée dans le brief : justification en une phrase dans `docs/QUESTIONS.md` et accord de l'owner. Validées : `unpdf`, `mammoth` (phase 0), `@electric-sql/pglite` en développement (B9, 11 septembre 2026), `@vercel/analytics` (C84, demandée par l'owner le 11 septembre 2026). Les dépendances installées par shadcn/ui (`@base-ui/react`, `class-variance-authority`, `cn`, `lucide-react`, `tw-animate-css`, `shadcn`) font partie de shadcn/ui.
 
 ## 7. Commandes utiles
 
@@ -189,7 +189,7 @@ Installées le 10 septembre 2026.
 | zod | 4.6 | API v4 (`z.email()`, `error:`) |
 | vitest | 5.0 | configuration en `vitest.config.mts` |
 | eslint / eslint-config-next / prettier | 9 / 16.3.4 / 3.9 | ESLint 9 signalé comme plus maintenu, voir C51 |
-| @anthropic-ai/sdk, stripe | 0.124 / 22.6 | installés dans leur phase |
+| @anthropic-ai/sdk, @vercel/analytics | 0.124 / 2.0 | SDK Anthropic sans clé pour l'instant ; Stripe jamais installé (Whop, C83) |
 
 Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $ par MTok, retrait pas avant le 30 juin 2027) ; `claude-haiku-4-5-20251001` (200K / 64K, 1 $ / 5 $ par MTok, retrait possible à partir du 15 octobre 2026).
 
@@ -216,3 +216,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-11 : nouveau domaine https://candidatly.app (DNS chez Vercel). Plus aucune mention de bêta ni de gratuité sur l'accueil, la page Crédits et les conditions (C81) ; bouton d'en-tête « Trouver mon stage/alternance ».
 - 2026-09-11 : page publique `/tarifs` et page `/forfait` après le questionnaire (C82) : trois forfaits (Basic, Plus, Premium), mensuel ou annuel avec 2 mois offerts, prix par jour ; le choix est enregistré sans paiement en attendant Stripe (A5). Données et règles dans `lib/pricing.ts`.
 - 2026-09-11 : paiement par Whop (C83) avec paiement obligatoire, choix de l'owner. Sans abonnement actif, offres et candidatures renvoient vers `/forfait` ; lettre adaptée réservée à Plus et Premium, recherches par jour limitées pour Basic et Plus. Tables Stripe renommées, `billing_plans` et `profiles.billing_exempt` ajoutés. Mise en service dans `docs/RUNBOOK.md`, « Paiements Whop ».
+- 2026-09-11 : Whop en service (plans de l'owner reliés, webhook créé, clés sur Vercel, événement de test reçu) ; compte de l'owner exempté. Vercel Web Analytics ajouté (C84), adresses de pages anonymisées avant envoi.
