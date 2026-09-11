@@ -47,9 +47,13 @@ En cas de contrôle, l'éditeur peut suspendre ou bloquer l'accès du compte (CG
 
 ### A2. Que fait-on des offres qui ne sont pas candidatables par l'API ?
 
+**Appliqué dans le MVP (11 septembre 2026)** : pour toutes les offres, la lettre est préparée, l'étudiant candidate sur le site de l'offre, puis confirme l'envoi dans Candidatly (C67).
+
 Mesuré le 10 septembre 2026 : 54 % des offres n'ont pas de `recipient_id`, dont toutes les offres France Travail, Meteojob, RH Alternance et iquesta. Pour elles, la seule voie est le site du partenaire indiqué par `apply.url` (directemploi.com, candidat.francetravail.fr, meteojob.com, etc.). Cette question est désormais traitée avec A3. Recommandation inchangée : les afficher, préparer la lettre adaptée, laisser l'étudiant candidater sur le site du partenaire, puis lui faire confirmer l'envoi.
 
 ### A3. D'où vient l'adresse email du recruteur ?
+
+**Reportée par l'owner le 11 septembre 2026** : pas d'envoi par email dans le MVP.
 
 **Pourquoi c'est bloquant.** Le canal d'envoi décidé le 10 septembre repose sur cette adresse, et aucune source autorisée ne la fournit (section 0). Le brief exclut les services d'enrichissement d'emails au MVP et le scraping des job boards.
 
@@ -63,6 +67,8 @@ Mesuré le 10 septembre 2026 : 54 % des offres n'ont pas de `recipient_id`, dont
 
 ### A4. Comment l'email s'ouvre-t-il dans la boîte de l'étudiant ?
 
+**Reportée avec A3.**
+
 Question utile seulement quand une adresse est connue (A3).
 
 **Options.**
@@ -72,6 +78,8 @@ Question utile seulement quand une adresse est connue (A3).
 **Recommandation.** Option 1 au lancement, option 2 quand le volume le justifie. Dans les deux cas, l'étudiant envoie lui-même, ce qui respecte le principe « jamais d'envoi silencieux ».
 
 ### A5. Quel modèle de prix ?
+
+**En attente.** Par défaut, le MVP est gratuit pendant la bêta et Stripe n'est pas installé ; le registre des crédits et le bonus d'inscription restent en base pour la suite.
 
 Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 septembre ajoute un abonnement premium pour l'envoi.
 
@@ -211,6 +219,17 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 | C64 | Espacement des appels par domaine | Une requête par domaine toutes les 2 s, mémorisée par instance du serveur. Plusieurs instances Vercel pourraient en théorie dépasser ce rythme sur un même domaine ; le volume reste faible (site connu pour 7 % des offres) | À centraliser si le volume grandit |
 | C65 | Lettre sans modèle | Les règles remplissent l'objet, les repères [entreprise], [poste] et [ville], une mention « votre entreprise », et ajoutent une phrase sur les compétences que l'offre cite et que le CV liste (liste de compétences de l'offre, sinon ligne « Compétences » du CV retrouvée dans le texte de l'offre). La longueur reste entre 90 et 110 % de la lettre de base ; sinon la phrase n'est pas ajoutée. L'étape 5 de l'inscription conseille d'écrire [entreprise] et [poste] dans la lettre de base | Adaptation modeste mais sans invention ; « Refaire l'adaptation » (3 fois au plus) sert surtout après un changement de lettre de base |
 | C66 | Nom de l'employeur dans la lettre | L'orthographe du recruteur dans l'offre est préférée aux capitales du répertoire ; pour une offre gérée par une école, aucun nom n'est inséré | Évite « HOLIS » en capitales et le nom de l'école à la place de l'employeur |
+
+### Constats du MVP (phase 4, 11 septembre 2026)
+
+| # | Sujet | Constat ou choix | Effet |
+|---|---|---|---|
+| C67 | Envoi sans email | L'étudiant copie sa lettre, candidate sur le site de l'offre, puis confirme dans Candidatly. La candidature passe en « envoyée » (`sent_via = partner_site`), l'offre en « candidature envoyée », une relance est proposée à J+5 avec un message à copier, et la tâche quotidienne passe les candidatures muettes en « sans réponse » à J+14 | Aucun envoi automatique, principe « jamais d'envoi silencieux » respecté |
+| C68 | Limite de débit | Compteur par utilisateur et par action en base (`check_rate_limit`, fenêtre fixe) : actualisation des offres 6 par 10 min, suggestion de métiers 20 par 10 min, préparation de candidature 30 par heure, dépôt de document 20 par heure, export 5 par heure, recherche d'adresse 60 par minute. En cas de panne du compteur, l'action passe | Protège les API gratuites et nos coûts sans bloquer les étudiants |
+| C69 | Pages légales | Mentions légales, confidentialité et conditions rédigées, avec des repères entre crochets pour l'identité de l'éditeur, le contact et l'adresse de l'hébergeur | À compléter par l'owner et à faire relire par un juriste avant l'ouverture publique |
+| C70 | Tests de bout en bout | Playwright sur le build de production et le projet Supabase lié, avec des données de test créées puis supprimées ; l'inscription n'est pas couverte car elle appelle des API externes | Les parcours clés sont vérifiés à chaque exécution de `npm run test:e2e` |
+| C71 | Suivi des erreurs | Sentry n'est pas installé : il faut un compte et une clé. Les erreurs restent dans les journaux JSON de Vercel | À ajouter avant l'ouverture publique |
+| C72 | Export des données | L'export JSON contient le profil, le texte des documents, les candidatures, les correspondances, les crédits et l'historique ; les fichiers PDF eux-mêmes ne sont pas inclus | Suffisant pour la portabilité au MVP ; téléchargement des fichiers à ajouter si besoin |
 
 ## D. Comptes et accès à préparer (owner)
 

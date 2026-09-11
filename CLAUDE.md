@@ -17,9 +17,9 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 | 0 | Cadrage, lecture des API, questions ouvertes, ce fichier | Validée le 10 septembre 2026 |
 | 1 | Init Next.js, Supabase (migrations, RLS, bucket), auth, `OfferProvider` + tests | Validée le 11 septembre 2026, fusionnée dans `main` |
 | 2 | Onboarding 6 étapes, mapping ROME, extraction CV/lettre, jobs `sync-offers` / `compute-matches`, écrans offres | Validée le 11 septembre 2026, fusionnée dans `main` |
-| 3 | `enrich-company`, résumé entreprise, génération de lettre + diff | Livrée sur la branche `phase-3`, en attente de validation |
-| 4 | Envoi, suivi, facturation (crédits ou abonnement selon A5), compte / export / suppression, Playwright | À faire |
-| 5 | Landing, légal, rate limiting, Sentry, coûts LLM, `docs/RUNBOOK.md` complet | À faire |
+| 3 | `enrich-company`, résumé entreprise, génération de lettre + diff | Validée le 11 septembre 2026, fusionnée dans `main` |
+| 4 | Envoi, suivi, facturation (crédits ou abonnement selon A5), compte / export / suppression, Playwright | MVP livré sur la branche `phase-4` : candidature sur le site de l'offre puis suivi, compte, export, suppression, Playwright. Envoi par email et Stripe reportés (A3 à A5) |
+| 5 | Landing, légal, rate limiting, Sentry, coûts LLM, `docs/RUNBOOK.md` complet | En partie dans le MVP : accueil, pages légales à compléter, limite de débit, en-têtes de sécurité, procédure de mise en ligne. Restent Sentry et la mise en ligne |
 
 ## 3. Stack
 
@@ -28,7 +28,7 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 - **Supabase** : Auth (email + mot de passe et Google), Postgres avec RLS sur toutes les tables, Storage bucket privé `documents`. Clés « publishable » et « secret » (les clés `anon` / `service_role` sont dépréciées fin 2026).
 - **Supabase Cron** (`pg_cron` + `pg_net`) pour les tâches planifiées : il appelle une route protégée du site. Trigger.dev, prévu par le brief, est retiré (B10).
 - **Anthropic SDK** `@anthropic-ai/sdk` : `claude-sonnet-5` (lettres), `claude-haiku-4-5-20251001` (ROME, résumé entreprise, extraction). Sorties JSON par « structured outputs » (`client.messages.parse` + `zodOutputFormat`). Installé ; pas de clé pour l'instant (décision de l'owner du 11 septembre 2026) : le choix des métiers utilise alors le classement de la nomenclature.
-- **Stripe** Checkout + webhooks ; abonnements par Stripe Billing si l'abonnement premium est confirmé (A5). À installer en phase 4.
+- **Stripe** : non installé. Le MVP est gratuit pendant la bêta tant que le modèle de prix (A5) n'est pas décidé ; le registre des crédits reste en base.
 - **Zod 4** à toutes les frontières (formulaires, réponses API externes, variables d'environnement, sorties JSON LLM).
 - **Vitest 5** (unitaires), **Playwright** (2 à 3 parcours critiques, phase 4).
 - Déploiement : Vercel (Node 24) + Supabase cloud (région UE), dont Supabase Cron et Vault.
@@ -79,7 +79,7 @@ tests/                          unit/ (Vitest), fixtures/ (réponses API réelle
 docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RUNBOOK, reference/
 ```
 
-Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`, `lib/matching`, `lib/offers` (synchronisation, filtres, rafraîchissement), `lib/onboarding`, `lib/rome`, `lib/text`, `lib/cron`, `app/api/geocode`, `app/api/cron/sync-offers`, `scripts/import-rome.ts`, `tests/db`. Ajouts de la phase 3 : `lib/enrichment` (répertoire des entreprises, site web, fiche, cache), `lib/letters` (adaptation, différences), `components/company-card.tsx`, `app/(app)/(dashboard)/applications/[id]`. À venir : `lib/credits`, `app/api/stripe/webhook`, `tests/e2e`.
+Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`, `lib/matching`, `lib/offers` (synchronisation, filtres, rafraîchissement), `lib/onboarding`, `lib/rome`, `lib/text`, `lib/cron`, `app/api/geocode`, `app/api/cron/sync-offers`, `scripts/import-rome.ts`, `tests/db`. Ajouts de la phase 3 : `lib/enrichment` (répertoire des entreprises, site web, fiche, cache), `lib/letters` (adaptation, différences), `components/company-card.tsx`, `app/(app)/(dashboard)/applications/[id]`. Ajouts de la phase 4 : `lib/rate-limit.ts`, `lib/letters/follow-up.ts`, `app/(app)/(dashboard)/account`, `app/api/account/export`, `app/(marketing)` (accueil et pages légales), `tests/e2e`. À venir : `lib/credits`, `app/api/stripe/webhook`.
 
 ## 6. Conventions
 
@@ -143,7 +143,7 @@ Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`
 ### Tests
 - Vitest : `tests/unit/**/*.test.ts` et `tests/db/**/*.test.ts` (migrations et RLS sur PGlite). Réponses API simulées depuis `tests/fixtures/` (réponses réelles tronquées et anonymisées). Les clients externes acceptent `fetchImpl` et `sleep` injectés.
 - Aucun test n'appelle une API externe réelle ni un LLM réel.
-- Playwright (phase 4) : `tests/e2e/`, contre `next build && next start` et une base Supabase de test.
+- Playwright : `tests/e2e/`, contre `next build && next start` (port 3100) et le projet Supabase lié. `global-setup.ts` crée une offre et deux étudiants inscrits, `global-teardown.ts` les supprime ; les parcours testés n'appellent aucune API externe. L'inscription elle-même n'est pas couverte, car elle appelle le géocodage et l'API Alternance.
 
 ### Git
 - Commits atomiques, messages en anglais au format conventionnel : `feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`.
@@ -160,6 +160,7 @@ npm run build        # build de production (vérifie aussi les types)
 npm run typecheck    # next typegen puis tsc --noEmit
 npm run lint         # ESLint (flat config)
 npm test             # Vitest
+npm run test:e2e     # Playwright : build de production, données de test sur le projet lié
 npm run format       # Prettier
 npm run db:start     # Supabase local (Docker requis)
 npm run db:reset     # rejoue migrations + seed.sql
@@ -204,3 +205,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-11 : l'owner se passe de l'API Anthropic pour l'instant et remplace Trigger.dev par Supabase Cron (B10). Trigger.dev est retiré du projet ; une migration planifie l'appel de `/api/cron/sync-offers` toutes les 15 minutes, l'adresse du site et le secret étant rangés dans Vault. Correction après test réel : une offre renvoyée deux fois par l'API faisait échouer l'enregistrement (C61).
 - 2026-09-11 : phase 2 validée par l'owner (« je valide tout, lance tout ») et fusionnée dans `main`. Phase 3 démarrée sur `phase-3`, sans API Anthropic : fiche entreprise et lettre construites sans IA, avec un point d'entrée prévu pour un modèle plus tard.
 - 2026-09-11 : phase 3 livrée sur `phase-3`, sans modèle de langage (B11). Fiche employeur depuis l'API Recherche d'entreprises (SIRET, ou nom et code postal avec notre propre score), lecture polie du site quand l'offre en donne un, cache de 30 jours (C62). Lettre adaptée par règles, affichée en différences surlignées avec la raison de chaque changement, modifiable, adaptation relançable 3 fois ; aucun crédit débité avant l'envoi (phase 4).
+- 2026-09-11 : phase 3 validée et fusionnée. L'owner retire l'envoi par email du MVP (« on règlera ça plus tard ») et demande un produit qui fonctionne. MVP sur `phase-4` : l'étudiant candidate sur le site de l'offre avec sa lettre prête puis confirme l'envoi ; suivi des statuts, relance conseillée à J+5, passage en « sans réponse » à J+14 ; page Compte (profil, documents, export JSON, suppression réelle) ; accueil et pages légales ; limite de débit par utilisateur ; en-têtes de sécurité ; tests Playwright. Stripe non installé : MVP gratuit en bêta (A5 ouverte).
