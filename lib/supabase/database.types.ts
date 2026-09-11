@@ -173,6 +173,36 @@ export type Database = {
         }
         Relationships: []
       }
+      company_lookups: {
+        Row: {
+          checked_at: string
+          confidence: number | null
+          created_at: string
+          key: string
+          siret: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          checked_at?: string
+          confidence?: number | null
+          created_at?: string
+          key: string
+          siret?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          checked_at?: string
+          confidence?: number | null
+          created_at?: string
+          key?: string
+          siret?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       credit_transactions: {
         Row: {
           application_id: string | null
@@ -861,6 +891,16 @@ export type Database = {
     Functions: {
       grant_signup_bonus: { Args: never; Returns: number }
       invoke_offer_sync: { Args: never; Returns: string }
+      pending_company_sirets: {
+        Args: { p_limit?: number }
+        Returns: {
+          company_description: string
+          company_name: string
+          company_website: string
+          postal_code: string
+          siret: string
+        }[]
+      }
       search_rome_candidates: {
         Args: { p_limit?: number; p_terms: string[] }
         Returns: {

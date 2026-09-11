@@ -1,3 +1,4 @@
+import { enrichPendingCompanies } from "@/lib/enrichment/pending";
 import { DatabaseError, ExternalApiError } from "@/lib/errors";
 import { logger as defaultLogger, type Logger } from "@/lib/logger";
 import { computeMatchesForUser } from "@/lib/matching/compute";
@@ -15,6 +16,9 @@ import { SEARCH_TTL_MS, markStaleOffers, syncSearchKey, type Db } from "./sync";
 
 export const MAX_SEARCHES_PER_RUN = 25;
 export const TIME_BUDGET_MS = 40_000;
+/** Employers identified ahead of time per call, before the route's 60 s limit. */
+export const MAX_COMPANIES_PER_RUN = 5;
+const COMPANY_DEADLINE_MS = 50_000;
 /** Stays well under the API Alternance limit of 60 searches per minute. */
 const PAUSE_BETWEEN_SEARCHES_MS = 1_100;
 
@@ -47,6 +51,7 @@ export type ScheduledSyncSummary = {
   remaining: number;
   users: number;
   stale: number;
+  companies: number;
 };
 
 export async function runScheduledSync(options: {
@@ -135,6 +140,19 @@ export async function runScheduledSync(options: {
   }
 
   const stale = await markStaleOffers(db, now);
+  let companies = 0;
+  try {
+    companies = await enrichPendingCompanies({
+      db,
+      now,
+      limit: MAX_COMPANIES_PER_RUN,
+      deadline: startedAt + COMPANY_DEADLINE_MS,
+      clock,
+      logger: log,
+    });
+  } catch (error) {
+    log.warn("pending_companies_failed", { error });
+  }
   const summary: ScheduledSyncSummary = {
     keys: keys.length,
     due: allDue.length,
@@ -143,6 +161,7 @@ export async function runScheduledSync(options: {
     remaining: allDue.length - synced - failed,
     users: users.size,
     stale,
+    companies,
   };
   log.info("scheduled_sync_completed", summary);
   return summary;
