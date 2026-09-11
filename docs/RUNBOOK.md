@@ -67,3 +67,18 @@ Le bouton « Continuer avec Google » n'apparaît que si Google est activé dans
 ## « La connexion est indisponible : ce site n'est pas encore relié à sa base de données »
 
 Ce message signifie que `NEXT_PUBLIC_SUPABASE_URL` ou `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` manque sur l'environnement. En local : fichier `.env.local` à la racine du projet, puis relancer `npm run dev`. Sur Vercel : Settings > Environment Variables, puis redéployer, car les variables `NEXT_PUBLIC_` sont figées au build.
+
+## Confirmation des emails à l'inscription
+
+Décision du 11 septembre 2026 : pas de confirmation par email pendant la bêta. La messagerie intégrée de Supabase n'envoie qu'aux membres de l'équipe du projet et à faible débit ; elle ne convient pas à de vrais utilisateurs.
+
+Pour couper la confirmation : Supabase > Authentication > Sign In / Providers > Email > décocher « Confirm email » > Save. L'inscription connecte alors directement l'étudiant, le code gère déjà ce cas. Un compte créé avant ce changement et resté non confirmé se débloque par le tableau de bord (Authentication > Users) ou par l'API d'administration.
+
+Ne pas utiliser `supabase config push` pour ce réglage : sur l'offre gratuite, Supabase refuse la mise à jour des emails sans serveur d'envoi, et la commande tente d'appliquer toute la configuration locale (Site URL et Redirect URLs de développement comprises) sans confirmation quand elle ne tourne pas dans un terminal interactif.
+
+Pour la réactiver avant l'ouverture publique :
+
+1. Créer un compte chez un service d'envoi d'emails (Resend, Brevo, Postmark…) et vérifier le domaine d'envoi.
+2. Supabase : Project Settings > Authentication > SMTP Settings : saisir l'hôte, le port, l'identifiant et le mot de passe du service.
+3. Supabase : Authentication > Sign In / Providers > Email : réactiver « Confirm email ». Recopier le modèle `supabase/templates/confirmation.html` et remettre `enable_confirmations = true` dans `supabase/config.toml`.
+4. Vérifier qu'une inscription reçoit bien l'email et que le lien ramène sur le site (Redirect URLs).
