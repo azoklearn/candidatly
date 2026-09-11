@@ -28,7 +28,7 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 - **Supabase** : Auth (email + mot de passe et Google), Postgres avec RLS sur toutes les tables, Storage bucket privé `documents`. Clés « publishable » et « secret » (les clés `anon` / `service_role` sont dépréciées fin 2026).
 - **Supabase Cron** (`pg_cron` + `pg_net`) pour les tâches planifiées : il appelle une route protégée du site. Trigger.dev, prévu par le brief, est retiré (B10).
 - **Anthropic SDK** `@anthropic-ai/sdk` : `claude-sonnet-5` (lettres), `claude-haiku-4-5-20251001` (ROME, résumé entreprise, extraction). Sorties JSON par « structured outputs » (`client.messages.parse` + `zodOutputFormat`). Installé ; pas de clé pour l'instant (décision de l'owner du 11 septembre 2026) : le choix des métiers utilise alors le classement de la nomenclature.
-- **Stripe** : non installé. Le MVP est gratuit pendant la bêta tant que le modèle de prix (A5) n'est pas décidé ; le registre des crédits reste en base.
+- **Whop** pour le paiement (C83), à la place de Stripe : forfaits Basic, Plus et Premium (`lib/pricing.ts`), plans créés par `npm run whop:setup`, session de paiement par l'API v1, webhook signé sur `/api/whop/webhook`, accès décidé par `lib/billing/access.ts`. Pas de SDK. Le mur de paiement ne s'active qu'avec `WHOP_API_KEY` et `WHOP_WEBHOOK_SECRET` ; `BILLING_DISABLED=1` le coupe (tests de bout en bout).
 - **Zod 4** à toutes les frontières (formulaires, réponses API externes, variables d'environnement, sorties JSON LLM).
 - **Vitest 5** (unitaires), **Playwright** (2 à 3 parcours critiques, phase 4).
 - Déploiement : Vercel (Node 24) + Supabase cloud (région UE), dont Supabase Cron et Vault.
@@ -128,7 +128,7 @@ Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`
 ### Base de données et crédits
 - Toutes les tables : `id uuid default gen_random_uuid()`, `created_at`, `updated_at` (trigger `set_updated_at`), RLS activée. Les utilisateurs ne lisent que leurs lignes ; `offers`, `companies` et le référentiel ROME sont en lecture seule ; les colonnes modifiables côté client sont listées par `grant update (...)`.
 - Crédits, envoi, scores et statuts d'envoi ne sont jamais modifiables depuis le client : service role ou fonctions Postgres dédiées (phase 4).
-- Toute opération sur les crédits passe par une fonction Postgres transactionnelle et idempotente (index uniques partiels sur `credit_transactions`). Les `event.id` Stripe traités sont stockés dans `stripe_events`.
+- Toute opération sur les crédits passe par une fonction Postgres transactionnelle et idempotente (index uniques partiels sur `credit_transactions`). Les événements Whop reçus sont enregistrés une fois dans `billing_events` ; les abonnements dans `subscriptions` ne sont écrits que par le webhook (clé secrète).
 - `offers.external_id` = `<partner_label>:<partner_job_id>` (source `api_alternance`).
 - Un profil et un solde de crédits sont créés par trigger à l'inscription (`handle_new_user`).
 - Migrations dans `supabase/migrations`. Sans Docker, elles sont rejouées sur PGlite avec une simulation d'auth et de storage Supabase (46 contrôles de RLS et de contraintes) ; ces tests sont dans `tests/db/migrations.test.ts` et tournent avec `npm test`. `lib/supabase/database.types.ts` est généré par la CLI officielle depuis le projet lié (`npm run db:types`).
@@ -169,7 +169,7 @@ npm run db:types     # régénère lib/supabase/database.types.ts depuis le proj
 npm run db:push      # applique les nouvelles migrations au projet lié (SUPABASE_DB_PASSWORD dans .env.local)
 npx shadcn@latest add <composant>
 npm run rome:import  # importe le référentiel ROME 4.0 (fichiers de docs/reference) dans le projet lié
-stripe listen --forward-to localhost:3000/api/stripe/webhook   # phase 4
+npm run whop:setup   # crée le produit, les plans et le webhook Whop (WHOP_API_KEY dans .env.local)
 ```
 
 Sans projet Supabase configuré, l'application tourne : les pages publiques s'affichent, l'espace connecté redirige vers la connexion, et les formulaires indiquent que l'authentification n'est pas configurée.
@@ -215,3 +215,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-11 : interface de l'application alignée sur la page d'accueil (palette et classes partagées dans `app/globals.css`, polices de `app/fonts.ts`, boutons pilule, CTA brillant `variant="shiny"`, grain) ; écrans de chargement (`loading.tsx` par page, squelettes, `PendingOverlay` pendant les actions longues) ; entreprises à fort potentiel d'embauche de l'API Alternance stockées dans `hiring_companies` et proposées en candidature spontanée sous 10 offres (C80).
 - 2026-09-11 : nouveau domaine https://candidatly.app (DNS chez Vercel). Plus aucune mention de bêta ni de gratuité sur l'accueil, la page Crédits et les conditions (C81) ; bouton d'en-tête « Trouver mon stage/alternance ».
 - 2026-09-11 : page publique `/tarifs` et page `/forfait` après le questionnaire (C82) : trois forfaits (Basic, Plus, Premium), mensuel ou annuel avec 2 mois offerts, prix par jour ; le choix est enregistré sans paiement en attendant Stripe (A5). Données et règles dans `lib/pricing.ts`.
+- 2026-09-11 : paiement par Whop (C83) avec paiement obligatoire, choix de l'owner. Sans abonnement actif, offres et candidatures renvoient vers `/forfait` ; lettre adaptée réservée à Plus et Premium, recherches par jour limitées pour Basic et Plus. Tables Stripe renommées, `billing_plans` et `profiles.billing_exempt` ajoutés. Mise en service dans `docs/RUNBOOK.md`, « Paiements Whop ».

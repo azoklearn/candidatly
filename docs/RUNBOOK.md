@@ -49,6 +49,23 @@ Lancer une synchronisation à la main, en local avec `npm run dev` et la valeur 
 curl -X POST http://localhost:3000/api/cron/sync-offers -H "Authorization: Bearer <CRON_SECRET>"
 ```
 
+## Paiements Whop
+
+Les forfaits se paient sur Whop (`docs/QUESTIONS.md` C83). Tant que `WHOP_API_KEY` et `WHOP_WEBHOOK_SECRET` manquent, il n'y a pas de mur de paiement : chaque étudiant garde l'accès complet.
+
+Mise en service :
+
+1. **Whop** : créer le compte et l'entreprise sur whop.com, puis renseigner les informations de versement demandées par Whop.
+2. **Clé d'API** : Dashboard > Developer > créer une clé « Account API key » (rôle Admin), la copier dans `.env.local` sous `WHOP_API_KEY`. Ne jamais la coller dans une conversation.
+3. **Produit, plans et webhook** : `npm run whop:setup`. Le script crée le produit Candidatly, les six plans en euros (Basic, Plus, Premium, au mois et à l'année), le webhook `https://www.candidatly.app/api/whop/webhook` (événements `membership.activated`, `membership.deactivated`, `membership.cancel_at_period_end_changed`, `payment.succeeded`, `payment.failed`), enregistre les plans dans `billing_plans` et écrit `WHOP_WEBHOOK_SECRET` dans `.env.local`. Il peut être relancé sans doublon.
+4. **Contrôle des prix** : ouvrir chaque plan dans le tableau de bord Whop et vérifier le montant affiché au paiement (14,99 €, 24,99 €, 39,99 € par mois ; 149,90 €, 249,90 €, 399,90 € par an).
+5. **Vercel** : ajouter `WHOP_API_KEY` et `WHOP_WEBHOOK_SECRET`, redéployer. Le mur de paiement s'active.
+6. **Vérifier** : choisir un forfait avec un compte de test, payer, revenir sur `/forfait/merci` : la page ouvre les offres dès que le webhook a enregistré l'abonnement. Contrôle en base : `select plan, status, current_period_end from subscriptions order by updated_at desc limit 5;`.
+
+Donner l'accès complet à un compte sans abonnement (owner, testeurs) : `update profiles set billing_exempt = true where email = '<adresse>';` dans l'éditeur SQL de Supabase.
+
+Si un paiement n'active rien : `select type, processed_at, created_at from billing_events order by created_at desc limit 10;`. Un événement sans `processed_at` a échoué et Whop le renvoie pendant 3 jours ; une adhésion achetée hors du site (sans métadonnée `user_id`) est ignorée et journalisée `membership_not_linked`.
+
 ## Mettre le MVP en ligne
 
 Adresse publique depuis le 11 septembre 2026 : https://candidatly.app (DNS chez Vercel), qui redirige vers https://www.candidatly.app. Utilisez l'adresse `www` partout où une adresse est demandée : `NEXT_PUBLIC_SITE_URL`, Site URL de Supabase, secret Vault `candidatly_site_url`. Les Redirect URLs de Supabase doivent lister `/auth/callback` et `/auth/confirm` pour `https://www.candidatly.app` et pour `https://candidatly.vercel.app`, qui reste active.
