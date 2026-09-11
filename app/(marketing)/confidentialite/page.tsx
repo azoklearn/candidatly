@@ -35,7 +35,8 @@ export default function PrivacyPage() {
         <li>Abonnement : forfait choisi, statut et dates de l’abonnement.</li>
         <li>
           Données techniques : journaux de fonctionnement, sans contenu de CV ni de lettre, et
-          mesure d’audience anonyme (pages vues).
+          mesure d’audience anonyme : pages vues et quelques étapes, comme l’inscription, le choix
+          d’un forfait ou la préparation d’une candidature, comptées sans vous identifier.
         </li>
       </ul>
       <h2>Finalités et bases légales</h2>

@@ -6,9 +6,11 @@ import { ActionForm } from "@/components/action-form";
 import { ConfirmForm } from "@/components/confirm-form";
 import { CopyButton } from "@/components/copy-button";
 import { SubmitButton } from "@/components/submit-button";
+import { TrackedLink } from "@/components/tracked-link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EVENTS } from "@/lib/analytics";
 
 import {
   markApplicationSent,
@@ -110,14 +112,14 @@ export function ApplicationTracking({
             </li>
           </ol>
           {applyUrl ? (
-            <a
+            <TrackedLink
               href={applyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              event={EVENTS.offerSiteOpened}
+              properties={{ emplacement: "candidature" }}
               className={buttonVariants({ variant: "outline" })}
             >
               Candidater sur le site de l’offre
-            </a>
+            </TrackedLink>
           ) : (
             <p className="text-muted-foreground">L’offre n’indique pas de lien de candidature.</p>
           )}

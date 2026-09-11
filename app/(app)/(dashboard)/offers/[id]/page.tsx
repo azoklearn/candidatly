@@ -7,8 +7,10 @@ import { z } from "zod";
 import { CompanyCardLoader, CompanyCardSkeleton } from "@/components/company-card";
 import { PendingOverlay } from "@/components/pending-overlay";
 import { SubmitButton } from "@/components/submit-button";
+import { TrackedLink } from "@/components/tracked-link";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EVENTS } from "@/lib/analytics";
 import { requireUserId } from "@/lib/auth/session";
 import { canPrepareLetters, requirePaidAccess } from "@/lib/billing/access";
 import {
@@ -193,14 +195,14 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                 </form>
               )}
               {job?.apply.url ? (
-                <a
+                <TrackedLink
                   href={job.apply.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  event={EVENTS.offerSiteOpened}
+                  properties={{ emplacement: "offre" }}
                   className="text-sm underline underline-offset-4"
                 >
                   Voir l’offre sur le site d’origine
-                </a>
+                </TrackedLink>
               ) : null}
             </CardContent>
           </Card>

@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { EVENTS } from "@/lib/analytics";
+import { trackServerEvent } from "@/lib/analytics-server";
 import { requireUserId } from "@/lib/auth/session";
 import { dailySearchAction, requirePaidAccess } from "@/lib/billing/access";
 import { requestOffersRefresh } from "@/lib/offers/request-refresh";
@@ -38,5 +40,6 @@ export async function refreshMyOffers(): Promise<void> {
   const daily = dailySearchAction(access);
   if (daily && !(await allowAction(supabase, daily))) return;
   await requestOffersRefresh(userId);
+  await trackServerEvent(EVENTS.offersRefreshed);
   revalidatePath("/offers");
 }

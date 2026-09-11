@@ -148,6 +148,11 @@ export function parseCronEnv(source: EnvSource): CronEnv {
 
 export const getCronEnv = memoize(() => parseCronEnv(process.env));
 
+/** Vercel sets VERCEL_URL on its deployments: server-side analytics events exist only there. */
+export function isVercelAnalyticsAvailable(): boolean {
+  return Boolean(process.env.VERCEL_WEB_ANALYTICS_ENDPOINT || process.env.VERCEL_URL);
+}
+
 /** Payments through Whop (docs/QUESTIONS.md C83, docs/RUNBOOK.md). */
 const WhopEnvSchema = z.object({
   WHOP_API_KEY: z.string().min(20),

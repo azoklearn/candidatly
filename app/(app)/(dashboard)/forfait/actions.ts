@@ -4,6 +4,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { EVENTS } from "@/lib/analytics";
+import { trackServerEvent } from "@/lib/analytics-server";
 import { authRedirectBase } from "@/lib/auth/routes";
 import { requireUserId } from "@/lib/auth/session";
 import { loadAccess } from "@/lib/billing/access";
@@ -43,6 +45,7 @@ export async function choosePlan(formData: FormData): Promise<void> {
     .eq("user_id", userId);
   if (error) logger.error("plan_choice_failed", { code: error.code });
   else logger.info("plan_chosen", { plan, billing });
+  await trackServerEvent(EVENTS.planChosen, { forfait: plan, facturation: billing });
 
   if (!isBillingConfigured()) redirect("/offers");
   const access = await loadAccess(supabase, userId);
@@ -60,5 +63,6 @@ export async function choosePlan(formData: FormData): Promise<void> {
     billing,
     returnUrl: `${base}/forfait/merci`,
   });
+  if (url) await trackServerEvent(EVENTS.checkoutStarted, { forfait: plan, facturation: billing });
   redirect(url ?? UNAVAILABLE);
 }

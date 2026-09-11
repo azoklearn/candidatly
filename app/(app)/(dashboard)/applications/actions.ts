@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 
+import { EVENTS } from "@/lib/analytics";
+import { trackServerEvent } from "@/lib/analytics-server";
 import { requireUserId } from "@/lib/auth/session";
 import { canPrepareLetters, requirePaidAccess } from "@/lib/billing/access";
 import { loadCompanyForOffer } from "@/lib/enrichment/company-for-offer";
@@ -132,6 +134,7 @@ export async function prepareApplication(offerId: string): Promise<void> {
     confidence: letter.confidence,
     changes: letter.changes.length,
   });
+  await trackServerEvent(EVENTS.applicationPrepared);
   redirect(`/applications/${inserted.data.id}`);
 }
 
@@ -262,6 +265,7 @@ export async function markApplicationSent(applicationId: string): Promise<void> 
         by: "student",
       });
       log.info("application_sent", { via: "partner_site" });
+      await trackServerEvent(EVENTS.applicationSent);
     }
   }
   revalidateApplication(applicationId);

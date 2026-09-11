@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getAnthropicClient, getModels } from "@/lib/ai/client";
+import { EVENTS } from "@/lib/analytics";
+import { trackServerEvent } from "@/lib/analytics-server";
 import { suggestRomeCodes, toSearchTerms, type RomeSuggestion } from "@/lib/ai/rome-mapping";
 import { requireUserId } from "@/lib/auth/session";
 import {
@@ -382,6 +384,7 @@ export async function finishOnboarding(): Promise<void> {
   }
   const refresh = await requestOffersRefresh(userId);
   log.info("onboarding_completed", { refresh });
+  await trackServerEvent(EVENTS.onboardingDone);
   // What the search found, then the plans (C82).
   redirect("/forfait");
 }

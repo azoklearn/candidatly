@@ -4,6 +4,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { EVENTS } from "@/lib/analytics";
+import { trackServerEvent } from "@/lib/analytics-server";
 import { isGoogleSignInEnabled } from "@/lib/auth/providers";
 import { authRedirectBase, DEFAULT_AFTER_LOGIN, safeNextPath } from "@/lib/auth/routes";
 import { getPublicEnv, isSupabaseConfigured } from "@/lib/env";
@@ -100,6 +102,7 @@ export async function signUp(_previous: AuthFormState, formData: FormData): Prom
       return { error: "Votre compte est créé. Connectez-vous pour continuer." };
     }
   }
+  await trackServerEvent(EVENTS.signup, { methode: "email" });
   redirect("/onboarding/1");
 }
 

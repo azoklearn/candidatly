@@ -1,5 +1,7 @@
 import { Tag } from "@/components/tag";
+import { TrackedLink } from "@/components/tracked-link";
 import { buttonVariants } from "@/components/ui/button";
+import { EVENTS } from "@/lib/analytics";
 import { formatDistance } from "@/lib/format";
 import type { HiringCompanyCardData } from "@/lib/offers/hiring-companies";
 
@@ -32,14 +34,13 @@ export function HiringCompanyCard({ company }: { company: HiringCompanyCardData 
         {company.headcount ? <Tag>{company.headcount}</Tag> : null}
       </div>
       {company.applyUrl ? (
-        <a
+        <TrackedLink
           href={company.applyUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          event={EVENTS.spontaneousApplication}
           className={`${buttonVariants({ variant: "outline", size: "sm" })} w-fit`}
         >
           Envoyer une candidature spontanée <span aria-hidden>↗</span>
-        </a>
+        </TrackedLink>
       ) : null}
     </li>
   );

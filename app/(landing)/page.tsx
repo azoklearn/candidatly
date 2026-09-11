@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { TrackedLink } from "@/components/tracked-link";
+import { EVENTS } from "@/lib/analytics";
 import { socialProofMessage, type LandingStats } from "@/lib/social-proof";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -59,9 +61,14 @@ export default async function HomePage({
           <Link className="header-login" href="/login">
             Se connecter
           </Link>
-          <Link className="header-cta" href="/signup">
+          <TrackedLink
+            className="header-cta"
+            href="/signup"
+            event={EVENTS.signupClicked}
+            properties={{ emplacement: "en-tete" }}
+          >
             Trouver mon stage/alternance <span>↗</span>
-          </Link>
+          </TrackedLink>
         </div>
       </header>
 
@@ -91,11 +98,16 @@ export default async function HomePage({
               qui cochent vraiment tes cases et prépare ta lettre pour chacune.
             </p>
             <div className="hero-actions">
-              <Link className="shiny-cta" href="/signup">
+              <TrackedLink
+                className="shiny-cta"
+                href="/signup"
+                event={EVENTS.signupClicked}
+                properties={{ emplacement: "hero" }}
+              >
                 <span>
                   Trouver mon opportunité <b>→</b>
                 </span>
-              </Link>
+              </TrackedLink>
               <a className="text-link" href="#comment-ca-marche">
                 Voir comment ça marche <span>↓</span>
               </a>
@@ -183,9 +195,14 @@ export default async function HomePage({
                   <span>✓</span> Une lettre adaptée à chaque offre
                 </li>
               </ul>
-              <Link className="button button-dark" href="/signup">
+              <TrackedLink
+                className="button button-dark"
+                href="/signup"
+                event={EVENTS.signupClicked}
+                properties={{ emplacement: "offres" }}
+              >
                 Découvrir Candidatly <span>→</span>
-              </Link>
+              </TrackedLink>
             </div>
             <div className="feed-demo reveal reveal-delay">
               <div className="feed-head">
@@ -324,11 +341,16 @@ export default async function HomePage({
             </h2>
             <p>Rejoins les étudiants qui refusent de laisser leur avenir au hasard.</p>
             <div className="final-actions">
-              <Link className="shiny-cta" href="/signup">
+              <TrackedLink
+                className="shiny-cta"
+                href="/signup"
+                event={EVENTS.signupClicked}
+                properties={{ emplacement: "final" }}
+              >
                 <span>
                   Trouver les offres qui me correspondent <b>→</b>
                 </span>
-              </Link>
+              </TrackedLink>
               <Link className="final-login" href="/login">
                 Déjà inscrit ? Se connecter
               </Link>

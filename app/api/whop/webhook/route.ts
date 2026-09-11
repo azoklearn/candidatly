@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { EVENTS } from "@/lib/analytics";
+import { trackServerEvent } from "@/lib/analytics-server";
 import { syncWhopMembership } from "@/lib/billing/sync-membership";
 import { createWhopClient } from "@/lib/billing/whop";
 import { WhopEventSchema, verifyWhopSignature, type WhopEvent } from "@/lib/billing/whop-webhook";
@@ -76,12 +78,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, duplicate: true });
     }
     if (event.type.startsWith("membership.")) {
-      await syncWhopMembership({
+      const subscription = await syncWhopMembership({
         db,
         whop: createWhopClient(),
         membershipId: event.data.id,
         logger: log,
       });
+      if (subscription && event.type === "membership.activated") {
+        await trackServerEvent(
+          EVENTS.subscriptionActivated,
+          { forfait: subscription.plan, facturation: subscription.billing },
+          request,
+        );
+      } else if (subscription && event.type === "membership.deactivated") {
+        await trackServerEvent(EVENTS.subscriptionEnded, { forfait: subscription.plan }, request);
+      }
     }
     const done = await db
       .from("billing_events")
