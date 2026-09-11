@@ -58,7 +58,7 @@ async function listPlans(companyId: string): Promise<WhopPlanListing[]> {
   const plans: WhopPlanListing[] = [];
   let after: string | null = null;
   do {
-    const query = new URLSearchParams({ company_id: companyId });
+    const query = new URLSearchParams({ account_id: companyId });
     if (after) query.set("after", after);
     const page: PlanPage = await whop<PlanPage>(`/plans?${query}`);
     plans.push(...page.data);
@@ -71,10 +71,14 @@ const euros = (value: number | null | undefined) =>
   typeof value === "number" ? value.toFixed(2) : "?";
 
 async function main() {
-  const account = await whop<{ id: string; title?: string }>("/accounts/me");
-  console.log(`Whop account: ${account.id}${account.title ? ` (${account.title})` : ""}`);
+  // --account=biz_... or WHOP_ACCOUNT_ID skip /accounts/me, which needs company:balance:read.
+  const accountId =
+    option("account") ||
+    process.env.WHOP_ACCOUNT_ID ||
+    (await whop<{ id: string }>("/accounts/me")).id;
+  console.log(`Whop account: ${accountId}`);
 
-  const listings = await listPlans(account.id);
+  const listings = await listPlans(accountId);
   console.log(`${listings.length} plan(s) on Whop:`);
   for (const plan of listings) {
     const first =
@@ -138,6 +142,7 @@ async function main() {
   }
   const webhook = await whop<{ id: string; webhook_secret?: string }>("/webhooks", {
     url: `${SITE}/api/whop/webhook`,
+    resource_id: accountId,
     api_version: "v1",
     enabled: true,
     events: WEBHOOK_EVENTS,
