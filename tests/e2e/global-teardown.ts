@@ -15,6 +15,10 @@ export default async function globalTeardown() {
     }
     await db.auth.admin.deleteUser(user.id);
   }
+  const { data } = await db.auth.admin.listUsers({ perPage: 1000 });
+  for (const user of (data?.users ?? []).filter((u) => u.email === state.signup.email)) {
+    await db.auth.admin.deleteUser(user.id);
+  }
   await db.from("offers").delete().eq("id", state.offerId);
   unlinkSync(STATE_FILE);
 }

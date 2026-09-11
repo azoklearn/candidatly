@@ -6,7 +6,11 @@ export const STATE_FILE = "tests/e2e/.state.json";
 export const OFFER_TITLE = "Développeur web en alternance (test E2E)";
 
 type TestUser = { id: string; email: string; login: string };
-export type E2EState = { offerId: string; users: { student: TestUser; leaver: TestUser } };
+export type E2EState = {
+  offerId: string;
+  users: { student: TestUser; leaver: TestUser };
+  signup: { email: string; password: string };
+};
 
 /** Service-role client for seeding and cleaning the linked Supabase project. */
 export function adminClient() {

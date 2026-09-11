@@ -8,6 +8,7 @@ import { isGoogleSignInEnabled } from "@/lib/auth/providers";
 import { authRedirectBase, DEFAULT_AFTER_LOGIN, safeNextPath } from "@/lib/auth/routes";
 import { getPublicEnv, isSupabaseConfigured } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthFormState = {
@@ -63,7 +64,7 @@ export async function signIn(_previous: AuthFormState, formData: FormData): Prom
     return {
       error:
         error.code === "email_not_confirmed"
-          ? "Confirmez d’abord votre adresse email grâce au lien que nous vous avons envoyé."
+          ? "Ce compte n’est pas encore activé. Réessayez dans quelques minutes."
           : "Email ou mot de passe incorrect.",
     };
   }
@@ -75,26 +76,45 @@ export async function signUp(_previous: AuthFormState, formData: FormData): Prom
   if (!parsed.success) return { fieldErrors: toFieldErrors(parsed.error) };
   if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED };
 
-  const base = authRedirectBase(
-    (await headers()).get("origin"),
-    getPublicEnv().NEXT_PUBLIC_SITE_URL,
-  );
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    ...parsed.data,
-    options: { emailRedirectTo: `${base}/auth/callback?next=/onboarding/1` },
-  });
+  const { data, error } = await supabase.auth.signUp(parsed.data);
   if (error) {
     log.info("sign_up_failed", { code: error.code });
     const known = error.code ? SIGN_UP_ERRORS[error.code] : undefined;
     return { error: known ?? "L’inscription n’a pas abouti. Réessayez." };
   }
-  // A session is returned directly when email confirmation is disabled.
-  if (data.session) redirect("/onboarding/1");
-  return {
-    message:
-      "Nous vous avons envoyé un email de confirmation. Cliquez sur le lien qu’il contient pour activer votre compte. Pensez à regarder dans vos courriers indésirables.",
-  };
+  // No email verification (docs/QUESTIONS.md C79). If the project still asks for one,
+  // the new account is confirmed on the server and signed in straight away.
+  if (!data.session) {
+    const user = data.user;
+    // An address already registered comes back as a user without identities: never touch it.
+    if (!user || (user.identities?.length ?? 0) === 0) {
+      return { error: SIGN_UP_ERRORS.user_already_exists };
+    }
+    if (!(await confirmNewAccount(user.id))) {
+      return { error: "L’inscription n’a pas abouti. Réessayez." };
+    }
+    const signedIn = await supabase.auth.signInWithPassword(parsed.data);
+    if (signedIn.error) {
+      log.error("sign_up_sign_in_failed", { code: signedIn.error.code });
+      return { error: "Votre compte est créé. Connectez-vous pour continuer." };
+    }
+  }
+  redirect("/onboarding/1");
+}
+
+async function confirmNewAccount(userId: string): Promise<boolean> {
+  try {
+    const { error } = await createAdminClient().auth.admin.updateUserById(userId, {
+      email_confirm: true,
+    });
+    if (error) throw error;
+    log.info("sign_up_auto_confirmed");
+    return true;
+  } catch (error) {
+    log.error("sign_up_confirm_failed", { error });
+    return false;
+  }
 }
 
 export async function signInWithGoogle(formData: FormData): Promise<void> {

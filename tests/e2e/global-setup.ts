@@ -120,5 +120,9 @@ export default async function globalSetup() {
       login: `/auth/confirm?type=email&next=/offers&token_hash=${link.data.properties.hashed_token}`,
     };
   }
-  writeFileSync(STATE_FILE, JSON.stringify({ offerId: offer.data.id, users } satisfies E2EState));
+  const signup = { email: `e2e-signup-${run}@example.com`, password: `E2e-${randomUUID()}` };
+  writeFileSync(
+    STATE_FILE,
+    JSON.stringify({ offerId: offer.data.id, users, signup } satisfies E2EState),
+  );
 }
