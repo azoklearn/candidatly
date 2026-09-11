@@ -25,5 +25,5 @@ export function socialProofMessage(stats: LandingStats | null): string {
     const count = rounded(stats.students, 50);
     return `${count.exact ? "Déjà" : "Déjà plus de"} ${count.text} étudiants utilisent Candidatly.`;
   }
-  return "Gratuit pendant la bêta, sans carte bancaire.";
+  return "Les offres officielles de La bonne alternance, triées pour toi.";
 }

@@ -15,8 +15,8 @@ export default function TermsPage() {
       </p>
       <h2>Accès et prix</h2>
       <p>
-        Le service nécessite un compte. Il est gratuit pendant la bêta. Toute formule payante future
-        sera annoncée à l’avance et ne s’appliquera qu’avec votre accord.
+        Le service nécessite un compte. Toute formule payante sera annoncée à l’avance et ne
+        s’appliquera qu’avec votre accord.
       </p>
       <h2>Fonctionnement</h2>
       <ul>
@@ -42,8 +42,8 @@ export default function TermsPage() {
       <h2>Responsabilité</h2>
       <p>
         Candidatly s’efforce d’assurer un service disponible et fiable, sans pouvoir le garantir en
-        continu pendant la bêta. Candidatly ne peut être tenu responsable des décisions des
-        recruteurs ni du contenu des sites tiers.
+        continu. Candidatly ne peut être tenu responsable des décisions des recruteurs ni du contenu
+        des sites tiers.
       </p>
       <h2>Suppression du compte</h2>
       <p>

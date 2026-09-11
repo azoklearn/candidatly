@@ -59,7 +59,7 @@ export default async function HomePage({
             Se connecter
           </Link>
           <Link className="header-cta" href="/signup">
-            Rejoindre la bêta <span>↗</span>
+            Trouver mon stage/alternance <span>↗</span>
           </Link>
         </div>
       </header>
@@ -302,8 +302,8 @@ export default async function HomePage({
                 </footer>
               </article>
               <article className="quote-stat reveal reveal-delay-2">
-                <strong>0 €</strong>
-                <p>pendant toute la bêta. Sans carte bancaire, sans engagement.</p>
+                <strong>100 %</strong>
+                <p>des changements apportés à ta lettre te sont montrés, un par un.</p>
                 <span>✦</span>
               </article>
             </div>
@@ -314,7 +314,7 @@ export default async function HomePage({
           <div className="final-dots" aria-hidden="true" />
           <div className="lp-container final-inner reveal">
             <span className="eyebrow light">
-              <span className="pulse" /> BÊTA OUVERTE POUR SEPTEMBRE
+              <span className="pulse" /> LES OFFRES DE LA RENTRÉE SONT EN LIGNE
             </span>
             <h2>
               Ton prochain “oui”
@@ -332,7 +332,6 @@ export default async function HomePage({
                 Déjà inscrit ? Se connecter
               </Link>
             </div>
-            <p className="final-note">Accès gratuit pendant la bêta · Sans carte bancaire.</p>
           </div>
         </section>
       </main>

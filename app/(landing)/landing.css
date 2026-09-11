@@ -1121,6 +1121,7 @@ html:has(.lp) {
 }
 .lp .header-cta {
   color: #fff;
+  white-space: nowrap;
   padding: 10px 13px 10px 17px;
   border-radius: 999px;
   background: linear-gradient(115deg, #0a3b92, #1764d8 68%, #80bdf5);
@@ -1477,6 +1478,33 @@ html:has(.lp) {
   }
   .lp .deleted-notice {
     margin-left: 0;
+  }
+}
+/* Phones: the header button "Trouver mon stage/alternance" must fit next to the logo. */
+@media (max-width: 520px) {
+  .lp .site-header .brand {
+    font-size: 17px;
+    gap: 7px;
+  }
+  .lp .site-header .brand-mark {
+    width: 24px;
+    height: 24px;
+    font-size: 19px;
+  }
+  .lp .header-cta {
+    padding: 8px 13px;
+    gap: 6px;
+  }
+  .lp .header-cta span {
+    display: none;
+  }
+}
+@media (max-width: 400px) {
+  .lp .header-cta {
+    max-width: 128px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
   }
 }
 @media (prefers-reduced-motion: reduce) {

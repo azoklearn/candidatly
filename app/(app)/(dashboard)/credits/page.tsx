@@ -8,7 +8,7 @@ export default function CreditsPage() {
   return (
     <ComingSoon
       title="Crédits"
-      description="Pendant la bêta, Candidatly est entièrement gratuit : aucune carte bancaire, aucun crédit à acheter. Les éventuelles formules payantes seront annoncées avant leur mise en place."
+      description="Aucun crédit à acheter pour le moment. Les éventuelles formules payantes seront annoncées avant leur mise en place."
     />
   );
 }

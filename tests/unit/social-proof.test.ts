@@ -21,9 +21,8 @@ describe("socialProofMessage", () => {
     expect(socialProofMessage({ placedStudents: 12, students: 130 })).toBe(
       "Déjà plus de 100 étudiants utilisent Candidatly.",
     );
-    expect(socialProofMessage({ placedStudents: 0, students: 3 })).toBe(
-      "Gratuit pendant la bêta, sans carte bancaire.",
-    );
-    expect(socialProofMessage(null)).toBe("Gratuit pendant la bêta, sans carte bancaire.");
+    const fallback = "Les offres officielles de La bonne alternance, triées pour toi.";
+    expect(socialProofMessage({ placedStudents: 0, students: 3 })).toBe(fallback);
+    expect(socialProofMessage(null)).toBe(fallback);
   });
 });
