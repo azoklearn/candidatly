@@ -588,6 +588,27 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          action: string
+          hits: number
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          action: string
+          hits?: number
+          user_id: string
+          window_start: string
+        }
+        Update: {
+          action?: string
+          hits?: number
+          user_id?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       rome_appellations: {
         Row: {
           classification: string
@@ -889,6 +910,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_rate_limit: {
+        Args: { p_action: string; p_limit: number; p_window_seconds: number }
+        Returns: boolean
+      }
+      daily_maintenance: { Args: never; Returns: Json }
       grant_signup_bonus: { Args: never; Returns: number }
       invoke_offer_sync: { Args: never; Returns: string }
       pending_company_sirets: {
