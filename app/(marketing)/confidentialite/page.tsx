@@ -32,7 +32,11 @@ export default function PrivacyPage() {
           Candidatures : lettres adaptées, statuts, dates, notes et historique des changements de
           statut.
         </li>
-        <li>Données techniques : journaux de fonctionnement, sans contenu de CV ni de lettre.</li>
+        <li>Abonnement : forfait choisi, statut et dates de l’abonnement.</li>
+        <li>
+          Données techniques : journaux de fonctionnement, sans contenu de CV ni de lettre, et
+          mesure d’audience anonyme (pages vues).
+        </li>
       </ul>
       <h2>Finalités et bases légales</h2>
       <ul>
@@ -43,6 +47,10 @@ export default function PrivacyPage() {
         <li>
           Assurer la sécurité et prévenir les abus, par exemple en limitant le nombre de demandes.
           Base légale : intérêt légitime.
+        </li>
+        <li>
+          Mesurer l’audience du site de façon agrégée, pour l’améliorer. Base légale : intérêt
+          légitime.
         </li>
       </ul>
       <p>
@@ -55,7 +63,11 @@ export default function PrivacyPage() {
           Supabase : base de données, stockage des fichiers et authentification, hébergés dans
           l’Union européenne.
         </li>
-        <li>Vercel : hébergement de l’application.</li>
+        <li>Vercel : hébergement de l’application et mesure d’audience (Vercel Web Analytics).</li>
+        <li>
+          Whop : paiement des forfaits. Whop reçoit votre identifiant Candidatly et les informations
+          de paiement que vous saisissez sur sa page, jamais vos documents.
+        </li>
         <li>
           API Alternance : reçoit vos critères de recherche (métiers, zone, niveau), jamais votre
           identité.
@@ -100,8 +112,10 @@ export default function PrivacyPage() {
       </p>
       <h2>Cookies</h2>
       <p>
-        Candidatly n’utilise que les cookies nécessaires à votre session de connexion. Aucun traceur
-        publicitaire ni outil de mesure d’audience n’est utilisé.
+        Candidatly n’utilise que les cookies nécessaires à votre session de connexion. La mesure
+        d’audience (Vercel Web Analytics) ne dépose aucun cookie : les visites sont comptées de
+        façon agrégée, et nous retirons des adresses de pages les identifiants et les paramètres
+        avant tout envoi. Aucun traceur publicitaire n’est utilisé.
       </p>
       <h2>Sécurité</h2>
       <p>
