@@ -4,6 +4,7 @@ import { isSupabaseConfigured } from "@/lib/env";
 import { ExternalApiError } from "@/lib/errors";
 import { searchPlaces, type PlaceType } from "@/lib/geocoding/geocode";
 import { logger } from "@/lib/logger";
+import { allowAction } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 const TYPES: readonly PlaceType[] = ["municipality", "housenumber", "street", "locality"];
@@ -18,6 +19,9 @@ export async function GET(request: NextRequest) {
   if (!data?.claims)
     return NextResponse.json({ places: [], error: "unauthorized" }, { status: 401 });
 
+  if (!(await allowAction(supabase, "geocode"))) {
+    return NextResponse.json({ places: [], error: "rate_limited" }, { status: 429 });
+  }
   const query = request.nextUrl.searchParams.get("q") ?? "";
   const requestedType = request.nextUrl.searchParams.get("type");
   const type = TYPES.find((value) => value === requestedType);

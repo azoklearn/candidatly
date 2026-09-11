@@ -30,7 +30,13 @@ const LEVELS = [
   ["bac+5", "Bac+5 (master, école d’ingénieur ou de commerce…)"],
 ] as const;
 
-export function ProfileForm({ profile }: { profile: ProfileValues }) {
+export function ProfileForm({
+  profile,
+  mode = "onboarding",
+}: {
+  profile: ProfileValues;
+  mode?: "onboarding" | "account";
+}) {
   const [state, action, pending] = useActionState<FormState, FormData>(saveProfile, {});
   const errors = state.fieldErrors ?? {};
 
@@ -57,6 +63,7 @@ export function ProfileForm({ profile }: { profile: ProfileValues }) {
 
   return (
     <ActionForm action={action} className="grid gap-5">
+      <input type="hidden" name="mode" value={mode} />
       {state.error ? (
         <Alert variant="destructive">
           <AlertDescription>{state.error}</AlertDescription>
@@ -115,8 +122,11 @@ export function ProfileForm({ profile }: { profile: ProfileValues }) {
           hint: "Utile pour les relances.",
         })}
       </div>
+      {state.saved ? (
+        <p className="text-sm text-muted-foreground">Modifications enregistrées.</p>
+      ) : null}
       <Button type="submit" disabled={pending} className="w-fit">
-        {pending ? "Enregistrement…" : "Continuer"}
+        {pending ? "Enregistrement…" : mode === "account" ? "Enregistrer" : "Continuer"}
       </Button>
     </ActionForm>
   );

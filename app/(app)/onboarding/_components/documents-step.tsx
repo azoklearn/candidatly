@@ -154,10 +154,12 @@ export function DocumentsStep({
   userId,
   cv,
   letter,
+  showContinue = true,
 }: {
   userId: string;
   cv: DocumentSummary | null;
   letter: DocumentSummary | null;
+  showContinue?: boolean;
 }) {
   const ready = cv !== null && letter !== null;
   return (
@@ -193,7 +195,7 @@ export function DocumentsStep({
         />
         <LetterText />
       </section>
-      {ready ? (
+      {!showContinue ? null : ready ? (
         <Link href="/onboarding/6" className={buttonVariants({ size: "lg" }) + " w-fit"}>
           Continuer
         </Link>

@@ -18,6 +18,7 @@ import { ExternalApiError, ValidationError } from "@/lib/errors";
 import { resolvePlace } from "@/lib/geocoding/geocode";
 import { requestOffersRefresh } from "@/lib/offers/request-refresh";
 import { logger } from "@/lib/logger";
+import { allowAction, RATE_LIMITED_MESSAGE } from "@/lib/rate-limit";
 import { firstIncompleteStep, LAST_STEP } from "@/lib/onboarding/state";
 import type { Database, TablesInsert } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
@@ -103,6 +104,10 @@ export async function saveProfile(_previous: FormState, formData: FormData): Pro
     log.error("profile_update_failed", { code: error.code });
     return { error: GENERIC_ERROR };
   }
+  if (read(formData, "mode") === "account") {
+    revalidatePath("/account");
+    return { saved: true };
+  }
   redirect("/onboarding/3");
 }
 
@@ -122,6 +127,7 @@ export async function suggestRome(
   const text = parsed.data;
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  if (!(await allowAction(supabase, "suggest_rome"))) return { error: RATE_LIMITED_MESSAGE };
   await supabase.from("profiles").update({ domain_free_text: text }).eq("user_id", userId);
 
   const terms = toSearchTerms(text);
@@ -186,6 +192,11 @@ export async function saveRome(_previous: FormState, formData: FormData): Promis
     log.error("rome_update_failed", { code: error.code });
     return { error: GENERIC_ERROR };
   }
+  if (read(formData, "mode") === "account") {
+    await requestOffersRefresh(userId);
+    revalidatePath("/account");
+    return { saved: true };
+  }
   redirect("/onboarding/4");
 }
 
@@ -231,6 +242,11 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
   if (error) {
     log.error("location_update_failed", { code: error.code });
     return { error: GENERIC_ERROR };
+  }
+  if (read(formData, "mode") === "account") {
+    await requestOffersRefresh(userId);
+    revalidatePath("/account");
+    return { saved: true };
   }
   redirect("/onboarding/5");
 }
@@ -288,6 +304,8 @@ export async function registerDocument(
   }
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  if (!(await allowAction(supabase, "upload_document")))
+    return { ok: false, error: RATE_LIMITED_MESSAGE };
   const folder = `${userId}/${kind === "cv" ? "cv" : "letter"}/`;
   if (!path.startsWith(folder) || path.includes(".."))
     return { ok: false, error: "Fichier non pris en charge." };
@@ -315,6 +333,7 @@ export async function registerDocument(
   });
   if (!saved) return { ok: false, error: GENERIC_ERROR };
   revalidatePath("/onboarding/5");
+  revalidatePath("/account");
   return { ok: true };
 }
 
@@ -340,6 +359,7 @@ export async function saveLetterText(_previous: FormState, formData: FormData): 
   });
   if (!saved) return { error: GENERIC_ERROR };
   revalidatePath("/onboarding/5");
+  revalidatePath("/account");
   return { saved: true };
 }
 

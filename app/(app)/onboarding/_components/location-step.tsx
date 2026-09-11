@@ -28,10 +28,12 @@ export function LocationStep({
   initialLabel,
   initialCitycode,
   initialRadius,
+  mode = "onboarding",
 }: {
   initialLabel: string | null;
   initialCitycode: string | null;
   initialRadius: number;
+  mode?: "onboarding" | "account";
 }) {
   const [state, action, pending] = useActionState<FormState, FormData>(saveLocation, {});
   const [query, setQuery] = useState(initialLabel ?? "");
@@ -75,6 +77,7 @@ export function LocationStep({
 
   return (
     <ActionForm action={action} className="grid gap-5">
+      <input type="hidden" name="mode" value={mode} />
       <div className="grid gap-2">
         <Label htmlFor="place">Ville ou adresse autour de laquelle chercher</Label>
         <Input
@@ -140,8 +143,13 @@ export function LocationStep({
           <AlertDescription>{state.error}</AlertDescription>
         </Alert>
       ) : null}
+      {state.saved ? (
+        <p className="text-sm text-muted-foreground">
+          Zone enregistrée, recherche d’offres relancée.
+        </p>
+      ) : null}
       <Button type="submit" disabled={pending || !chosen} className="w-fit">
-        {pending ? "Vérification…" : "Continuer"}
+        {pending ? "Vérification…" : mode === "account" ? "Enregistrer" : "Continuer"}
       </Button>
     </ActionForm>
   );

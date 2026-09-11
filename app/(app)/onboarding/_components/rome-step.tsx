@@ -13,7 +13,15 @@ import { FieldError, FieldHint, textareaClassName } from "./fields";
 type Option = { code: string; label: string; reason?: string };
 const MAX_CODES = 5;
 
-export function RomeStep({ initialText, selected }: { initialText: string; selected: Option[] }) {
+export function RomeStep({
+  initialText,
+  selected,
+  mode = "onboarding",
+}: {
+  initialText: string;
+  selected: Option[];
+  mode?: "onboarding" | "account";
+}) {
   const [suggestState, suggestAction, suggesting] = useActionState<RomeSuggestState, FormData>(
     suggestRome,
     {},
@@ -63,6 +71,7 @@ export function RomeStep({ initialText, selected }: { initialText: string; selec
 
       {options.length > 0 ? (
         <ActionForm action={saveAction} className="grid gap-4">
+          <input type="hidden" name="mode" value={mode} />
           <fieldset className="grid gap-3">
             <legend className="mb-2 text-sm font-medium">
               Métiers retenus pour votre recherche ({checkedCount} sur {MAX_CODES} au maximum)
@@ -111,8 +120,13 @@ export function RomeStep({ initialText, selected }: { initialText: string; selec
               <AlertDescription>{saveState.error}</AlertDescription>
             </Alert>
           ) : null}
+          {saveState.saved ? (
+            <p className="text-sm text-muted-foreground">
+              Métiers enregistrés, recherche d’offres relancée.
+            </p>
+          ) : null}
           <Button type="submit" disabled={saving || checkedCount === 0} className="w-fit">
-            {saving ? "Enregistrement…" : "Continuer"}
+            {saving ? "Enregistrement…" : mode === "account" ? "Enregistrer" : "Continuer"}
           </Button>
         </ActionForm>
       ) : null}
