@@ -28,7 +28,7 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 - **Supabase** : Auth (email + mot de passe et Google), Postgres avec RLS sur toutes les tables, Storage bucket privé `documents`. Clés « publishable » et « secret » (les clés `anon` / `service_role` sont dépréciées fin 2026).
 - **Supabase Cron** (`pg_cron` + `pg_net`) pour les tâches planifiées : il appelle une route protégée du site. Trigger.dev, prévu par le brief, est retiré (B10).
 - **Anthropic SDK** `@anthropic-ai/sdk` : `claude-sonnet-5` (lettres), `claude-haiku-4-5-20251001` (ROME, résumé entreprise, extraction). Sorties JSON par « structured outputs » (`client.messages.parse` + `zodOutputFormat`). Installé ; pas de clé pour l'instant (décision de l'owner du 11 septembre 2026) : le choix des métiers utilise alors le classement de la nomenclature.
-- **Whop** pour le paiement (C83), à la place de Stripe : forfaits Basic, Plus et Premium (`lib/pricing.ts`), plans créés par `npm run whop:setup`, session de paiement par l'API v1, webhook signé sur `/api/whop/webhook`, accès décidé par `lib/billing/access.ts`. Pas de SDK. Le mur de paiement ne s'active qu'avec `WHOP_API_KEY` et `WHOP_WEBHOOK_SECRET` ; `BILLING_DISABLED=1` le coupe (tests de bout en bout).
+- **Whop** pour le paiement (C83), à la place de Stripe : forfaits Basic, Plus et Premium (`lib/pricing.ts`), plans créés par l'owner dans Whop et reliés par `npm run whop:setup` (`lib/billing/match-plans.ts`), session de paiement par l'API v1, webhook signé sur `/api/whop/webhook`, accès décidé par `lib/billing/access.ts`. Pas de SDK. Le mur de paiement ne s'active qu'avec `WHOP_API_KEY` et `WHOP_WEBHOOK_SECRET` ; `BILLING_DISABLED=1` le coupe (tests de bout en bout).
 - **Zod 4** à toutes les frontières (formulaires, réponses API externes, variables d'environnement, sorties JSON LLM).
 - **Vitest 5** (unitaires), **Playwright** (2 à 3 parcours critiques, phase 4).
 - Déploiement : Vercel (Node 24) + Supabase cloud (région UE), dont Supabase Cron et Vault.
@@ -169,7 +169,7 @@ npm run db:types     # régénère lib/supabase/database.types.ts depuis le proj
 npm run db:push      # applique les nouvelles migrations au projet lié (SUPABASE_DB_PASSWORD dans .env.local)
 npx shadcn@latest add <composant>
 npm run rome:import  # importe le référentiel ROME 4.0 (fichiers de docs/reference) dans le projet lié
-npm run whop:setup   # crée le produit, les plans et le webhook Whop (WHOP_API_KEY dans .env.local)
+npm run whop:setup   # relie les plans Whop aux forfaits et crée le webhook (-- --dry-run pour voir sans écrire)
 ```
 
 Sans projet Supabase configuré, l'application tourne : les pages publiques s'affichent, l'espace connecté redirige vers la connexion, et les formulaires indiquent que l'authentification n'est pas configurée.
