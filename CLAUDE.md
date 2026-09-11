@@ -17,7 +17,7 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 | 0 | Cadrage, lecture des API, questions ouvertes, ce fichier | Validée le 10 septembre 2026 |
 | 1 | Init Next.js, Supabase (migrations, RLS, bucket), auth, `OfferProvider` + tests | Validée le 11 septembre 2026, fusionnée dans `main` |
 | 2 | Onboarding 6 étapes, mapping ROME, extraction CV/lettre, jobs `sync-offers` / `compute-matches`, écrans offres | Validée le 11 septembre 2026, fusionnée dans `main` |
-| 3 | `enrich-company`, résumé entreprise, génération de lettre + diff | En cours sur la branche `phase-3` |
+| 3 | `enrich-company`, résumé entreprise, génération de lettre + diff | Livrée sur la branche `phase-3`, en attente de validation |
 | 4 | Envoi, suivi, facturation (crédits ou abonnement selon A5), compte / export / suppression, Playwright | À faire |
 | 5 | Landing, légal, rate limiting, Sentry, coûts LLM, `docs/RUNBOOK.md` complet | À faire |
 
@@ -79,7 +79,7 @@ tests/                          unit/ (Vitest), fixtures/ (réponses API réelle
 docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RUNBOOK, reference/
 ```
 
-Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`, `lib/matching`, `lib/offers` (synchronisation, filtres, rafraîchissement), `lib/onboarding`, `lib/rome`, `lib/text`, `lib/cron`, `app/api/geocode`, `app/api/cron/sync-offers`, `scripts/import-rome.ts`, `tests/db`. À venir : `lib/enrichment`, `lib/credits`, `app/api/stripe/webhook`, `tests/e2e`.
+Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`, `lib/matching`, `lib/offers` (synchronisation, filtres, rafraîchissement), `lib/onboarding`, `lib/rome`, `lib/text`, `lib/cron`, `app/api/geocode`, `app/api/cron/sync-offers`, `scripts/import-rome.ts`, `tests/db`. Ajouts de la phase 3 : `lib/enrichment` (répertoire des entreprises, site web, fiche, cache), `lib/letters` (adaptation, différences), `components/company-card.tsx`, `app/(app)/(dashboard)/applications/[id]`. À venir : `lib/credits`, `app/api/stripe/webhook`, `tests/e2e`.
 
 ## 6. Conventions
 
@@ -203,3 +203,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-11 : phase 2 livrée sur `phase-2`. Onboarding en 6 étapes, choix des métiers ROME (repli sur le classement de la nomenclature tant que la clé Anthropic manque), lecture des CV PDF et des lettres PDF, Word ou collées, recherche des offres et calcul des correspondances en ligne faute de compte Trigger.dev, écrans liste et détail des offres. Deux corrections après test réel : classement ROME (C55) et doublons du géocodeur (C58). Parcours complet vérifié sur le projet cloud avec un utilisateur de test.
 - 2026-09-11 : l'owner se passe de l'API Anthropic pour l'instant et remplace Trigger.dev par Supabase Cron (B10). Trigger.dev est retiré du projet ; une migration planifie l'appel de `/api/cron/sync-offers` toutes les 15 minutes, l'adresse du site et le secret étant rangés dans Vault. Correction après test réel : une offre renvoyée deux fois par l'API faisait échouer l'enregistrement (C61).
 - 2026-09-11 : phase 2 validée par l'owner (« je valide tout, lance tout ») et fusionnée dans `main`. Phase 3 démarrée sur `phase-3`, sans API Anthropic : fiche entreprise et lettre construites sans IA, avec un point d'entrée prévu pour un modèle plus tard.
+- 2026-09-11 : phase 3 livrée sur `phase-3`, sans modèle de langage (B11). Fiche employeur depuis l'API Recherche d'entreprises (SIRET, ou nom et code postal avec notre propre score), lecture polie du site quand l'offre en donne un, cache de 30 jours (C62). Lettre adaptée par règles, affichée en différences surlignées avec la raison de chaque changement, modifiable, adaptation relançable 3 fois ; aucun crédit débité avant l'envoi (phase 4).

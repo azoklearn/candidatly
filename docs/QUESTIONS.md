@@ -98,6 +98,7 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 | B8 | Zod | « Zod » | Zod 4 est la version courante (`zod` 4.5.x) ; API v4 (`z.email()`, `error:`) | Zod 4 |
 | B9 | Tests de la base sans Docker | Non précisé | PGlite (Postgres 18 compilé en WebAssembly, `@electric-sql/pglite`, licence Apache 2.0) rejoue les migrations et teste la RLS en quelques secondes, sans Docker ni réseau | **Accepté le 11 septembre 2026** : dépendance de développement, tests dans `tests/db/`, lancés par `npm test` |
 | B10 | Tâches planifiées | « Trigger.dev » pour `sync-offers` et les autres jobs | L'owner ne souhaite pas de compte Trigger.dev. Comparaison du 11 septembre 2026 : Vercel Cron est limité à une exécution par jour en offre gratuite ; Railway coûte 5 $ par mois et ajoute un service à déployer ; Supabase Cron (`pg_cron` et `pg_net`) est déjà disponible sur le projet | **Choisi par l'owner le 11 septembre 2026** : Supabase Cron appelle `/api/cron/sync-offers` toutes les 15 minutes, secrets dans Vault ; Trigger.dev retiré du projet |
+| B11 | Fiche entreprise et lettre sans modèle de langage | « Résumé LLM » (Haiku, §6.2) et « génération de lettre » (Sonnet 5, §6.1) | L'owner se passe de l'API Anthropic (11 septembre 2026) | **Appliqué** : fiche et lettre construites par règles, sans rien inventer, avec les formats de sortie des §6.1 et §6.2 ; un modèle pourra remplacer les règles sans toucher aux écrans (`lib/letters/adapt.ts`, `lib/enrichment/company-summary.ts`) |
 
 ---
 
@@ -200,6 +201,16 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 | C59 | Documents | CV en PDF uniquement (brief) ; lettre en PDF, Word ou texte collé de 200 caractères minimum. Remplacer un document supprime l'ancien fichier (minimisation). Un PDF sans texte, par exemple un scan, est refusé avec un message | Pas d'OCR au MVP |
 | C60 | Filtres de la liste d'offres | Distance, date de publication, entreprise et « offres enregistrées », dans l'URL ; liste limitée aux 300 meilleures correspondances | Aucun état caché côté client |
 | C61 | Offres en double dans une réponse | Le 11 septembre, une recherche sur Paris a renvoyé chaque offre France Travail deux fois, avec le même identifiant : 9 résultats pour 5 offres. L'enregistrement échouait (« ON CONFLICT DO UPDATE command cannot affect row a second time ») | Doublons retirés avant l'enregistrement, nombre de doublons dans les logs |
+
+### Constats de la phase 3 (11 septembre 2026)
+
+| # | Sujet | Constat ou choix | Effet |
+|---|---|---|---|
+| C62 | Cache des recherches d'entreprise | Chaque recherche, trouvée ou non, est gardée 30 jours dans `company_lookups` (clé SIRET, ou nom normalisé et code postal). Chaque passage du cron identifie à l'avance jusqu'à 5 employeurs d'offres récentes ; les autres le sont à la première ouverture de la fiche | Pas de requête répétée vers l'API pour un employeur introuvable |
+| C63 | Lecture des sites d'entreprise | Les adresses viennent d'offres tierces : seuls les hôtes publics en http(s), sur les ports standard, sont lus ; les adresses IP, noms locaux et identifiants dans l'URL sont refusés ; chaque redirection est vérifiée et le `robots.txt` de l'hôte final est respecté. Limite acceptée au MVP : le nom de domaine n'est pas résolu pour vérifier qu'il ne pointe pas vers une adresse privée | Risque de requête interne limité, à revoir avant la bêta |
+| C64 | Espacement des appels par domaine | Une requête par domaine toutes les 2 s, mémorisée par instance du serveur. Plusieurs instances Vercel pourraient en théorie dépasser ce rythme sur un même domaine ; le volume reste faible (site connu pour 7 % des offres) | À centraliser si le volume grandit |
+| C65 | Lettre sans modèle | Les règles remplissent l'objet, les repères [entreprise], [poste] et [ville], une mention « votre entreprise », et ajoutent une phrase sur les compétences demandées par l'offre et présentes dans le CV. La longueur reste entre 90 et 110 % de la lettre de base ; sinon la phrase n'est pas ajoutée. L'étape 5 de l'inscription conseille d'écrire [entreprise] et [poste] dans la lettre de base | Adaptation modeste mais sans invention ; « Refaire l'adaptation » (3 fois au plus) sert surtout après un changement de lettre de base |
+| C66 | Nom de l'employeur dans la lettre | L'orthographe du recruteur dans l'offre est préférée aux capitales du répertoire ; pour une offre gérée par une école, aucun nom n'est inséré | Évite « HOLIS » en capitales et le nom de l'école à la place de l'employeur |
 
 ## D. Comptes et accès à préparer (owner)
 
