@@ -860,6 +860,7 @@ export type Database = {
     }
     Functions: {
       grant_signup_bonus: { Args: never; Returns: number }
+      invoke_offer_sync: { Args: never; Returns: string }
       search_rome_candidates: {
         Args: { p_limit?: number; p_terms: string[] }
         Returns: {
