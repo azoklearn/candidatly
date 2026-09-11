@@ -70,7 +70,7 @@ Ce message signifie que `NEXT_PUBLIC_SUPABASE_URL` ou `NEXT_PUBLIC_SUPABASE_PUBL
 
 ## Confirmation des emails à l'inscription
 
-Décision du 11 septembre 2026 : pas de confirmation par email pendant la bêta. La messagerie intégrée de Supabase n'envoie qu'aux membres de l'équipe du projet et à faible débit ; elle ne convient pas à de vrais utilisateurs.
+Décision du 11 septembre 2026 : pas de confirmation par email pendant la bêta. Le réglage est coupé depuis ce jour-là. La messagerie intégrée de Supabase n'envoie qu'aux membres de l'équipe du projet et à faible débit ; elle ne convient pas à de vrais utilisateurs.
 
 Pour couper la confirmation : Supabase > Authentication > Sign In / Providers > Email > décocher « Confirm email » > Save. L'inscription connecte alors directement l'étudiant, le code gère déjà ce cas. Un compte créé avant ce changement et resté non confirmé se débloque par le tableau de bord (Authentication > Users) ou par l'API d'administration.
 
