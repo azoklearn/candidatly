@@ -3,13 +3,11 @@ import { expect, test } from "@playwright/test";
 test("the landing page and the legal pages are public", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Trouver mon opportunité" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Décrocher mon alternance" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Trouver mon stage\/alternance/ })).toBeVisible();
   // No beta or price wording on the landing page (C81).
   await expect(page.getByText(/bêta|0 €|gratuit/i)).toHaveCount(0);
-  await expect(
-    page.getByRole("link", { name: "Trouver les offres qui me correspondent" }),
-  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Prendre une longueur d’avance" })).toBeVisible();
   await page.getByRole("link", { name: "Tarifs" }).first().click();
   await expect(
     page.getByRole("heading", { level: 1, name: "Un forfait pour chaque recherche" }),

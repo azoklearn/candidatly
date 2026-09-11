@@ -7,9 +7,9 @@ import { socialProofMessage, type LandingStats } from "@/lib/social-proof";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
-  title: { absolute: "Candidatly · Ta prochaine opportunité t’attend" },
+  title: { absolute: "Candidatly · Décroche ton alternance" },
   description:
-    "Candidatly trouve les stages et alternances qui te ressemblent et prépare ta lettre de motivation pour chacune.",
+    "Candidatly traque les offres d’alternance qui collent à ton profil, te dit lesquelles valent le coup et prépare ta lettre pour chacune.",
 };
 
 /** Real numbers for the proof pill; none when the database is unreachable. */
@@ -87,15 +87,16 @@ export default async function HomePage({
               <span>{proof}</span>
             </div>
             <h1>
-              Ton futur poste
+              Arrête de postuler
               <br />
-              ne devrait pas dépendre
+              dans le vide.
               <br />
-              d’un <em>coup de chance.</em>
+              <em>Décroche.</em>
             </h1>
             <p className="hero-copy">
-              Candidatly trie pour toi les offres de stage et d’alternance, ne te montre que celles
-              qui cochent vraiment tes cases et prépare ta lettre pour chacune.
+              Des offres d’alternance sortent tous les jours et disparaissent aussi vite. Candidatly
+              garde celles qui collent à ton profil, te dit pourquoi, et prépare ta lettre pendant
+              que les autres recopient la leur.
             </p>
             <div className="hero-actions">
               <TrackedLink
@@ -105,7 +106,7 @@ export default async function HomePage({
                 properties={{ emplacement: "hero" }}
               >
                 <span>
-                  Trouver mon opportunité <b>→</b>
+                  Décrocher mon alternance <b>→</b>
                 </span>
               </TrackedLink>
               <a className="text-link" href="#comment-ca-marche">
@@ -119,13 +120,13 @@ export default async function HomePage({
           <div className="section-heading reveal">
             <span className="section-number">01 — LA MÉTHODE</span>
             <h2>
-              Moins de recherches.
+              Deux minutes pour toi.
               <br />
-              <em>Plus de réponses.</em>
+              <em>Le tri, c’est nous.</em>
             </h2>
             <p>
-              Quelques minutes pour nous dire ce que tu cherches. Ensuite, Candidatly fait le tri,
-              avec exigence.
+              Tu dis ce que tu vises une seule fois. Ensuite, tu ne vois plus que les offres qui
+              méritent ton temps.
             </p>
           </div>
           <div className="steps">
@@ -136,10 +137,10 @@ export default async function HomePage({
                 <i />
                 <i />
               </div>
-              <h3>Tu poses ton cap.</h3>
+              <h3>Tu dis ce que tu vises.</h3>
               <p>
-                Ta formation, ton niveau, les métiers visés, ta ville. Un profil qui va au-delà de
-                trois mots-clés.
+                Ta formation, ton niveau, les métiers, ta ville. Un profil qui va plus loin que
+                trois mots-clés jetés dans une barre de recherche.
               </p>
               <span className="step-arrow">↘</span>
             </article>
@@ -150,20 +151,20 @@ export default async function HomePage({
                 <i />
                 <i />
               </div>
-              <h3>On garde l’œil ouvert.</h3>
+              <h3>On surveille pendant que tu bosses.</h3>
               <p>
-                Candidatly suit les offres publiées sur La bonne alternance et ses partenaires,
-                mises à jour plusieurs fois par jour.
+                Les offres publiées sur La bonne alternance et ses partenaires, suivies pour toi
+                plusieurs fois par jour. Zéro onglet à garder ouvert.
               </p>
               <span className="step-arrow">↘</span>
             </article>
             <article className="step-card dark-card reveal reveal-delay-2">
               <span className="step-index">03</span>
               <div className="step-icon spark-icon">✦</div>
-              <h3>Tu candidates au bon moment.</h3>
+              <h3>Tu frappes en premier.</h3>
               <p>
-                Une sélection nette et une lettre adaptée à chaque offre. Tu candidates, puis tu
-                suis tes réponses.
+                Une sélection courte, une lettre déjà adaptée à l’entreprise, et le suivi de tes
+                réponses. Tu postules quand ça compte.
               </p>
               <span className="step-arrow">↘</span>
             </article>
@@ -175,24 +176,24 @@ export default async function HomePage({
             <div className="opportunity-copy reveal">
               <span className="section-number">02 — PAS JUSTE DES ANNONCES</span>
               <h2>
-                Le feed qui
+                Le feed qui ne te fait
                 <br />
-                <em>connaît tes critères.</em>
+                <em>pas perdre ton temps.</em>
               </h2>
               <p>
-                Chaque offre est comparée à ton profil : métier, distance, niveau, fraîcheur et mots
-                de ton CV. Contrat, date de début, durée, télétravail : tu vois l’essentiel, tout de
-                suite.
+                Chaque offre est confrontée à ton profil : métier, distance, niveau, fraîcheur, mots
+                de ton CV. Contrat, début, durée, télétravail : tu vois l’essentiel en trois
+                secondes, pas en trois clics.
               </p>
               <ul className="check-list">
                 <li>
-                  <span>✓</span> Des offres à jour, retirées dès qu’elles expirent
+                  <span>✓</span> Des offres vivantes, retirées dès qu’elles expirent
                 </li>
                 <li>
-                  <span>✓</span> Un score de compatibilité transparent
+                  <span>✓</span> Un score de compatibilité qui s’explique
                 </li>
                 <li>
-                  <span>✓</span> Une lettre adaptée à chaque offre
+                  <span>✓</span> Une lettre réécrite pour chaque entreprise
                 </li>
               </ul>
               <TrackedLink
@@ -201,7 +202,7 @@ export default async function HomePage({
                 event={EVENTS.signupClicked}
                 properties={{ emplacement: "offres" }}
               >
-                Découvrir Candidatly <span>→</span>
+                Voir mes offres <span>→</span>
               </TrackedLink>
             </div>
             <div className="feed-demo reveal reveal-delay">
@@ -281,9 +282,9 @@ export default async function HomePage({
           <div className="testimonial-header reveal">
             <span className="section-number">03 — NOS ENGAGEMENTS</span>
             <h2>
-              Le moment où
+              Zéro blabla.
               <br />
-              <em>tout s’aligne.</em>
+              <em>Que du concret.</em>
             </h2>
             <div className="rating">
               <span>✦</span> Offres : La bonne alternance · Entreprises : Annuaire des Entreprises
@@ -293,8 +294,8 @@ export default async function HomePage({
             <article className="quote quote-main reveal">
               <span className="quote-mark">“</span>
               <blockquote>
-                Ta lettre reste la tienne. Candidatly l’adapte à chaque offre sans rien inventer, et
-                te montre chaque changement.
+                Ta lettre reste la tienne. Candidatly l’adapte à chaque entreprise sans rien
+                inventer, et te montre chaque mot changé.
               </blockquote>
               <footer>
                 <span className="person-avatar coral">✦</span>
@@ -309,12 +310,12 @@ export default async function HomePage({
               <article className="quote quote-small reveal reveal-delay">
                 <blockquote>
                   Tu candidates sur le site de l’offre, puis Candidatly suit tes réponses et te
-                  propose une relance au bon moment.
+                  sonne quand il faut relancer.
                 </blockquote>
                 <footer>
                   <span className="person-avatar violet">✓</span>
                   <span>
-                    <strong>Un suivi sans oubli</strong>
+                    <strong>Aucune candidature oubliée</strong>
                     <small>Relance conseillée après 5 jours</small>
                   </span>
                 </footer>
@@ -335,11 +336,11 @@ export default async function HomePage({
               <span className="pulse" /> LES OFFRES DE LA RENTRÉE SONT EN LIGNE
             </span>
             <h2>
-              Ton prochain “oui”
+              Les bonnes offres
               <br />
-              commence <em>ici.</em>
+              partent <em>vite.</em>
             </h2>
-            <p>Rejoins les étudiants qui refusent de laisser leur avenir au hasard.</p>
+            <p>Pendant que tu hésites, quelqu’un d’autre envoie sa candidature.</p>
             <div className="final-actions">
               <TrackedLink
                 className="shiny-cta"
@@ -348,7 +349,7 @@ export default async function HomePage({
                 properties={{ emplacement: "final" }}
               >
                 <span>
-                  Trouver les offres qui me correspondent <b>→</b>
+                  Prendre une longueur d’avance <b>→</b>
                 </span>
               </TrackedLink>
               <Link className="final-login" href="/login">
@@ -364,7 +365,7 @@ export default async function HomePage({
           <span className="brand-mark">C</span>
           <span>Candidatly</span>
         </a>
-        <p>© 2026 Candidatly. Cherche moins. Choisis mieux.</p>
+        <p>© 2026 Candidatly. Cherche moins. Décroche plus.</p>
         <div>
           <Link href="/mentions-legales">Mentions légales</Link>
           <Link href="/confidentialite">Confidentialité</Link>

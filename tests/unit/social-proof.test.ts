@@ -21,7 +21,7 @@ describe("socialProofMessage", () => {
     expect(socialProofMessage({ placedStudents: 12, students: 130 })).toBe(
       "Déjà plus de 100 étudiants utilisent Candidatly.",
     );
-    const fallback = "Les offres officielles de La bonne alternance, triées pour toi.";
+    const fallback = "Les offres d’alternance officielles, triées pour ton profil.";
     expect(socialProofMessage({ placedStudents: 0, students: 3 })).toBe(fallback);
     expect(socialProofMessage(null)).toBe(fallback);
   });
