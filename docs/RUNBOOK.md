@@ -70,15 +70,13 @@ Ce message signifie que `NEXT_PUBLIC_SUPABASE_URL` ou `NEXT_PUBLIC_SUPABASE_PUBL
 
 ## Confirmation des emails à l'inscription
 
-Décision du 11 septembre 2026 : pas de confirmation par email pendant la bêta. Le réglage est coupé depuis ce jour-là. La messagerie intégrée de Supabase n'envoie qu'aux membres de l'équipe du projet et à faible débit ; elle ne convient pas à de vrais utilisateurs.
+Active : l'owner l'a réactivée le 11 septembre 2026 (réglage « Confirm email » de Supabase), après l'avoir coupée le même jour faute d'emails reçus (C76, C78). Après l'inscription, l'étudiant reçoit un email ; le lien le connecte et l'envoie au questionnaire (`/auth/callback`). S'il ouvre le lien dans un autre navigateur ou sur un autre appareil, son adresse est tout de même confirmée : il se connecte avec son email et son mot de passe.
 
-Pour couper la confirmation : Supabase > Authentication > Sign In / Providers > Email > décocher « Confirm email » > Save. L'inscription connecte alors directement l'étudiant, le code gère déjà ce cas. Un compte créé avant ce changement et resté non confirmé se débloque par le tableau de bord (Authentication > Users) ou par l'API d'administration.
+La messagerie intégrée de Supabase n'envoie qu'aux membres de l'équipe du projet, à quelques emails par heure. Pour de vrais étudiants, configurer un serveur d'envoi :
 
-Ne pas utiliser `supabase config push` pour ce réglage : sur l'offre gratuite, Supabase refuse la mise à jour des emails sans serveur d'envoi, et la commande tente d'appliquer toute la configuration locale (Site URL et Redirect URLs de développement comprises) sans confirmation quand elle ne tourne pas dans un terminal interactif.
-
-Pour la réactiver avant l'ouverture publique :
-
-1. Créer un compte chez un service d'envoi d'emails (Resend, Brevo, Postmark…) et vérifier le domaine d'envoi.
+1. Créer un compte chez un service d'envoi (Resend, Brevo, Postmark…) et vérifier le domaine d'envoi.
 2. Supabase : Project Settings > Authentication > SMTP Settings : saisir l'hôte, le port, l'identifiant et le mot de passe du service.
-3. Supabase : Authentication > Sign In / Providers > Email : réactiver « Confirm email ». Recopier le modèle `supabase/templates/confirmation.html` et remettre `enable_confirmations = true` dans `supabase/config.toml`.
-4. Vérifier qu'une inscription reçoit bien l'email et que le lien ramène sur le site (Redirect URLs).
+3. Supabase : Authentication > Emails : recopier le modèle `supabase/templates/confirmation.html` (lien vers `/auth/confirm`, qui fonctionne quel que soit l'appareil). L'offre gratuite n'autorise ce changement qu'avec un serveur d'envoi.
+4. Tester une inscription avec une adresse extérieure à l'équipe.
+
+Pour couper de nouveau la confirmation : Authentication > Sign In / Providers > Email > décocher « Confirm email ». Ne pas utiliser `supabase config push` pour ces réglages (voir la section précédente de ce document dans l'historique git).
