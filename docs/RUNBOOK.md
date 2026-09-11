@@ -22,6 +22,8 @@ Ne jamais coller un jeton dans un ticket, un commit, un log ou une conversation 
 
 Supabase Cron lance toutes les 15 minutes la fonction `public.invoke_offer_sync()`, qui appelle `POST <site>/api/cron/sync-offers` avec le secret partagé. Chaque appel met à jour au plus 25 recherches vieilles de plus de 6 heures, recalcule les correspondances des étudiants concernés et retire les offres périmées. Tant que les deux secrets ci-dessous manquent dans Vault, la tâche tourne sans rien appeler : c'est le cas du projet de développement, qui n'a pas de site déployé.
 
+État : en service depuis le 11 septembre 2026 sur le projet `ylupsjydkbmryctfrfte`, avec `candidatly_site_url` = `https://www.candidatly.app` (premier appel accepté à 16 h 34 UTC). Un 401 dans `net._http_response` signifie que le secret de Vault diffère de `CRON_SECRET` sur Vercel.
+
 Mise en service, une fois le site déployé :
 
 1. Générer un secret d'au moins 32 caractères (`openssl rand -hex 32`) et le mettre dans la variable `CRON_SECRET` de Vercel.
