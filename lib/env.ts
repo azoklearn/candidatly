@@ -125,12 +125,17 @@ export function isAnthropicConfigured(): boolean {
   }
 }
 
-const TriggerEnvSchema = z.object({ TRIGGER_SECRET_KEY: z.string().min(1) });
+/** Shared secret of the scheduled calls from Supabase Cron (docs/RUNBOOK.md). */
+const CronEnvSchema = z.object({
+  CRON_SECRET: z.string().min(32),
+});
+export type CronEnv = z.output<typeof CronEnvSchema>;
 
-/** Trigger.dev reads TRIGGER_SECRET_KEY itself; without it, jobs run inline (local development). */
-export function isTriggerConfigured(): boolean {
-  return TriggerEnvSchema.safeParse(withoutEmptyStrings(process.env)).success;
+export function parseCronEnv(source: EnvSource): CronEnv {
+  return parseGroup("cron", CronEnvSchema, source);
 }
+
+export const getCronEnv = memoize(() => parseCronEnv(process.env));
 
 const LOG_LEVELS = ["debug", "info", "warn", "error"] as const;
 export type LogLevelName = (typeof LOG_LEVELS)[number];

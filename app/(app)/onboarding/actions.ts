@@ -16,7 +16,7 @@ import {
 } from "@/lib/documents/extract-text";
 import { ExternalApiError, ValidationError } from "@/lib/errors";
 import { resolvePlace } from "@/lib/geocoding/geocode";
-import { requestOffersRefresh } from "@/lib/jobs/dispatch";
+import { requestOffersRefresh } from "@/lib/offers/request-refresh";
 import { logger } from "@/lib/logger";
 import { firstIncompleteStep, LAST_STEP } from "@/lib/onboarding/state";
 import type { Database, TablesInsert } from "@/lib/supabase/database.types";

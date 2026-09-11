@@ -20,16 +20,13 @@
     "db:types": "supabase gen types typescript --linked --schema public > lib/supabase/database.types.ts",
     "db:types:local": "supabase gen types typescript --local > lib/supabase/database.types.ts",
     "db:push": "supabase db push",
-    "rome:import": "node --env-file=.env.local scripts/import-rome.ts",
-    "trigger:dev": "trigger.dev dev",
-    "trigger:deploy": "trigger.dev deploy"
+    "rome:import": "node --env-file=.env.local scripts/import-rome.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",
     "@base-ui/react": "^1.8.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
-    "@trigger.dev/sdk": "^4.5.16",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.2.6",
     "lucide-react": "^1.44.0",
@@ -45,7 +42,6 @@
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
     "@tailwindcss/postcss": "^4",
-    "@trigger.dev/build": "^4.5.16",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -54,7 +50,6 @@
     "prettier": "^3.9.6",
     "supabase": "^2.117.0",
     "tailwindcss": "^4",
-    "trigger.dev": "^4.5.16",
     "typescript": "~6.0.3",
     "vitest": "^5.0.0"
   }

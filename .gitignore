@@ -22,10 +22,9 @@ playwright/.cache/
 .env*.local
 .env.production
 
-# supabase, trigger.dev, vercel local state
+# supabase, vercel local state
 supabase/.branches/
 supabase/.temp/
-.trigger/
 .vercel/
 
 # misc

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { requireUserId } from "@/lib/auth/session";
-import { requestOffersRefresh } from "@/lib/jobs/dispatch";
+import { requestOffersRefresh } from "@/lib/offers/request-refresh";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 
