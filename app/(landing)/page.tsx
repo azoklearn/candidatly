@@ -53,6 +53,7 @@ export default async function HomePage({
           <a href="#comment-ca-marche">Comment ça marche</a>
           <a href="#offres">Les offres</a>
           <a href="#engagements">Nos engagements</a>
+          <Link href="/tarifs">Tarifs</Link>
         </nav>
         <div className="header-actions">
           <Link className="header-login" href="/login">
@@ -346,6 +347,7 @@ export default async function HomePage({
           <Link href="/mentions-legales">Mentions légales</Link>
           <Link href="/confidentialite">Confidentialité</Link>
           <Link href="/conditions">Conditions d’utilisation</Link>
+          <Link href="/tarifs">Tarifs</Link>
         </div>
       </footer>
     </>

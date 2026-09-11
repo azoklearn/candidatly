@@ -10,6 +10,14 @@ test("the landing page and the legal pages are public", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: "Trouver les offres qui me correspondent" }),
   ).toBeVisible();
+  await page.getByRole("link", { name: "Tarifs" }).first().click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Un forfait pour chaque recherche" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Choisir / })).toHaveCount(3);
+  await expect(page.getByText("soit 0,68 € par jour")).toBeVisible();
+  await page.getByRole("radio", { name: "Mensuel" }).click();
+  await expect(page.getByText("soit 0,83 € par jour")).toBeVisible();
   for (const [path, title] of [
     ["/mentions-legales", "Mentions légales"],
     ["/confidentialite", "Politique de confidentialité"],

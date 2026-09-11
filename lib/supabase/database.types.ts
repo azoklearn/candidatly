@@ -567,6 +567,8 @@ export type Database = {
       profiles: {
         Row: {
           availability_date: string | null
+          chosen_billing: string | null
+          chosen_plan: string | null
           created_at: string
           degree_label: string | null
           diploma_level:
@@ -583,6 +585,7 @@ export type Database = {
           location_lng: number | null
           onboarding_completed: boolean
           phone: string | null
+          plan_chosen_at: string | null
           rome_codes: string[]
           rome_version: number | null
           school: string | null
@@ -593,6 +596,8 @@ export type Database = {
         }
         Insert: {
           availability_date?: string | null
+          chosen_billing?: string | null
+          chosen_plan?: string | null
           created_at?: string
           degree_label?: string | null
           diploma_level?:
@@ -609,6 +614,7 @@ export type Database = {
           location_lng?: number | null
           onboarding_completed?: boolean
           phone?: string | null
+          plan_chosen_at?: string | null
           rome_codes?: string[]
           rome_version?: number | null
           school?: string | null
@@ -619,6 +625,8 @@ export type Database = {
         }
         Update: {
           availability_date?: string | null
+          chosen_billing?: string | null
+          chosen_plan?: string | null
           created_at?: string
           degree_label?: string | null
           diploma_level?:
@@ -635,6 +643,7 @@ export type Database = {
           location_lng?: number | null
           onboarding_completed?: boolean
           phone?: string | null
+          plan_chosen_at?: string | null
           rome_codes?: string[]
           rome_version?: number | null
           school?: string | null

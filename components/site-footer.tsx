@@ -12,6 +12,9 @@ export function SiteFooter() {
           <p>Entreprises : Annuaire des Entreprises (INSEE, INPI), Licence Ouverte 2.0.</p>
         </div>
         <nav aria-label="Informations légales" className="flex flex-wrap gap-4">
+          <Link href="/tarifs" className="hover:text-foreground">
+            Tarifs
+          </Link>
           <Link href="/mentions-legales" className="hover:text-foreground">
             Mentions légales
           </Link>

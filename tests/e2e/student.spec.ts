@@ -46,10 +46,19 @@ test("a student prepares, sends and tracks an application, then exports their da
   await page.goto("/offers");
   await expect(page.getByText("Candidature envoyée")).toBeVisible();
 
+  // The page shown after the questionnaire: what the search found, then the plans (C82).
+  await page.goto("/forfait");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("1 offre");
+  await expect(page.getByText("Recommandé")).toBeVisible();
+  await page.getByRole("button", { name: "Choisir Plus" }).click();
+  await expect(page).toHaveURL(/\/offers$/);
+
   const response = await page.request.get("/api/account/export");
   expect(response.status()).toBe(200);
   const data = await response.json();
   expect(data.profile.first_name).toBe("Camille");
+  expect(data.profile.chosen_plan).toBe("plus");
+  expect(data.profile.chosen_billing).toBe("annual");
   expect(data.applications).toHaveLength(1);
   expect(data.applications[0].status).toBe("replied_positive");
 });

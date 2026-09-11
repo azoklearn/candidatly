@@ -146,6 +146,22 @@ describe("row level security for a signed-in user", () => {
     });
   });
 
+  it("keeps the chosen plan out of the client's reach", async () => {
+    expect(
+      await errorOf(`update public.profiles set chosen_plan = 'gold' where user_id = '${USER_B}'`),
+    ).toMatch(/profiles_chosen_plan_values/);
+    expect(
+      await errorOf(`update public.profiles set chosen_plan = 'plus' where user_id = '${USER_B}'`),
+    ).toMatch(/profiles_plan_choice_complete/);
+    await as("authenticated", USER_A, async () => {
+      expect(
+        await errorOf(
+          `update public.profiles set chosen_plan = 'premium', chosen_billing = 'annual', plan_chosen_at = now() where user_id = '${USER_A}'`,
+        ),
+      ).toMatch(/permission denied/);
+    });
+  });
+
   it("serves hiring companies read-only, to signed-in users only", async () => {
     expect(
       await errorOf(

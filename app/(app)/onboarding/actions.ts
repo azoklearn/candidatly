@@ -382,5 +382,6 @@ export async function finishOnboarding(): Promise<void> {
   }
   const refresh = await requestOffersRefresh(userId);
   log.info("onboarding_completed", { refresh });
-  redirect("/offers");
+  // What the search found, then the plans (C82).
+  redirect("/forfait");
 }
