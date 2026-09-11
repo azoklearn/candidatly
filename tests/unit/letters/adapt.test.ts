@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { adaptLetter, cleanOfferTitle, sharedSkills } from "@/lib/letters/adapt";
+import { adaptLetter, cleanOfferTitle, cvSkillItems, sharedSkills } from "@/lib/letters/adapt";
 
 const BASE = `Objet : Candidature pour une alternance
 
@@ -23,6 +23,7 @@ const OFFER = {
   companyName: "HOLIS",
   city: "Paris",
   skills: ["Maitrise de React", "Maitrise de PostgreSQL", "Bonne capacité de communication"],
+  description: null,
 };
 const CV = "Camille Testeur. Compétences : TypeScript, React, SQL, Git.";
 
@@ -91,9 +92,20 @@ describe("adaptLetter", () => {
     expect(adapted.missing_info).toEqual([
       "Passage à compléter dans votre lettre : [équipe]",
       "L'offre ne précise pas le nom de l'employeur.",
-      "Aucune compétence demandée par l'offre ne figure dans votre CV : ajoutez une phrase personnelle sur les missions.",
+      "Aucune compétence de votre CV n'est citée dans l'offre : ajoutez une phrase personnelle sur les missions.",
       "Votre lettre de base ne contient ni [entreprise] ni [poste] : ajoutez ces repères pour que l'adaptation se fasse automatiquement.",
     ]);
     expect(adapted.confidence).toBe(0.4);
+  });
+});
+
+describe("skills found in the offer's text", () => {
+  it("reads the CV's skill lines and finds them in the description when the offer has no skill list", () => {
+    const cv = "Compétences : TypeScript, React, PostgreSQL, Git, Node.js";
+    expect(cvSkillItems(cv)).toEqual(["TypeScript", "React", "PostgreSQL", "Git", "Node.js"]);
+    const description =
+      "Back end : maîtrise de PostgreSQL, Heroku et Git/Github. Front end : React et Redux.";
+    expect(sharedSkills([], cv, 3, description)).toEqual(["React", "PostgreSQL", "Git"]);
+    expect(sharedSkills([], cv, 3, "Poste en comptabilité")).toEqual([]);
   });
 });

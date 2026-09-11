@@ -42,3 +42,39 @@ describe("annotateSegments", () => {
     ]);
   });
 });
+
+describe("grouped changes", () => {
+  it("shows a rewritten passage as one removal then one addition", () => {
+    const before = "Objet : Candidature pour une alternance en développement web";
+    const after = "Objet : Candidature en alternance au poste de Développeur Full-Stack";
+    const segments = diffWords(before, after);
+    expect(rebuild(segments, "insert")).toBe(after);
+    const spaceBetweenChanges = segments.some(
+      (segment, i) =>
+        i > 0 &&
+        segment.type === "equal" &&
+        /^\s+$/.test(segment.text) &&
+        segments[i - 1]?.type !== "equal" &&
+        segments[i + 1] !== undefined &&
+        segments[i + 1]?.type !== "equal",
+    );
+    expect(spaceBetweenChanges).toBe(false);
+    expect(segments.filter((s) => s.type === "insert").length).toBeLessThanOrEqual(2);
+  });
+
+  it("gives a passage the reason of the most specific change, matching whole words only", () => {
+    const changes = [
+      { replacement: "Candidature en alternance au poste de Développeur", reason: "Objet." },
+      { replacement: "Développeur", reason: "Intitulé." },
+    ];
+    const segments = annotateSegments(
+      [
+        { type: "insert", text: "Développeur" },
+        { type: "equal", text: " " },
+        { type: "insert", text: "en" },
+      ],
+      changes,
+    );
+    expect(segments.map((s) => s.reason)).toEqual(["Intitulé.", undefined, "Objet."]);
+  });
+});

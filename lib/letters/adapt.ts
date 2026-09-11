@@ -28,7 +28,13 @@ export const LETTER_GENERATOR = "rules-v1";
 
 export type AdaptLetterInput = {
   baseLetter: string;
-  offer: { title: string; companyName: string | null; city: string | null; skills: string[] };
+  offer: {
+    title: string;
+    companyName: string | null;
+    city: string | null;
+    skills: string[];
+    description: string | null;
+  };
   cvText: string;
 };
 
@@ -71,8 +77,33 @@ export function cleanOfferTitle(title: string): string {
   return clean.replace(/\s+/g, " ").trim();
 }
 
-/** Skills named in the offer's skill lists that the CV also contains, in the offer's spelling. */
-export function sharedSkills(offerSkills: string[], cvText: string, max = 3): string[] {
+const CV_SKILL_LINE =
+  /^\s*[-•*]?\s*(?:comp[ée]tences?|skills?|outils|langages?|technologies|logiciels|stack|environnement technique)\b[^:\n]*:\s*(.+)$/gimu;
+
+/** Items of the CV's skill lines, such as "Compétences : TypeScript, React, PostgreSQL". */
+export function cvSkillItems(cvText: string): string[] {
+  const items: string[] = [];
+  for (const match of cvText.matchAll(CV_SKILL_LINE)) {
+    for (const raw of (match[1] ?? "").split(/[,;•|]|\s\/\s|\s-\s/)) {
+      const item = raw.trim().replace(/[.)]+$/, "");
+      if (item.length >= 2 && item.length <= 30) items.push(item);
+    }
+  }
+  return items;
+}
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Skills that both the offer and the CV name: first the offer's skill lists, in the
+ * offer's spelling, then the CV's own skill list found anywhere in the offer's text.
+ */
+export function sharedSkills(
+  offerSkills: string[],
+  cvText: string,
+  max = 3,
+  offerText = "",
+): string[] {
   const cv = new Set(tokenize(cvText, 2));
   const found: string[] = [];
   const seen = new Set<string>();
@@ -86,6 +117,19 @@ export function sharedSkills(offerSkills: string[], cvText: string, max = 3): st
       found.push(word);
       if (found.length >= max) return found;
     }
+  }
+  const haystack = normalize(`${offerText}\n${offerSkills.join("\n")}`);
+  for (const item of cvSkillItems(cvText)) {
+    const key = tokenize(item, 2)[0];
+    if (!key || SKILL_NOISE.has(key) || seen.has(key)) continue;
+    const pattern = new RegExp(
+      `(?<![\\p{L}\\p{N}])${escapeRegex(normalize(item))}(?![\\p{L}\\p{N}])`,
+      "u",
+    );
+    if (!pattern.test(haystack)) continue;
+    seen.add(key);
+    found.push(item);
+    if (found.length >= max) break;
   }
   return found;
 }
@@ -182,11 +226,11 @@ export function adaptLetter(input: AdaptLetterInput): CoverLetterResult {
   if (!company) missing.add("L'offre ne précise pas le nom de l'employeur.");
 
   let skillsDone = false;
-  const skills = sharedSkills(input.offer.skills, input.cvText);
+  const skills = sharedSkills(input.offer.skills, input.cvText, 3, input.offer.description ?? "");
   const target = skills.length > 0 ? insertionPoint(base) : null;
   if (skills.length === 0) {
     missing.add(
-      "Aucune compétence demandée par l'offre ne figure dans votre CV : ajoutez une phrase personnelle sur les missions.",
+      "Aucune compétence de votre CV n'est citée dans l'offre : ajoutez une phrase personnelle sur les missions.",
     );
   } else if (target) {
     const inner = spans.filter((span) => span.start >= target.start && span.end <= target.end);

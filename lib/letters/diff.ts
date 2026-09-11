@@ -15,21 +15,48 @@ function merge(segments: DiffSegment[]): DiffSegment[] {
     if (last && last.type === segment.type) last.text += segment.text;
     else merged.push({ ...segment });
   }
-  // A lone space between two changed words belongs to the change: one highlight, not two.
-  for (let i = 1; i < merged.length - 1; i++) {
-    const [previous, current, next] = [merged[i - 1], merged[i], merged[i + 1]];
-    if (
-      current?.type === "equal" &&
-      /^\s+$/.test(current.text) &&
-      previous?.type === "insert" &&
-      next?.type === "insert"
-    ) {
-      previous.text += current.text + next.text;
-      merged.splice(i, 2);
-      i--;
-    }
-  }
   return merged;
+}
+
+/**
+ * Turns interleaved changes ("pour une" struck, "en" added, "alternance" kept...) into one
+ * struck passage followed by one added passage whenever only spaces separate them.
+ */
+function groupChanges(segments: DiffSegment[]): DiffSegment[] {
+  const grouped: DiffSegment[] = [];
+  let i = 0;
+  while (i < segments.length) {
+    const first = segments[i];
+    if (!first || first.type === "equal") {
+      if (first) grouped.push(first);
+      i++;
+      continue;
+    }
+    let removed = "";
+    let added = "";
+    let hasRemoved = false;
+    let hasAdded = false;
+    while (i < segments.length) {
+      const segment = segments[i];
+      const next = segments[i + 1];
+      if (segment?.type === "delete") {
+        removed += segment.text;
+        hasRemoved = true;
+      } else if (segment?.type === "insert") {
+        added += segment.text;
+        hasAdded = true;
+      } else if (segment && /^\s+$/.test(segment.text) && next && next.type !== "equal") {
+        removed += segment.text;
+        added += segment.text;
+      } else {
+        break;
+      }
+      i++;
+    }
+    if (hasRemoved) grouped.push({ type: "delete", text: removed });
+    if (hasAdded) grouped.push({ type: "insert", text: added });
+  }
+  return grouped;
 }
 
 /** Longest common subsequence on words and spaces; plain replace when the texts are huge. */
@@ -72,7 +99,23 @@ export function diffWords(before: string, after: string): DiffSegment[] {
   }
   while (i < n) segments.push({ type: "delete", text: a[i++] ?? "" });
   while (j < m) segments.push({ type: "insert", text: b[j++] ?? "" });
-  return merge(segments);
+  return groupChanges(merge(segments));
+}
+
+const words = (value: string) =>
+  value
+    .split(/\s+/)
+    .map((word) => word.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ""))
+    .filter(Boolean);
+
+function containsWords(haystack: string, needle: string): boolean {
+  const all = words(haystack);
+  const part = words(needle);
+  if (part.length === 0) return false;
+  for (let start = 0; start + part.length <= all.length; start++) {
+    if (part.every((word, offset) => all[start + offset] === word)) return true;
+  }
+  return false;
 }
 
 /** Gives each inserted passage the reason of the change it comes from, or marks it as the student's. */
@@ -83,7 +126,10 @@ export function annotateSegments(
   return segments.map((segment) => {
     const text = segment.text.trim();
     if (segment.type !== "insert" || !text) return segment;
-    const change = changes.find((candidate) => candidate.replacement.includes(text));
+    // The most specific change whose replacement contains the passage as whole words.
+    const change = changes
+      .filter((candidate) => containsWords(candidate.replacement, text))
+      .sort((a, b) => a.replacement.length - b.replacement.length)[0];
     return { ...segment, reason: change?.reason ?? "Modifié par vous." };
   });
 }

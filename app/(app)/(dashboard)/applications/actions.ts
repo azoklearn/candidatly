@@ -12,6 +12,7 @@ import { cityFromAddress } from "@/lib/format";
 import { LETTER_GENERATOR, adaptLetter } from "@/lib/letters/adapt";
 import type { StoredLetterDiff } from "@/lib/letters/stored";
 import { logger } from "@/lib/logger";
+import { toPlainText } from "@/lib/text/html";
 import { JobOfferReadSchema } from "@/lib/providers/api-alternance";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database, Json, Tables } from "@/lib/supabase/database.types";
@@ -56,6 +57,7 @@ async function buildLetter(
       companyName: offer.is_delegated ? null : (offer.company_name ?? registryName),
       city: cityFromAddress(offer.location_label),
       skills: job.success ? job.data.offer.desired_skills : [],
+      description: toPlainText(offer.description),
     },
   });
   return {
