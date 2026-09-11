@@ -93,7 +93,7 @@ export async function signUp(_previous: AuthFormState, formData: FormData): Prom
   if (data.session) redirect("/onboarding/1");
   return {
     message:
-      "Nous vous avons envoyé un email de confirmation. Cliquez sur le lien qu’il contient pour activer votre compte.",
+      "Nous vous avons envoyé un email de confirmation. Cliquez sur le lien qu’il contient pour activer votre compte. Pensez à regarder dans vos courriers indésirables.",
   };
 }
 
