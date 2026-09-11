@@ -148,6 +148,7 @@ Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`
 ### Git
 - Commits atomiques, messages en anglais au format conventionnel : `feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`.
 - Une phase = une branche (`phase-1`...), fusionnée dans `main` après validation de l'owner.
+- Depuis le 11 septembre 2026, l'owner demande de pousser tout le temps : chaque changement vérifié (typage, lint, tests) est fusionné dans `main` et poussé sur https://github.com/azoklearn/candidatly, avec les identifiants déjà enregistrés sur le poste. Jamais de jeton collé dans la conversation ; contrôle des secrets avant chaque push.
 
 ### Librairies hors stack
 - Avant d'ajouter une librairie non listée dans le brief : justification en une phrase dans `docs/QUESTIONS.md` et accord de l'owner. Validées : `unpdf`, `mammoth` (phase 0), `@electric-sql/pglite` en développement (B9, 11 septembre 2026). Les dépendances installées par shadcn/ui (`@base-ui/react`, `class-variance-authority`, `cn`, `lucide-react`, `tw-animate-css`, `shadcn`) font partie de shadcn/ui.
