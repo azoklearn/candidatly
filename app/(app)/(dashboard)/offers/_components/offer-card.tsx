@@ -61,6 +61,7 @@ export function OfferCard({ data }: { data: OfferCardData }) {
         {data.hasCompanyCard ? <Badge>Fiche entreprise disponible</Badge> : null}
         {offer.is_delegated ? <Badge>Offre gérée par une école</Badge> : null}
         {saved ? <Badge>Enregistrée</Badge> : null}
+        {data.status === "applied" ? <Badge>Candidature envoyée</Badge> : null}
       </div>
       <div className="flex flex-wrap gap-2">
         <Link

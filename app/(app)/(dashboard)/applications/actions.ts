@@ -12,6 +12,8 @@ import { cityFromAddress } from "@/lib/format";
 import { LETTER_GENERATOR, adaptLetter } from "@/lib/letters/adapt";
 import type { StoredLetterDiff } from "@/lib/letters/stored";
 import { logger } from "@/lib/logger";
+import { FOLLOW_UP_DELAY_MS } from "@/lib/letters/follow-up";
+import { allowAction } from "@/lib/rate-limit";
 import { toPlainText } from "@/lib/text/html";
 import { JobOfferReadSchema } from "@/lib/providers/api-alternance";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -81,6 +83,7 @@ export async function prepareApplication(offerId: string): Promise<void> {
     .eq("offer_id", offerId)
     .maybeSingle();
   if (existing.data) redirect(`/applications/${existing.data.id}`);
+  if (!(await allowAction(supabase, "prepare_application"))) redirect(`/offers/${offerId}`);
   const { data: offer } = await supabase.from("offers").select("*").eq("id", offerId).maybeSingle();
   if (!offer) notFound();
 
@@ -185,4 +188,151 @@ export async function regenerateLetter(applicationId: string): Promise<void> {
     }
   }
   revalidatePath(`/applications/${applicationId}`);
+}
+
+const SENT_STATUSES = [
+  "sent",
+  "viewed",
+  "replied_positive",
+  "replied_negative",
+  "no_answer",
+  "unknown",
+];
+const StudentStatusSchema = z.enum(["sent", "replied_positive", "replied_negative", "no_answer"]);
+
+async function logEvent(
+  userId: string,
+  type: string,
+  payload: Record<string, string>,
+): Promise<void> {
+  const { error } = await createAdminClient()
+    .from("events")
+    .insert({ user_id: userId, type, payload });
+  if (error) log.warn("event_insert_failed", { type, code: error.code });
+}
+
+function revalidateApplication(applicationId: string) {
+  revalidatePath(`/applications/${applicationId}`);
+  revalidatePath("/applications");
+}
+
+/**
+ * The student applied on the offer's website with the prepared letter (no email sending
+ * in the MVP, docs/QUESTIONS.md C67). Status changes go through the server only.
+ */
+export async function markApplicationSent(applicationId: string): Promise<void> {
+  if (!z.uuid().safeParse(applicationId).success) notFound();
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  const { data: application } = await supabase
+    .from("applications")
+    .select("id, status, offer_id")
+    .eq("id", applicationId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!application) notFound();
+  if (application.status === "draft" || application.status === "ready") {
+    const now = Date.now();
+    const admin = createAdminClient();
+    const { error } = await admin
+      .from("applications")
+      .update({
+        status: "sent",
+        sent_at: new Date(now).toISOString(),
+        sent_via: "partner_site",
+        next_follow_up_at: new Date(now + FOLLOW_UP_DELAY_MS).toISOString(),
+      })
+      .eq("id", applicationId)
+      .eq("user_id", userId)
+      .in("status", ["draft", "ready"]);
+    if (error) {
+      log.error("application_send_failed", { code: error.code });
+    } else {
+      await admin
+        .from("matches")
+        .update({ status: "applied" })
+        .eq("user_id", userId)
+        .eq("offer_id", application.offer_id);
+      await logEvent(userId, "application_status", {
+        application_id: applicationId,
+        status: "sent",
+        by: "student",
+      });
+      log.info("application_sent", { via: "partner_site" });
+    }
+  }
+  revalidateApplication(applicationId);
+}
+
+export async function updateApplicationStatus(
+  applicationId: string,
+  status: string,
+): Promise<void> {
+  const parsed = StudentStatusSchema.safeParse(status);
+  if (!z.uuid().safeParse(applicationId).success || !parsed.success) notFound();
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  const { data: application } = await supabase
+    .from("applications")
+    .select("id, status")
+    .eq("id", applicationId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!application) notFound();
+  if (SENT_STATUSES.includes(application.status) && application.status !== parsed.data) {
+    const closed = parsed.data !== "sent";
+    const { error } = await createAdminClient()
+      .from("applications")
+      .update(closed ? { status: parsed.data, next_follow_up_at: null } : { status: parsed.data })
+      .eq("id", applicationId)
+      .eq("user_id", userId);
+    if (error) log.error("application_status_failed", { code: error.code });
+    else
+      await logEvent(userId, "application_status", {
+        application_id: applicationId,
+        status: parsed.data,
+        by: "student",
+      });
+  }
+  revalidateApplication(applicationId);
+}
+
+export async function markFollowUpDone(applicationId: string): Promise<void> {
+  if (!z.uuid().safeParse(applicationId).success) notFound();
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  const { error } = await createAdminClient()
+    .from("applications")
+    .update({ next_follow_up_at: null })
+    .eq("id", applicationId)
+    .eq("user_id", userId)
+    .in("status", ["sent", "viewed"]);
+  if (error) log.error("follow_up_update_failed", { code: error.code });
+  else await logEvent(userId, "follow_up_sent", { application_id: applicationId });
+  revalidateApplication(applicationId);
+}
+
+export type NotesFormState = { error?: string; saved?: boolean };
+
+export async function saveNotes(
+  applicationId: string,
+  _previous: NotesFormState,
+  formData: FormData,
+): Promise<NotesFormState> {
+  if (!z.uuid().safeParse(applicationId).success) return { error: "Candidature introuvable." };
+  const notes = String(formData.get("notes") ?? "")
+    .replace(/\r\n?/g, "\n")
+    .trim();
+  if (notes.length > 2_000) return { error: "2 000 caractères maximum." };
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  const { data, error } = await supabase
+    .from("applications")
+    .update({ notes: notes || null })
+    .eq("id", applicationId)
+    .eq("user_id", userId)
+    .select("id");
+  if (error || data.length === 0) return { error: "L’enregistrement a échoué. Réessayez." };
+  revalidatePath(`/applications/${applicationId}`);
+  return { saved: true };
 }

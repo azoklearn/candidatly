@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireUserId } from "@/lib/auth/session";
 import { requestOffersRefresh } from "@/lib/offers/request-refresh";
 import { logger } from "@/lib/logger";
+import { allowAction } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 const StatusSchema = z.object({
@@ -31,6 +32,7 @@ export async function setMatchStatus(matchId: string, status: string): Promise<v
 export async function refreshMyOffers(): Promise<void> {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  if (!(await allowAction(supabase, "refresh_offers"))) return;
   await requestOffersRefresh(userId);
   revalidatePath("/offers");
 }
