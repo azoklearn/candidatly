@@ -1,9 +1,11 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { DEFAULT_AFTER_LOGIN, safeNextPath } from "@/lib/auth/routes";
+import { isGoogleSignInEnabled } from "@/lib/auth/providers";
+import { authRedirectBase, DEFAULT_AFTER_LOGIN, safeNextPath } from "@/lib/auth/routes";
 import { getPublicEnv, isSupabaseConfigured } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
@@ -14,7 +16,8 @@ export type AuthFormState = {
   fieldErrors?: { email?: string; password?: string };
 };
 
-const NOT_CONFIGURED = "L’authentification n’est pas encore configurée sur cet environnement.";
+const NOT_CONFIGURED =
+  "La connexion est indisponible : ce site n’est pas encore relié à sa base de données.";
 const log = logger.child({ area: "auth" });
 
 const CredentialsSchema = z.object({
@@ -72,11 +75,14 @@ export async function signUp(_previous: AuthFormState, formData: FormData): Prom
   if (!parsed.success) return { fieldErrors: toFieldErrors(parsed.error) };
   if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED };
 
-  const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
+  const base = authRedirectBase(
+    (await headers()).get("origin"),
+    getPublicEnv().NEXT_PUBLIC_SITE_URL,
+  );
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     ...parsed.data,
-    options: { emailRedirectTo: `${NEXT_PUBLIC_SITE_URL}/auth/callback?next=/onboarding/1` },
+    options: { emailRedirectTo: `${base}/auth/callback?next=/onboarding/1` },
   });
   if (error) {
     log.info("sign_up_failed", { code: error.code });
@@ -93,13 +99,17 @@ export async function signUp(_previous: AuthFormState, formData: FormData): Prom
 
 export async function signInWithGoogle(formData: FormData): Promise<void> {
   if (!isSupabaseConfigured()) redirect("/login?error=config");
+  if (!(await isGoogleSignInEnabled())) redirect("/login?error=google_disabled");
   const next = safeNextPath(String(formData.get("next") ?? ""), DEFAULT_AFTER_LOGIN);
-  const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
+  const base = authRedirectBase(
+    (await headers()).get("origin"),
+    getPublicEnv().NEXT_PUBLIC_SITE_URL,
+  );
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${NEXT_PUBLIC_SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`,
+      redirectTo: `${base}/auth/callback?next=${encodeURIComponent(next)}`,
     },
   });
   if (error || !data.url) {

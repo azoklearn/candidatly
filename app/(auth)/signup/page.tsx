@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { isGoogleSignInEnabled } from "@/lib/auth/providers";
+import { isSupabaseConfigured } from "@/lib/env";
 
 import { signUp } from "../actions";
 import { CredentialsForm } from "../credentials-form";
@@ -9,7 +12,9 @@ import { GoogleButton, OrSeparator } from "../google-button";
 
 export const metadata: Metadata = { title: "Créer un compte" };
 
-export default function SignUpPage() {
+export default async function SignUpPage() {
+  const configured = isSupabaseConfigured();
+  const google = await isGoogleSignInEnabled();
   return (
     <Card>
       <CardHeader>
@@ -19,8 +24,19 @@ export default function SignUpPage() {
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <GoogleButton next="/onboarding/1" />
-        <OrSeparator />
+        {!configured ? (
+          <Alert variant="destructive">
+            <AlertDescription>
+              La connexion est indisponible : ce site n’est pas encore relié à sa base de données.
+            </AlertDescription>
+          </Alert>
+        ) : null}
+        {google ? (
+          <>
+            <GoogleButton next="/onboarding/1" />
+            <OrSeparator />
+          </>
+        ) : null}
         <CredentialsForm action={signUp} mode="sign-up" />
         <p className="text-sm text-muted-foreground">
           Déjà inscrit ?{" "}
