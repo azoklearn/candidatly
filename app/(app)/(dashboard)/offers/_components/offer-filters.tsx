@@ -3,12 +3,15 @@ import { Button } from "@/components/ui/button";
 export type OfferFilterValues = { maxKm: string; days: string; company: string; view: string };
 
 const control =
-  "h-8 rounded-lg border border-input bg-transparent px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+  "h-9 rounded-full border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 /** Plain GET form: filters live in the URL and work without JavaScript. */
 export function OfferFilters({ values }: { values: OfferFilterValues }) {
   return (
-    <form method="get" className="flex flex-wrap items-end gap-3 rounded-xl border p-3 text-sm">
+    <form
+      method="get"
+      className="flex flex-wrap items-end gap-3 rounded-2xl border bg-card p-3 text-sm sm:p-4"
+    >
       <label className="grid gap-1">
         <span className="text-muted-foreground">Distance</span>
         <select name="km" defaultValue={values.maxKm} className={control}>

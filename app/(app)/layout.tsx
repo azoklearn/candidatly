@@ -10,5 +10,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   if (!data?.claims) redirect("/login");
-  return children;
+  return (
+    <>
+      <div className="app-grain" aria-hidden />
+      {children}
+    </>
+  );
 }

@@ -65,8 +65,11 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
       >
         Retour à l’offre
       </Link>
-      <header className="grid gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Votre lettre pour cette offre</h1>
+      <header className="fade-up grid gap-2">
+        <p className="eyebrow">Votre candidature</p>
+        <h1 className="page-title">
+          Votre lettre <em>pour cette offre</em>
+        </h1>
         <p className="text-muted-foreground">
           {[offer.title, offer.company_name, cityFromAddress(offer.location_label)]
             .filter(Boolean)

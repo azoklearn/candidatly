@@ -9,6 +9,17 @@ test("a student prepares, sends and tracks an application, then exports their da
   await page.goto(users.student.login);
   await expect(page).toHaveURL(/\/offers$/);
   await expect(page.getByRole("heading", { name: "Vos offres" })).toBeVisible();
+  // Few offers: companies that hire apprentices nearby complete the page (C80).
+  await expect(
+    page.getByRole("heading", {
+      name: "Entreprises à fort potentiel d’embauche près de chez vous",
+    }),
+  ).toBeVisible();
+  // The search may also hold real companies: check the seeded one, not a total.
+  const seeded = page.getByRole("listitem").filter({ hasText: "Atelier numérique 1 (test E2E)" });
+  await expect(
+    seeded.getByRole("link", { name: /Envoyer une candidature spontanée/ }),
+  ).toHaveAttribute("href", /labonnealternance/);
 
   await page.getByRole("link", { name: OFFER_TITLE }).click();
   await expect(

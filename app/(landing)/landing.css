@@ -31,9 +31,9 @@
   --lemon: #8cc6ff;
   --coral: #1764d8;
   --line: #c8d9e8;
-  --serif: var(--lp-font-serif), Georgia, serif;
-  --sans: var(--lp-font-sans), sans-serif;
-  --mono: var(--lp-font-mono), monospace;
+  --serif: var(--font-instrument-serif), Georgia, serif;
+  --sans: var(--font-dm-sans), sans-serif;
+  --mono: var(--font-dm-mono), monospace;
 }
 
 .lp * {

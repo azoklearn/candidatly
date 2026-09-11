@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Tag } from "@/components/tag";
 import { Button } from "@/components/ui/button";
 import { cityFromAddress, contractLabel, formatDistance, formatRelativeDays } from "@/lib/format";
 
@@ -22,14 +23,6 @@ export type OfferCardData = {
   hasCompanyCard: boolean;
 };
 
-function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-      {children}
-    </span>
-  );
-}
-
 export function OfferCard({ data }: { data: OfferCardData }) {
   const { offer } = data;
   const saved = data.status === "saved";
@@ -41,34 +34,34 @@ export function OfferCard({ data }: { data: OfferCardData }) {
   ].filter(Boolean);
 
   return (
-    <li className="grid gap-3 rounded-xl border p-4">
+    <li className="card-lift grid gap-3 rounded-2xl border bg-card p-4 sm:p-5">
       <div className="flex items-start justify-between gap-4">
-        <div className="grid gap-1">
-          <Link href={`/offers/${offer.id}`} className="font-medium hover:underline">
+        <div className="grid min-w-0 gap-1">
+          <Link
+            href={`/offers/${offer.id}`}
+            className="text-[1.05rem] leading-snug font-semibold tracking-[-0.02em] hover:text-brand"
+          >
             {offer.title}
           </Link>
           <p className="text-sm text-muted-foreground">{details.join(" · ")}</p>
         </div>
-        <span
-          className="shrink-0 rounded-md border px-2 py-1 text-sm font-medium"
-          title="Correspondance avec votre profil"
-        >
-          {Math.round(data.score)} %
+        <span className="match-pill shrink-0" title="Correspondance avec votre profil">
+          ✦ {Math.round(data.score)} %
         </span>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Badge>{contractLabel(offer.contract_types)}</Badge>
-        {data.hasCompanyCard ? <Badge>Fiche entreprise disponible</Badge> : null}
-        {offer.is_delegated ? <Badge>Offre gérée par une école</Badge> : null}
-        {saved ? <Badge>Enregistrée</Badge> : null}
-        {data.status === "applied" ? <Badge>Candidature envoyée</Badge> : null}
+        <Tag>{contractLabel(offer.contract_types)}</Tag>
+        {data.hasCompanyCard ? <Tag>Fiche entreprise disponible</Tag> : null}
+        {offer.is_delegated ? <Tag>Offre gérée par une école</Tag> : null}
+        {saved ? <Tag>Enregistrée</Tag> : null}
+        {data.status === "applied" ? <Tag>Candidature envoyée</Tag> : null}
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2 border-t border-dashed border-foreground/10 pt-3">
         <Link
           href={`/offers/${offer.id}`}
-          className="text-sm font-medium underline underline-offset-4"
+          className="text-sm font-semibold text-brand underline-offset-4 hover:underline"
         >
-          Voir le détail
+          Voir le détail <span aria-hidden>→</span>
         </Link>
         <form
           action={setMatchStatus.bind(null, data.matchId, saved ? "new" : "saved")}

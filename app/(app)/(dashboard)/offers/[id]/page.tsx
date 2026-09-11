@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { z } from "zod";
 
 import { CompanyCardLoader, CompanyCardSkeleton } from "@/components/company-card";
+import { PendingOverlay } from "@/components/pending-overlay";
 import { SubmitButton } from "@/components/submit-button";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,13 +91,19 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="grid gap-6">
-      <Link href="/offers" className="text-sm text-muted-foreground underline underline-offset-4">
-        Retour aux offres
+      <Link
+        href="/offers"
+        className="w-fit text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+      >
+        <span aria-hidden>← </span>Retour aux offres
       </Link>
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-        <article className="grid content-start gap-6">
-          <header className="grid gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight">{offer.title}</h1>
+        <article className="fade-up grid content-start gap-6">
+          <header className="grid gap-2">
+            <p className="eyebrow">Offre d’alternance</p>
+            <h1 className="text-3xl leading-tight font-bold tracking-[-0.045em] text-balance">
+              {offer.title}
+            </h1>
             <p className="text-muted-foreground">
               {[offer.company_name, cityFromAddress(offer.location_label)]
                 .filter(Boolean)
@@ -140,9 +147,26 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                 </Link>
               ) : (
                 <form action={prepareApplication.bind(null, offer.id)}>
-                  <SubmitButton className="w-full" pendingLabel="Préparation de votre lettre…">
+                  <SubmitButton
+                    variant="shiny"
+                    size="lg"
+                    className="w-full"
+                    pendingLabel="Préparation de votre lettre…"
+                  >
                     Préparer ma candidature
                   </SubmitButton>
+                  <PendingOverlay
+                    title={
+                      <>
+                        On prépare votre <em>candidature</em>
+                      </>
+                    }
+                    messages={[
+                      "On lit l’offre en détail…",
+                      "On adapte votre lettre de motivation…",
+                      "On met en forme votre dossier…",
+                    ]}
+                  />
                 </form>
               )}
               {job?.apply.url ? (

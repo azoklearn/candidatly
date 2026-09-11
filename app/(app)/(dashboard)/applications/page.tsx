@@ -40,8 +40,11 @@ export default async function ApplicationsPage() {
 
   return (
     <div className="grid gap-8">
-      <div className="grid gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Vos candidatures</h1>
+      <div className="fade-up grid gap-2">
+        <p className="eyebrow">Votre suivi</p>
+        <h1 className="page-title">
+          Vos <em>candidatures</em>
+        </h1>
         <p className="text-sm text-muted-foreground">
           {due > 0
             ? `${due} relance${due > 1 ? "s" : ""} conseillée${due > 1 ? "s" : ""} : ouvrez la candidature pour copier le message.`
@@ -49,11 +52,13 @@ export default async function ApplicationsPage() {
         </p>
       </div>
       {data.length === 0 ? (
-        <div className="grid gap-2 rounded-xl border p-6 text-sm">
-          <p className="font-medium">Aucune candidature pour le moment.</p>
+        <div className="grid gap-2 rounded-2xl border bg-card p-6 text-sm">
+          <p className="section-title">
+            Votre première candidature <em>vous attend</em>
+          </p>
           <p className="text-muted-foreground">
             Ouvrez une offre et cliquez sur « Préparer ma candidature » :{" "}
-            <Link href="/offers" className="underline underline-offset-4">
+            <Link href="/offers" className="font-medium text-brand underline underline-offset-4">
               voir vos offres
             </Link>
             .
@@ -65,19 +70,19 @@ export default async function ApplicationsPage() {
           if (items.length === 0) return null;
           return (
             <section key={group.title} className="grid gap-3">
-              <h2 className="font-medium">
+              <h2 className="text-lg font-bold tracking-[-0.03em]">
                 {group.title} ({items.length})
               </h2>
               <ul className="grid gap-3">
                 {items.map((application) => (
                   <li
                     key={application.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4"
+                    className="card-lift flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-4 sm:p-5"
                   >
                     <div className="grid gap-1">
                       <Link
                         href={`/applications/${application.id}`}
-                        className="font-medium hover:underline"
+                        className="font-semibold tracking-[-0.02em] hover:text-brand"
                       >
                         {application.offer?.title ?? "Offre"}
                       </Link>

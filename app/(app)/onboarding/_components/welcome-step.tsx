@@ -26,9 +26,9 @@ export function WelcomeStep({ firstName }: { firstName: string | null }) {
       </ul>
       <Link
         href="/onboarding/2"
-        className={`${buttonVariants({ size: "lg" })} h-12 w-fit px-6 text-base`}
+        className={`${buttonVariants({ variant: "shiny", size: "lg" })} h-12 w-fit px-7 text-base`}
       >
-        C’est parti
+        C’est parti <span aria-hidden>→</span>
       </Link>
     </div>
   );

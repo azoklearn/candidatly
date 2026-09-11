@@ -27,7 +27,7 @@ function Section({
   return (
     <section className="grid max-w-2xl gap-4 border-t pt-8">
       <div className="grid gap-1">
-        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+        <h2 className="text-lg font-bold tracking-[-0.03em]">{title}</h2>
         {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
       </div>
       {children}
@@ -50,8 +50,11 @@ export default async function AccountPage() {
 
   return (
     <div className="grid gap-8">
-      <header className="grid gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Votre compte</h1>
+      <header className="fade-up grid gap-2">
+        <p className="eyebrow">Réglages</p>
+        <h1 className="page-title">
+          Votre <em>compte</em>
+        </h1>
         {email ? <p className="text-sm text-muted-foreground">Connecté avec {email}</p> : null}
       </header>
       <Section title="Profil">

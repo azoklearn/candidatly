@@ -1,7 +1,18 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 
+import { toSearchKey } from "../../lib/offers/search-keys";
+
 import { adminClient, OFFER_TITLE, STATE_FILE, type E2EState } from "./support";
+
+/** Search of the seeded students, for the hiring companies shown next to their offers. */
+const STUDENT_SEARCH = {
+  romeCodes: ["M1855"],
+  lat: 48.8566,
+  lng: 2.3522,
+  radiusKm: 30,
+  diplomaLevel: "bac+3" as const,
+};
 
 const BASE_LETTER = [
   "Objet : Candidature pour une alternance",
@@ -120,6 +131,25 @@ export default async function globalSetup() {
       login: `/auth/confirm?type=email&next=/offers&token_hash=${link.data.properties.hashed_token}`,
     };
   }
+  const hiring = await db.from("hiring_companies").insert(
+    [1, 2].map((n) => ({
+      source: "api_alternance" as const,
+      query_key: toSearchKey(STUDENT_SEARCH).key,
+      external_id: `e2e:${run}:${n}`,
+      name: `Atelier numérique ${n} (test E2E)`,
+      naf_code: "62.01Z",
+      naf_label: "Programmation informatique",
+      headcount: "10-19",
+      address: "3 AVENUE VICTORIA 75004 PARIS",
+      // At the student's own position: ranked first even if real companies share the search.
+      lat: STUDENT_SEARCH.lat,
+      lng: STUDENT_SEARCH.lng,
+      apply_url: `https://labonnealternance.apprentissage.beta.gouv.fr/emploi/recruteurs_lba/e2e-${n}`,
+      last_seen_at: now,
+    })),
+  );
+  if (hiring.error) throw hiring.error;
+
   const signup = { email: `e2e-signup-${run}@example.com`, password: `E2e-${randomUUID()}` };
   writeFileSync(
     STATE_FILE,
