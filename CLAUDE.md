@@ -26,12 +26,12 @@ Principes non négociables : validation humaine avant chaque envoi, aucun fait i
 - **Next.js 16** App Router, TypeScript `strict` (TypeScript 6.0), Turbopack. Le fichier de session s'appelle `proxy.ts` (runtime Node.js), pas `middleware.ts`.
 - **Tailwind CSS 4** (configuration en CSS, pas de `tailwind.config.js`) et **shadcn/ui** (style `base-nova`, composants Base UI, variables CSS, police Geist via `--font-sans`).
 - **Supabase** : Auth (email + mot de passe et Google), Postgres avec RLS sur toutes les tables, Storage bucket privé `documents`. Clés « publishable » et « secret » (les clés `anon` / `service_role` sont dépréciées fin 2026).
-- **Trigger.dev v4** pour les jobs asynchrones et planifiés (à installer en phase 2). La v4 n'a pas besoin de route `/api/trigger`.
-- **Anthropic SDK** `@anthropic-ai/sdk` : `claude-sonnet-5` (lettres), `claude-haiku-4-5-20251001` (ROME, résumé entreprise, extraction). Sorties JSON par « structured outputs » (`client.messages.parse` + `zodOutputFormat`). À installer en phase 2.
+- **Supabase Cron** (`pg_cron` + `pg_net`) pour les tâches planifiées : il appelle une route protégée du site. Trigger.dev, prévu par le brief, est retiré (B10).
+- **Anthropic SDK** `@anthropic-ai/sdk` : `claude-sonnet-5` (lettres), `claude-haiku-4-5-20251001` (ROME, résumé entreprise, extraction). Sorties JSON par « structured outputs » (`client.messages.parse` + `zodOutputFormat`). Installé ; pas de clé pour l'instant (décision de l'owner du 11 septembre 2026) : le choix des métiers utilise alors le classement de la nomenclature.
 - **Stripe** Checkout + webhooks ; abonnements par Stripe Billing si l'abonnement premium est confirmé (A5). À installer en phase 4.
 - **Zod 4** à toutes les frontières (formulaires, réponses API externes, variables d'environnement, sorties JSON LLM).
 - **Vitest 5** (unitaires), **Playwright** (2 à 3 parcours critiques, phase 4).
-- Déploiement : Vercel (Node 24) + Supabase cloud (région UE) + Trigger.dev cloud (`runtime: "node-24"`).
+- Déploiement : Vercel (Node 24) + Supabase cloud (région UE), dont Supabase Cron et Vault.
 - Pas d'ORM : client Supabase typé par `lib/supabase/database.types.ts`.
 
 ## 4. Sources de données externes
@@ -79,7 +79,7 @@ tests/                          unit/ (Vitest), fixtures/ (réponses API réelle
 docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RUNBOOK, reference/
 ```
 
-À venir : `lib/ai`, `lib/enrichment`, `lib/geocoding`, `lib/matching`, `lib/credits`, `lib/documents`, `trigger/`, `scripts/import-rome.ts`, `app/api/geocode`, `app/api/stripe/webhook`, `tests/e2e`.
+Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`, `lib/matching`, `lib/offers` (synchronisation, filtres, rafraîchissement), `lib/onboarding`, `lib/rome`, `lib/text`, `lib/cron`, `app/api/geocode`, `app/api/cron/sync-offers`, `scripts/import-rome.ts`, `tests/db`. À venir : `lib/enrichment`, `lib/credits`, `app/api/stripe/webhook`, `tests/e2e`.
 
 ## 6. Conventions
 
@@ -109,8 +109,8 @@ docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RU
 ### Secrets et configuration
 - `lib/env.ts` valide les variables avec Zod, par groupe, à la première utilisation (`getPublicEnv`, `getSupabaseAdminEnv`, `getApiAlternanceEnv`...) : l'application démarre sans les comptes des phases suivantes, et une variable manquante lève une `ConfigError` qui cite son nom, jamais sa valeur. C'est le seul module qui lit `process.env`.
 - `.env.local` jamais commité (ignoré par git) ; `.env.example` liste toutes les variables du projet.
-- Aucune clé côté client : appels LLM et API externes uniquement côté serveur (server actions, route handlers) ou dans les jobs. Le géocodage passera par `app/api/geocode`.
-- `SUPABASE_SECRET_KEY` n'est utilisée que par `lib/supabase/admin.ts` (jobs, webhook Stripe).
+- Aucune clé côté client : appels LLM et API externes uniquement côté serveur (server actions, route handlers). Le géocodage passe par `app/api/geocode`.
+- `SUPABASE_SECRET_KEY` n'est utilisée que par `lib/supabase/admin.ts` (synchronisation planifiée, rafraîchissement des offres, webhook Stripe).
 - Ne jamais afficher, logger ni committer un jeton. Le logger masque les clés sensibles par nom.
 
 ### Logs
@@ -133,12 +133,12 @@ docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RU
 - Un profil et un solde de crédits sont créés par trigger à l'inscription (`handle_new_user`).
 - Migrations dans `supabase/migrations`. Sans Docker, elles sont rejouées sur PGlite avec une simulation d'auth et de storage Supabase (46 contrôles de RLS et de contraintes) ; ces tests sont dans `tests/db/migrations.test.ts` et tournent avec `npm test`. `lib/supabase/database.types.ts` est généré par la CLI officielle depuis le projet lié (`npm run db:types`).
 
-### Jobs Trigger.dev (phase 2)
-- Un fichier par job dans `/trigger`, `import { task, schedules } from "@trigger.dev/sdk"`, `schemaTask` avec Zod pour les payloads.
-- Idempotence : `idempotencyKey` explicite au déclenchement ; retry avec backoff (`maxAttempts: 3`), `AbortTaskRunError` pour les erreurs non rejouables.
-- Les jobs orchestrent des fonctions de `/lib` testables unitairement.
-- Tâches : `sync-offers` (cron `0 */6 * * *`, fuseau Europe/Paris, une recherche par combinaison codes ROME et zone, puis suppression logique des offres périmées), `compute-matches` (par utilisateur), `refresh-user-offers` (fin d'onboarding et bouton « Actualiser »).
-- Sans `TRIGGER_SECRET_KEY`, `lib/jobs/dispatch.ts` exécute le rafraîchissement directement dans la server action : c'est le mode du développement local tant que le compte Trigger.dev n'existe pas. Le cron ne tourne qu'une fois les jobs déployés.
+### Tâches planifiées (Supabase Cron)
+- Pas de service de jobs externe (décision de l'owner du 11 septembre 2026, B10) : Supabase Cron appelle toutes les 15 minutes la route protégée `app/api/cron/sync-offers`, avec `Authorization: Bearer <CRON_SECRET>`.
+- Chaque appel traite un lot : au plus 25 recherches vieilles de plus de 6 heures, les jamais faites d'abord, en 40 secondes au plus, avec une pause entre deux appels à l'API. Il recalcule les correspondances des utilisateurs concernés puis retire les offres périmées (`lib/offers/scheduled-sync.ts`).
+- L'adresse du site et le secret sont dans Supabase Vault (`candidatly_site_url`, `candidatly_cron_secret`) : la migration ne contient aucun secret et la tâche ne fait rien tant qu'ils manquent. Mise en service et contrôle : `docs/RUNBOOK.md`.
+- Fin d'onboarding et bouton « Actualiser » : rafraîchissement immédiat dans la server action (`lib/offers/request-refresh.ts`), quelques secondes.
+- La logique reste dans des fonctions de `/lib` testables unitairement ; la route et le cron ne font qu'orchestrer.
 
 ### Tests
 - Vitest : `tests/unit/**/*.test.ts` et `tests/db/**/*.test.ts` (migrations et RLS sur PGlite). Réponses API simulées depuis `tests/fixtures/` (réponses réelles tronquées et anonymisées). Les clients externes acceptent `fetchImpl` et `sleep` injectés.
@@ -167,8 +167,6 @@ npm run db:types     # régénère lib/supabase/database.types.ts depuis le proj
 npm run db:push      # applique les nouvelles migrations au projet lié (SUPABASE_DB_PASSWORD dans .env.local)
 npx shadcn@latest add <composant>
 npm run rome:import  # importe le référentiel ROME 4.0 (fichiers de docs/reference) dans le projet lié
-npm run trigger:dev  # jobs Trigger.dev en local (TRIGGER_SECRET_KEY et TRIGGER_PROJECT_REF requis)
-npm run trigger:deploy  # déploie les jobs sur Trigger.dev cloud
 stripe listen --forward-to localhost:3000/api/stripe/webhook   # phase 4
 ```
 
@@ -189,7 +187,7 @@ Installées le 10 septembre 2026.
 | zod | 4.6 | API v4 (`z.email()`, `error:`) |
 | vitest | 5.0 | configuration en `vitest.config.mts` |
 | eslint / eslint-config-next / prettier | 9 / 16.3.4 / 3.9 | ESLint 9 signalé comme plus maintenu, voir C51 |
-| @trigger.dev/sdk, @anthropic-ai/sdk, stripe | 4.5 / 0.124 / 22.6 | installés dans leur phase |
+| @anthropic-ai/sdk, stripe | 0.124 / 22.6 | installés dans leur phase |
 
 Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $ par MTok, retrait pas avant le 30 juin 2027) ; `claude-haiku-4-5-20251001` (200K / 64K, 1 $ / 5 $ par MTok, retrait possible à partir du 15 octobre 2026).
 
@@ -203,3 +201,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-10 : phase 0 validée (« go »), hypothèses par défaut de la section B appliquées. Phase 1 : pas de Docker sur le poste, migrations vérifiées sur PGlite et types générés depuis le schéma migré ; TypeScript épinglé en 6.0 ; shadcn/ui avec Base UI ; auth email + mot de passe et Google, confirmation par `token_hash` (`/auth/confirm`) ou code PKCE (`/auth/callback`) ; le fournisseur API Alternance couvre recherche et détail, pas l'envoi (pas d'habilitation). Schéma : ajouts C42 à C47 appliqués, statut d'abonnement prévu en attendant A5.
 - 2026-09-10 : projet Supabase cloud de développement « candidatly » créé par l'owner (région Paris, ref `ylupsjydkbmryctfrfte`) et lié à la CLI. Les six migrations y sont appliquées ; les types viennent désormais de la CLI officielle. Vérifié sur la base réelle : création du profil et du solde à l'inscription, RLS (profil, crédits, historique, tables de service), stockage privé par dossier et types de fichiers.
 - 2026-09-11 : phase 2 livrée sur `phase-2`. Onboarding en 6 étapes, choix des métiers ROME (repli sur le classement de la nomenclature tant que la clé Anthropic manque), lecture des CV PDF et des lettres PDF, Word ou collées, recherche des offres et calcul des correspondances en ligne faute de compte Trigger.dev, écrans liste et détail des offres. Deux corrections après test réel : classement ROME (C55) et doublons du géocodeur (C58). Parcours complet vérifié sur le projet cloud avec un utilisateur de test.
+- 2026-09-11 : l'owner se passe de l'API Anthropic pour l'instant et remplace Trigger.dev par Supabase Cron (B10). Trigger.dev est retiré du projet ; une migration planifie l'appel de `/api/cron/sync-offers` toutes les 15 minutes, l'adresse du site et le secret étant rangés dans Vault. Correction après test réel : une offre renvoyée deux fois par l'API faisait échouer l'enregistrement (C61).

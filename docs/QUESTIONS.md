@@ -88,15 +88,16 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 
 | # | Sujet | Ce que dit le brief | Constat vérifié | Hypothèse par défaut |
 |---|---|---|---|---|
-| B1 | Trigger.dev | « Trigger.dev (v3) » et une route `/api/trigger` dans l'arborescence | La v3 est retirée (« Trigger.dev v3 has been retired ») ; SDK actuel 4.5.x ; aucune route Next.js n'est nécessaire, les tâches sont déclenchées par `tasks.trigger()` côté serveur | Trigger.dev v4, pas de `/api/trigger` |
+| B1 | Trigger.dev | « Trigger.dev (v3) » et une route `/api/trigger` dans l'arborescence | La v3 est retirée (« Trigger.dev v3 has been retired ») ; SDK actuel 4.5.x ; aucune route Next.js n'est nécessaire, les tâches sont déclenchées par `tasks.trigger()` côté serveur | Remplacé par B10 : Trigger.dev n'est plus utilisé |
 | B2 | Extraction PDF et DOCX | Non précisé (« extraction du texte ») | Aucune lib de la stack ne lit un PDF. `unpdf` (unjs, MIT, build PDF.js sans binaire natif, Node >= 22) et `mammoth` (BSD, JS pur) sont maintenus et adaptés à Vercel / Trigger.dev. `pdf-parse` 2.x impose un binaire natif `@napi-rs/canvas` | Ajouter `unpdf` et `mammoth` ; justification : maintenus, sans dépendance native et adaptés au serverless (`pdf2json`, l'autre option sans dépendance, repose sur un fork ancien de PDF.js) |
 | B3 | Génération de lettre | « Température basse (0.3) » | `claude-sonnet-5` renvoie 400 si `temperature`, `top_p` ou `top_k` est fixé ; le thinking adaptatif est actif par défaut | Pas de température ; `thinking: { type: "disabled" }` pour un rendu déterministe et un coût maîtrisé ; sobriété imposée par le system prompt ; sortie via structured outputs. Alternative si la qualité déçoit en test : thinking adaptatif avec `effort: "medium"` |
 | B4 | API Adresse | `https://api-adresse.data.gouv.fr` | L'API Adresse de la BAN a été transférée à l'IGN (Géoplateforme). Le service historique répond encore mais son arrêt a été annoncé (redirection prévue jusqu'au 14 avril 2026, non effective au 9 septembre 2026, sans date garantie). Même contrat d'API sur `https://data.geopf.fr/geocodage` | Base URL Géoplateforme, ancien hôte non utilisé |
 | B5 | Session Next.js | Non précisé | Next.js 16 renomme `middleware.ts` en `proxy.ts` (runtime Node.js obligatoire) ; pattern Supabase officiel `updateSession` + `getClaims()` | `proxy.ts` |
 | B6 | Clés Supabase | Non précisé | Les clés `anon` / `service_role` sont dépréciées fin 2026 au profit des clés `sb_publishable_...` / `sb_secret_...` | Variables `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` et `SUPABASE_SECRET_KEY` |
-| B7 | Logger | « utilise un logger » | Aucune lib de log dans la stack | Wrapper maison `lib/logger.ts` (JSON sur stdout, délègue au logger Trigger.dev dans les jobs). Pas de lib externe au MVP ; Sentry en phase 5 comme prévu |
+| B7 | Logger | « utilise un logger » | Aucune lib de log dans la stack | Wrapper maison `lib/logger.ts` (une ligne JSON par événement sur stdout, lue par les journaux de Vercel). Pas de lib externe au MVP ; Sentry en phase 5 comme prévu |
 | B8 | Zod | « Zod » | Zod 4 est la version courante (`zod` 4.5.x) ; API v4 (`z.email()`, `error:`) | Zod 4 |
 | B9 | Tests de la base sans Docker | Non précisé | PGlite (Postgres 18 compilé en WebAssembly, `@electric-sql/pglite`, licence Apache 2.0) rejoue les migrations et teste la RLS en quelques secondes, sans Docker ni réseau | **Accepté le 11 septembre 2026** : dépendance de développement, tests dans `tests/db/`, lancés par `npm test` |
+| B10 | Tâches planifiées | « Trigger.dev » pour `sync-offers` et les autres jobs | L'owner ne souhaite pas de compte Trigger.dev. Comparaison du 11 septembre 2026 : Vercel Cron est limité à une exécution par jour en offre gratuite ; Railway coûte 5 $ par mois et ajoute un service à déployer ; Supabase Cron (`pg_cron` et `pg_net`) est déjà disponible sur le projet | **Choisi par l'owner le 11 septembre 2026** : Supabase Cron appelle `/api/cron/sync-offers` toutes les 15 minutes, secrets dans Vault ; Trigger.dev retiré du projet |
 
 ---
 
@@ -145,7 +146,7 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 
 | # | Question | Hypothèse par défaut | Raison |
 |---|---|---|---|
-| C30 | Node.js | 24.x partout (local, Vercel, Trigger.dev `runtime: "node-24"`) ; `engines.node` dans `package.json` | Node 20 déprécié chez Vercel le 1er octobre 2026 |
+| C30 | Node.js | 24.x partout (local et Vercel) ; `engines.node` dans `package.json` | Node 20 déprécié chez Vercel le 1er octobre 2026 |
 | C31 | TypeScript | 6.0.x (une seule version pour `tsc` et typescript-eslint) ; passage à TS 7 quand typescript-eslint le supportera | typescript-eslint 8.70 exige `< 6.1` |
 | C32 | shadcn/ui | Base UI (défaut depuis juillet 2026), style `new-york`, `baseColor: neutral`, variables CSS | Choix irréversible après `init`, défaut maintenu par shadcn |
 | C33 | `cacheComponents` Next.js | Désactivé au MVP | Le pattern Supabase (`cookies()` dans les Server Components) exigerait `<Suspense>` partout |
@@ -193,7 +194,7 @@ Le brief prévoyait des packs de crédits sans abonnement ; la décision du 10 s
 |---|---|---|---|
 | C54 | Clé Anthropic absente | L'étape « Domaine recherché » propose alors 8 métiers classés par la recherche dans la nomenclature, le premier coché. Avec `ANTHROPIC_API_KEY`, Haiku choisit parmi 30 candidats officiels et ne peut rien inventer | L'onboarding fonctionne sans clé, avec des suggestions moins fines |
 | C55 | Classement des métiers ROME | La première version additionnait les scores de tous les intitulés : « développement » écrasait « web ». Désormais chaque mot pèse selon sa rareté, un métier est classé par son meilleur intitulé et les mots sont réduits à 7 lettres (« développement » trouve « développeur »). Vérifié sur 10 requêtes types avec les données du projet cloud | Migration `20260911110000_rome_search_ranking.sql` |
-| C56 | Trigger.dev pas encore configuré | Sans `TRIGGER_SECRET_KEY`, la recherche d'offres tourne dans la requête (quelques secondes). Le cron `sync-offers` toutes les 6 h n'existe qu'après `npm run trigger:deploy` avec `TRIGGER_PROJECT_REF` | Voir section D |
+| C56 | Rafraîchissement sans service de jobs | La recherche d'offres de fin d'onboarding et du bouton « Actualiser » tourne dans la requête (quelques secondes). La synchronisation de fond passe par Supabase Cron (B10) | Rien à configurer en local ; en production, deux secrets dans Vault (`docs/RUNBOOK.md`) |
 | C57 | Volume d'offres en informatique | Le 11 septembre, l'API renvoie 0 offre de développement autour de Lyon, même à 100 km, et 9 à Paris, comme en section F point 7. Elle renvoie aussi 150 « recruteurs » : ce sont des entreprises susceptibles de recruter, pas des offres publiées, et Candidatly ne les affiche pas (le brief se limite aux offres publiées) | L'écran vide conseille d'élargir le rayon ou d'ajouter des métiers. Question produit pour plus tard : proposer ou non les candidatures spontanées |
 | C58 | Doublons du géocodeur | La Géoplateforme a renvoyé deux fois la même commune pour « Lyon » | Doublons retirés dans `lib/geocoding/geocode.ts` |
 | C59 | Documents | CV en PDF uniquement (brief) ; lettre en PDF, Word ou texte collé de 200 caractères minimum. Remplacer un document supprime l'ancien fichier (minimisation). Un PDF sans texte, par exemple un scan, est refusé avec un message | Pas d'OCR au MVP |
@@ -209,7 +210,7 @@ Aucun n'est nécessaire pour démarrer la phase 1 (Supabase local + réponses mo
 3. **Google Cloud** : client OAuth 2.0 (type Web), URI de redirection `https://<project-ref>.supabase.co/auth/v1/callback`, écran de consentement ; client ID et secret à saisir dans Supabase Auth.
 4. **Anthropic** : clé API dans `ANTHROPIC_API_KEY`, limite de dépense mensuelle configurée.
 5. **Stripe** : compte en mode test (clés `sk_test_...`, secret de webhook), trois produits / prix pour les packs ; le passage en mode live exige une entité juridique.
-6. **Trigger.dev** : projet cloud (plan Free : 10 schedules, concurrence limitée), clé `TRIGGER_SECRET_KEY`.
+6. **Tâches planifiées** : plus de compte Trigger.dev à créer (B10). En production, `CRON_SECRET` dans Vercel et deux secrets dans Supabase Vault (`docs/RUNBOOK.md`).
 7. **Vercel** : projet lié au dépôt, Node 24.
 8. **Machine locale** : Docker Desktop ou OrbStack pour `supabase start`, Stripe CLI.
 
@@ -221,7 +222,7 @@ Vérifiées le 9 septembre 2026 (`npm view <pkg> version` et documentation offic
 
 - **Next.js 16.3** : `cookies()`, `headers()`, `params`, `searchParams` sont asynchrones ; `middleware.ts` devient `proxy.ts` (Node.js uniquement) ; Turbopack par défaut ; `next lint` supprimé (ESLint flat config appelé directement) ; `revalidateTag` prend un second argument ; `create-next-app` génère un `AGENTS.md` qui référence `CLAUDE.md`.
 - **Supabase** : `@supabase/ssr` avec `getAll` / `setAll`, `getClaims()` dans le proxy (jamais `getSession()` côté serveur), `getUser()` quand il faut vérifier une déconnexion serveur ; `supabase-js` exige Node >= 22.
-- **Trigger.dev 4.5** : `import { task, schedules } from "@trigger.dev/sdk"`, `schemaTask` + Zod, `idempotencyKey` (portée `run` par défaut depuis 4.3.1), files prédéfinies avec `queue()`, cron avec fuseau `Europe/Paris`.
+- **Trigger.dev 4.5**, retiré du projet le 11 septembre 2026 (B10) : `import { task, schedules } from "@trigger.dev/sdk"`, `schemaTask` + Zod, `idempotencyKey` (portée `run` par défaut depuis 4.3.1), files prédéfinies avec `queue()`, cron avec fuseau `Europe/Paris`.
 - **Anthropic SDK 0.124** : structured outputs GA (`output_config.format`, helper `zodOutputFormat`, `client.messages.parse`), pas de contraintes numériques ni de longueur dans la grammaire (validées par Zod après coup), prompt caching à partir de 1 024 tokens (Sonnet 5) ou 4 096 (Haiku 4.5).
 - **Stripe 22.6** : `new Stripe(secret)` (classe), `request.text()` pour le corps brut du webhook, `constructEvent`, `Idempotency-Key` sur la création de session.
 - **Zod 4.5** : `import * as z from "zod"`, `z.email()`, `error:` au lieu de `message:`, `z.treeifyError()`.

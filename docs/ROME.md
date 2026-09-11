@@ -772,7 +772,7 @@ Conversion des colonnes `O` / `N` / `""` : `O` vers `true`, `N` vers `false`, `"
 5. Journaliser le nombre de créations, mises à jour, désactivations ; comparer avec le ChangeLog xlsx en cas de doute.
 6. Mettre à jour la mention légale (lue depuis `rome_versions`).
 
-Fréquence : manuelle à chaque nouvelle version (deux par an), ou job Trigger.dev mensuel de vérification de `last_modified` qui alerte sans importer.
+Fréquence : manuelle à chaque nouvelle version (deux par an), ou tâche Supabase Cron mensuelle de vérification de `last_modified` qui alerte sans importer.
 
 ### 11.3 Recherche texte et garde-fou contre les hallucinations du LLM
 

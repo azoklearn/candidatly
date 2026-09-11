@@ -580,7 +580,7 @@ Conséquences pour le client :
 
 - Ne jamais supposer un corps JSON sur une 429 ; ne pas parser le corps, se baser sur le statut.
 - Si `Retry-After` est présent, l'honorer ; sinon, backoff exponentiel autonome (démarrer à 1 s).
-- Vercel et Trigger.dev cloud partagent des ASN publics : la limite de 30 requêtes par seconde par ASN peut être consommée par d'autres clients hébergés au même endroit. ⚠️ Non vérifié : l'impact réel depuis nos environnements de production n'a pas été mesuré.
+- Vercel partage des ASN publics : la limite de 30 requêtes par seconde par ASN peut être consommée par d'autres clients hébergés au même endroit. ⚠️ Non vérifié : l'impact réel depuis nos environnements de production n'a pas été mesuré.
 
 ### 9.3 En-têtes de réponse (200)
 
@@ -754,14 +754,14 @@ Pour `size_and_context` (« taille, localisation, âge ») : `headcount_range`, 
 
 ### 15.6 Débit, retry, idempotence (job `enrich-company`)
 
-- File d'attente globale côté Trigger.dev limitée à 2 requêtes par seconde vers cette API (marge sous les 7 par IP et les 30 par ASN partagés).
+- Débit global limité côté serveur à 2 requêtes par seconde vers cette API (marge sous les 7 par IP et les 30 par ASN partagés).
 - Retry sur 429 et 5xx avec backoff exponentiel (`Retry-After` honoré si présent ; sinon 1 s, 2 s, 4 s ; 3 essais max via la configuration globale `maxAttempts: 3`). Les 400 sont des erreurs non rejouables (`AbortTaskRunError`).
 - Idempotence : `idempotencyKey` = `enrich-company:<siret>` ou `enrich-company:<nom normalisé>:<code postal>` ; upsert sur `companies.siret`.
 - Fixtures : `docs/reference/recherche-entreprises.sample.json` couvre SIRET, SIREN, nom + code postal, `minimal` + `score`, `/near_point`, 400, 404, 429 et le cas 200 vide. Aucun test ne doit appeler l'API réelle.
 
 ## 16. Points restant à vérifier
 
-1. Impact réel de la limite de 30 requêtes par seconde par ASN depuis Vercel et Trigger.dev cloud (ASN partagés) : non mesuré ; à observer en production avec des métriques sur les 429.
+1. Impact réel de la limite de 30 requêtes par seconde par ASN depuis Vercel (ASN partagés) : non mesuré ; à observer en production avec des métriques sur les 429.
 2. Comportement d'`activite_principale` au 1er janvier 2027 (bascule en NAF 2025 quand `activite_principale_naf25` sera supprimé) : non écrit explicitement ; surveiller l'OpenAPI vers décembre 2026. Prévoir aussi la section `V`.
 3. Sémantique de `finances.ca = 0` (nul ou non renseigné) : non documentée.
 4. Champ `nationalite` des dirigeants : `null` dans tous les échantillons, on ignore s'il est jamais renseigné.
