@@ -54,3 +54,16 @@ curl -X POST http://localhost:3000/api/cron/sync-offers -H "Authorization: Beare
 3. **Supabase, base.** Les migrations sont déjà appliquées au projet lié (`npm run db:push` pour les suivantes). Enregistrer dans Vault l'adresse du site et le secret de la synchronisation (section précédente).
 4. **Pages légales.** Remplacer les repères entre crochets des pages `/mentions-legales`, `/confidentialite` et `/conditions` (identité de l'éditeur, contact, hébergeur), puis les faire relire.
 5. **Vérifier.** Créer un compte, finir l'inscription, ouvrir une offre, préparer une candidature, confirmer l'envoi, exporter ses données, supprimer le compte. Contrôler après un quart d'heure la synchronisation (`cron.job_run_details`) et le lendemain la tâche `candidatly-daily-maintenance`.
+
+## Activer la connexion avec Google
+
+Le bouton « Continuer avec Google » n'apparaît que si Google est activé dans le projet Supabase (lecture en direct, mise à jour sous 5 minutes).
+
+1. **Google Cloud Console** (console.cloud.google.com), projet de votre choix : APIs et services > Écran de consentement OAuth, type « Externe », nom Candidatly, email de contact.
+2. APIs et services > Identifiants > Créer des identifiants > ID client OAuth, type « Application Web ». URI de redirection autorisé : `https://ylupsjydkbmryctfrfte.supabase.co/auth/v1/callback`.
+3. **Supabase** : Authentication > Sign In / Providers > Google : activer, coller l'ID client et le code secret générés à l'étape 2, enregistrer. Ne jamais les coller dans une conversation ni dans le dépôt.
+4. **Supabase** : Authentication > URL Configuration : Site URL égale à l'adresse du site, et dans Redirect URLs, `<site>/auth/callback` pour chaque adresse utilisée (`http://localhost:3000` en local, l'adresse Vercel en ligne).
+
+## « La connexion est indisponible : ce site n'est pas encore relié à sa base de données »
+
+Ce message signifie que `NEXT_PUBLIC_SUPABASE_URL` ou `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` manque sur l'environnement. En local : fichier `.env.local` à la racine du projet, puis relancer `npm run dev`. Sur Vercel : Settings > Environment Variables, puis redéployer, car les variables `NEXT_PUBLIC_` sont figées au build.
