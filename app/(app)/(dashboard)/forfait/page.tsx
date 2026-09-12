@@ -8,11 +8,13 @@ import { requireUserId } from "@/lib/auth/session";
 import { loadAccess } from "@/lib/billing/access";
 import { DatabaseError } from "@/lib/errors";
 import { searchSummary } from "@/lib/offers/search-summary";
+import { toTeaserCards } from "@/lib/offers/teaser";
 import { countHiringCompanies, loadPlanCounts } from "@/lib/plan-choice";
 import { PLANS, featuredBadge } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
 
 import { choosePlan } from "./actions";
+import { OfferTeaser } from "./_components/offer-teaser";
 
 export const metadata: Metadata = { title: "Votre forfait" };
 
@@ -23,13 +25,22 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
   const params = await searchParams;
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
-  const [offers, profile, counts, access] = await Promise.all([
+  const [offers, preview, profile, counts, access] = await Promise.all([
     supabase
       .from("matches")
       .select("id, offer:offers!inner(removed_at)", { count: "exact", head: true })
       .eq("user_id", userId)
       .neq("status", "dismissed")
       .is("offer.removed_at", null),
+    // Only coarse columns: the title and the employer never leave the server (C88).
+    supabase
+      .from("matches")
+      .select("score, offer:offers!inner(location_label, contract_types, published_at, removed_at)")
+      .eq("user_id", userId)
+      .neq("status", "dismissed")
+      .is("offer.removed_at", null)
+      .order("score", { ascending: false })
+      .limit(4),
     supabase
       .from("profiles")
       .select("rome_codes, location_lat, location_lng, search_radius_km, diploma_level")
@@ -39,6 +50,7 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
     loadAccess(supabase, userId),
   ]);
   if (offers.error) throw new DatabaseError("matches.count", offers.error);
+  if (preview.error) throw new DatabaseError("matches.preview", preview.error);
   if (profile.error) throw new DatabaseError("profiles.select", profile.error);
   const companies = profile.data ? await countHiringCompanies(supabase, profile.data) : 0;
   const summary = searchSummary(offers.count ?? 0, companies);
@@ -88,6 +100,7 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
         </div>
       ) : (
         <>
+          <OfferTeaser cards={toTeaserCards(preview.data)} />
           <PricingTable badge={featuredBadge(counts)} choose={choosePlan} />
           <p className="mx-auto max-w-2xl text-center text-xs text-muted-foreground">
             Paiement sécurisé par Whop. En formule annuelle, le prix barré est le prix du même

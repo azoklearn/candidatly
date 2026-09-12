@@ -58,6 +58,9 @@ test("a student prepares, sends and tracks an application, then exports their da
   await page.goto("/forfait");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("1 offre");
   await expect(page.getByText("Recommandé")).toBeVisible();
+  // The preview shows the city but never the job title, not even in the HTML (C88).
+  await expect(page.getByText("Vos offres attendent derrière le flou")).toBeVisible();
+  expect(await page.content()).not.toContain(OFFER_TITLE);
   await page.getByRole("button", { name: "Choisir Plus" }).click();
   await expect(page).toHaveURL(/\/offers$/);
 

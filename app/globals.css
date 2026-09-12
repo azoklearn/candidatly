@@ -218,6 +218,19 @@
     white-space: nowrap;
   }
 
+  /* Empty bars standing in for the job title and the employer before payment (C88). */
+  .teaser-bar {
+    display: block;
+    height: 1.1rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--muted), #e2dbcd 60%, var(--muted));
+    filter: blur(3px);
+  }
+  .teaser-bar-small {
+    height: 0.7rem;
+    opacity: 0.75;
+  }
+
   .app-grain {
     position: fixed;
     inset: 0;
