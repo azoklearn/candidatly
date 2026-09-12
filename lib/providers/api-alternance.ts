@@ -206,6 +206,7 @@ export function normalizeHiringCompany(
     lat: hasValidPoint ? lat : null,
     lng: hasValidPoint ? lng : null,
     applyUrl: cleanHttpUrl(recruiter.apply.url),
+    phone: emptyToNull(recruiter.apply.phone),
   };
 }
 

@@ -110,7 +110,7 @@ const SPEC_RECRUITER = {
     size: "10-19",
   },
   apply: {
-    phone: null,
+    phone: " 01 23 45 67 89 ",
     url: "https://labonnealternance.apprentissage.beta.gouv.fr/emploi/recruteurs_lba/12345678901234/atelier",
     recipient_id: null,
   },
@@ -144,6 +144,7 @@ describe("hiring companies", () => {
         lat: 48.850699,
         lng: 2.308628,
         applyUrl: SPEC_RECRUITER.apply.url,
+        phone: "01 23 45 67 89",
       },
     ]);
   });

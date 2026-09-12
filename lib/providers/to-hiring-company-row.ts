@@ -22,6 +22,7 @@ export function toHiringCompanyRow(
     lat: company.lat,
     lng: company.lng,
     apply_url: company.applyUrl,
+    phone: company.phone,
     last_seen_at: seenAt.toISOString(),
   };
 }

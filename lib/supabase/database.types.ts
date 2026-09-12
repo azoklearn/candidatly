@@ -420,6 +420,7 @@ export type Database = {
           naf_code: string | null
           naf_label: string | null
           name: string
+          phone: string | null
           query_key: string
           siret: string | null
           source: Database["public"]["Enums"]["offers_source"]
@@ -438,6 +439,7 @@ export type Database = {
           naf_code?: string | null
           naf_label?: string | null
           name: string
+          phone?: string | null
           query_key: string
           siret?: string | null
           source: Database["public"]["Enums"]["offers_source"]
@@ -456,6 +458,7 @@ export type Database = {
           naf_code?: string | null
           naf_label?: string | null
           name?: string
+          phone?: string | null
           query_key?: string
           siret?: string | null
           source?: Database["public"]["Enums"]["offers_source"]

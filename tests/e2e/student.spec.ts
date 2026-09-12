@@ -20,11 +20,19 @@ test("a student prepares, sends and tracks an application, then exports their da
   await expect(
     seeded.getByRole("link", { name: /Envoyer une candidature spontanée/ }),
   ).toHaveAttribute("href", /labonnealternance/);
+  // The phone published with the company is a real contact channel (C87).
+  await expect(seeded.getByRole("link", { name: /Appeler 01 23 45 67 89/ })).toHaveAttribute(
+    "href",
+    "tel:+33123456789",
+  );
 
   await page.getByRole("link", { name: OFFER_TITLE }).click();
   await expect(
     page.getByText("L’offre ne donne ni SIRET ni nom d’employeur exploitable."),
   ).toBeVisible();
+  // The seeded offer publishes no phone: the card says so instead of inventing a channel.
+  await expect(page.getByText("Contacter le recruteur")).toBeVisible();
+  await expect(page.getByText("Passez par le site de l’offre")).toBeVisible();
   await page.getByRole("button", { name: "Préparer ma candidature" }).click();
 
   await expect(page).toHaveURL(/\/applications\/[0-9a-f-]{36}$/);

@@ -22,6 +22,7 @@ import {
   formatDistance,
 } from "@/lib/format";
 import { readScoreReasons } from "@/lib/matching/reasons";
+import { hasDirectContact, offerContact } from "@/lib/offers/contact";
 import { JobOfferReadSchema } from "@/lib/providers/api-alternance";
 import { createClient } from "@/lib/supabase/server";
 import { toPlainText } from "@/lib/text/html";
@@ -92,6 +93,13 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
     ["Publiée le", formatDate(offer.published_at)],
     ["Expire le", formatDate(offer.expires_at)],
   ].filter((fact): fact is [string, string] => Boolean(fact[1]));
+  // Real channels only: no source gives a recruiter email (docs/QUESTIONS.md C87).
+  const contact = offerContact({
+    phone: job?.apply.phone,
+    applyUrl: job?.apply.url,
+    website: offer.company_website,
+    isDelegated: offer.is_delegated,
+  });
 
   return (
     <div className="grid gap-6">
@@ -203,6 +211,50 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                 >
                   Voir l’offre sur le site d’origine
                 </TrackedLink>
+              ) : null}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Contacter le recruteur</CardTitle>
+              <CardDescription>
+                {hasDirectContact(contact)
+                  ? "Pour poser une question ou relancer après votre candidature."
+                  : "Cette offre ne publie ni téléphone ni site d’entreprise."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              {contact.phone && contact.telHref ? (
+                <>
+                  <TrackedLink
+                    href={contact.telHref}
+                    event={EVENTS.recruiterCalled}
+                    properties={{ emplacement: "offre" }}
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    Appeler {contact.phone}
+                  </TrackedLink>
+                  <p className="text-xs text-muted-foreground">
+                    {contact.phoneOwner === "school"
+                      ? "Numéro du centre de formation qui gère cette offre."
+                      : "Numéro publié avec l’offre par l’employeur."}
+                  </p>
+                </>
+              ) : null}
+              {contact.website ? (
+                <TrackedLink
+                  href={contact.website}
+                  event={EVENTS.offerSiteOpened}
+                  properties={{ emplacement: "entreprise" }}
+                  className="text-sm underline underline-offset-4"
+                >
+                  Site de l’entreprise
+                </TrackedLink>
+              ) : null}
+              {!hasDirectContact(contact) ? (
+                <p className="text-sm text-muted-foreground">
+                  Passez par le site de l’offre : c’est le canal que le recruteur a choisi.
+                </p>
               ) : null}
             </CardContent>
           </Card>

@@ -71,6 +71,8 @@ export type NormalizedHiringCompany = {
   lng: number | null;
   /** Page where the student can send an unsolicited application. */
   applyUrl: string | null;
+  /** Phone of the company, when the source gives one: no source gives an email. */
+  phone: string | null;
 };
 
 export type ProviderWarning = { code: string; message: string };

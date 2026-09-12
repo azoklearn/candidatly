@@ -18,6 +18,10 @@ export function TrackedLink({ event, properties, href, onClick, ...rest }: Track
     track(event, properties);
     onClick?.(click);
   };
+  // tel: and mailto: open an app, not a tab; only web addresses get target="_blank".
+  if (/^(tel|mailto):/.test(href)) {
+    return <a href={href} onClick={handleClick} {...rest} />;
+  }
   if (/^https?:\/\//.test(href)) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" onClick={handleClick} {...rest} />

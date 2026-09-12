@@ -33,15 +33,27 @@ export function HiringCompanyCard({ company }: { company: HiringCompanyCardData 
         {company.sector ? <Tag>{company.sector}</Tag> : null}
         {company.headcount ? <Tag>{company.headcount}</Tag> : null}
       </div>
-      {company.applyUrl ? (
-        <TrackedLink
-          href={company.applyUrl}
-          event={EVENTS.spontaneousApplication}
-          className={`${buttonVariants({ variant: "outline", size: "sm" })} w-fit`}
-        >
-          Envoyer une candidature spontanée <span aria-hidden>↗</span>
-        </TrackedLink>
-      ) : null}
+      <div className="flex flex-wrap gap-2">
+        {company.applyUrl ? (
+          <TrackedLink
+            href={company.applyUrl}
+            event={EVENTS.spontaneousApplication}
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            Envoyer une candidature spontanée <span aria-hidden>↗</span>
+          </TrackedLink>
+        ) : null}
+        {company.telHref && company.phone ? (
+          <TrackedLink
+            href={company.telHref}
+            event={EVENTS.recruiterCalled}
+            properties={{ emplacement: "entreprise" }}
+            className={buttonVariants({ variant: "ghost", size: "sm" })}
+          >
+            Appeler {company.phone}
+          </TrackedLink>
+        ) : null}
+      </div>
     </li>
   );
 }

@@ -1,5 +1,6 @@
 import { NAF_LABELS } from "@/lib/enrichment/naf-labels";
 import { cityFromAddress } from "@/lib/format";
+import { formatPhone, telHref } from "@/lib/offers/contact";
 import { logger } from "@/lib/logger";
 import { haversineKm } from "@/lib/matching/score";
 import type { ProfileDiplomaLevel } from "@/lib/providers/types";
@@ -25,6 +26,8 @@ export type HiringCompanyCardData = {
   city: string | null;
   distanceKm: number | null;
   applyUrl: string | null;
+  phone: string | null;
+  telHref: string | null;
 };
 
 export type HiringCompanyRow = {
@@ -37,6 +40,7 @@ export type HiringCompanyRow = {
   lat: number | null;
   lng: number | null;
   apply_url: string | null;
+  phone?: string | null;
 };
 
 /** "10-19" becomes "10 à 19 salariés"; ranges without employees give null. */
@@ -78,6 +82,8 @@ export function rankHiringCompanies(
           ? null
           : haversineKm(origin, { lat: row.lat, lng: row.lng }),
       applyUrl: row.apply_url,
+      phone: formatPhone(row.phone),
+      telHref: telHref(row.phone),
     }))
     .sort(
       (a, b) =>
@@ -111,7 +117,7 @@ export async function loadHiringCompanies(
   });
   const { data, error } = await db
     .from("hiring_companies")
-    .select("id, name, naf_code, naf_label, headcount, address, lat, lng, apply_url")
+    .select("id, name, naf_code, naf_label, headcount, address, lat, lng, apply_url, phone")
     .eq("query_key", key)
     .limit(200);
   if (error) {

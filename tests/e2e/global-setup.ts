@@ -145,6 +145,7 @@ export default async function globalSetup() {
       lat: STUDENT_SEARCH.lat,
       lng: STUDENT_SEARCH.lng,
       apply_url: `https://labonnealternance.apprentissage.beta.gouv.fr/emploi/recruteurs_lba/e2e-${n}`,
+      phone: "01 23 45 67 89",
       last_seen_at: now,
     })),
   );

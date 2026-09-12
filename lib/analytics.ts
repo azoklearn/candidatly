@@ -22,6 +22,7 @@ export const EVENTS = {
   applicationSent: "Candidature envoyée",
   spontaneousApplication: "Candidature spontanée",
   offerSiteOpened: "Site de l’offre ouvert",
+  recruiterCalled: "Recruteur appelé",
   signupClicked: "Clic inscription",
 } as const;
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];
