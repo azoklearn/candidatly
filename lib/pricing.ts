@@ -27,7 +27,7 @@ export const PLANS: readonly Plan[] = [
     id: "basic",
     name: "Basic",
     tagline: "Pour trouver les bonnes offres",
-    monthlyCents: 1499,
+    monthlyCents: 999,
     features: [
       { label: "Les offres d’alternance de votre zone et de votre domaine" },
       { label: "Un score de correspondance pour chaque offre" },
@@ -39,7 +39,7 @@ export const PLANS: readonly Plan[] = [
     id: "plus",
     name: "Plus",
     tagline: "Pour candidater sans y passer vos soirées",
-    monthlyCents: 2499,
+    monthlyCents: 1499,
     features: [
       { label: "Tout le forfait Basic" },
       { label: "Votre lettre de motivation adaptée à chaque entreprise" },
@@ -53,7 +53,7 @@ export const PLANS: readonly Plan[] = [
     id: "premium",
     name: "Premium",
     tagline: "Pour mettre toutes les chances de votre côté",
-    monthlyCents: 3999,
+    monthlyCents: 1999,
     features: [
       { label: "Tout le forfait Plus" },
       { label: "Recherches illimitées" },

@@ -20,12 +20,12 @@ const listing = (
 });
 
 const OWNER_PLANS = [
-  listing("plan_b_m", 14.99, 30),
-  listing("plan_p_m", 24.99, 30),
-  listing("plan_x_m", 39.99, 30),
-  listing("plan_b_y", 149.9, 365),
-  listing("plan_p_y", 249.9, 365),
-  listing("plan_x_y", 399.9, 365),
+  listing("plan_b_m", 9.99, 30),
+  listing("plan_p_m", 14.99, 30),
+  listing("plan_x_m", 19.99, 30),
+  listing("plan_b_y", 99.9, 365),
+  listing("plan_p_y", 149.9, 365),
+  listing("plan_x_y", 199.9, 365),
 ];
 
 const match = (listings: WhopPlanListing[], explicit?: Record<string, string>) =>
@@ -46,17 +46,17 @@ describe("matchWhopPlans", () => {
       plan: "plus",
       billing: "annual",
       providerPlanId: "plan_p_y",
-      priceCents: 24990,
+      priceCents: 14990,
     });
     expect(result.links).toHaveLength(6);
   });
 
   it("reports plans with another price, period or currency instead of guessing", () => {
     const result = match([
-      listing("plan_b_m", 14.99, 30),
-      listing("plan_p_m", 19.99, 30),
-      listing("plan_x_m", 39.99, 7),
-      listing("plan_usd", 149.9, 365, { currency: "usd" }),
+      listing("plan_b_m", 9.99, 30),
+      listing("plan_p_m", 12.99, 30),
+      listing("plan_x_m", 19.99, 7),
+      listing("plan_usd", 99.9, 365, { currency: "usd" }),
     ]);
     expect(result.links.map((link) => link.providerPlanId)).toEqual(["plan_b_m"]);
     expect(result.missing).toContain("plus:monthly");
@@ -65,7 +65,7 @@ describe("matchWhopPlans", () => {
   });
 
   it("flags two plans at the same price and lets explicit ids decide", () => {
-    const twins = [...OWNER_PLANS, listing("plan_b_m2", 14.99, 30)];
+    const twins = [...OWNER_PLANS, listing("plan_b_m2", 9.99, 30)];
     expect(match(twins).ambiguous).toEqual(["basic:monthly"]);
     const forced = match(twins, { "basic:monthly": "plan_b_m2" });
     expect(forced.ambiguous).toEqual([]);

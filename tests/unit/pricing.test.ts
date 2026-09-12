@@ -19,27 +19,27 @@ const text = (cents: number) => formatEuros(cents).replace(/\s/g, " ");
 
 describe("prices", () => {
   it("keeps the owner's monthly prices, with two free months a year", () => {
-    expect(PLANS.map((p) => p.monthlyCents)).toEqual([1499, 2499, 3999]);
-    expect(PLANS.map(annualCents)).toEqual([14990, 24990, 39990]);
+    expect(PLANS.map((p) => p.monthlyCents)).toEqual([999, 1499, 1999]);
+    expect(PLANS.map(annualCents)).toEqual([9990, 14990, 19990]);
   });
 
   it("shows the monthly price and its price per day", () => {
     expect(priceView(plan("plus"), "monthly")).toEqual({
-      mainCents: 2499,
+      mainCents: 1499,
       struckCents: null,
-      perDayCents: 83,
+      perDayCents: 50,
       billedLabel: null,
     });
-    expect(priceView(plan("basic"), "monthly").perDayCents).toBe(50);
+    expect(priceView(plan("basic"), "monthly").perDayCents).toBe(33);
   });
 
   it("strikes the real monthly price next to the annual price per month", () => {
     const view = priceView(plan("plus"), "annual");
-    expect(view.mainCents).toBe(2083);
-    expect(view.struckCents).toBe(2499);
-    expect(view.perDayCents).toBe(68);
-    expect(view.billedLabel?.replace(/\s/g, " ")).toBe("facturé 249,90 € par an");
-    expect(text(priceView(plan("premium"), "annual").mainCents)).toBe("33,33 €");
+    expect(view.mainCents).toBe(1249);
+    expect(view.struckCents).toBe(1499);
+    expect(view.perDayCents).toBe(41);
+    expect(view.billedLabel?.replace(/\s/g, " ")).toBe("facturé 149,90 € par an");
+    expect(text(priceView(plan("premium"), "annual").mainCents)).toBe("16,66 €");
   });
 });
 

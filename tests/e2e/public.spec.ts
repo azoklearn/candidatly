@@ -20,9 +20,9 @@ test("the landing page and the legal pages are public", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByRole("link", { name: /^Choisir / })).toHaveCount(3);
   // Monthly is shown first; the annual view adds the struck monthly price.
-  await expect(page.getByText("soit 0,83 € par jour")).toBeVisible();
+  await expect(page.getByText("soit 0,50 € par jour")).toBeVisible();
   await page.getByRole("radio", { name: /Annuel/ }).click();
-  await expect(page.getByText("soit 0,68 € par jour")).toBeVisible();
+  await expect(page.getByText("soit 0,41 € par jour")).toBeVisible();
   for (const [path, title] of [
     ["/mentions-legales", "Mentions légales"],
     ["/confidentialite", "Politique de confidentialité"],
