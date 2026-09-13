@@ -19,6 +19,7 @@ const empty: OnboardingSnapshot = {
     location_lat: null,
     location_lng: null,
     onboarding_completed: false,
+    documents_skipped_at: null,
   },
   hasCv: false,
   hasLetter: false,
@@ -53,6 +54,26 @@ describe("onboarding progress", () => {
     expect(firstIncompleteStep(located)).toBe(5);
     expect(firstIncompleteStep({ ...located, hasCv: true })).toBe(5);
     expect(firstIncompleteStep({ ...located, hasCv: true, hasLetter: true })).toBe(6);
+  });
+
+  it("lets students skip the CV and the letter (C89)", () => {
+    const located = {
+      ...withProfile,
+      profile: {
+        ...withProfile.profile,
+        rome_codes: ["M1805"],
+        location_lat: 45.76,
+        location_lng: 4.84,
+      },
+    };
+    const skipped = {
+      ...located,
+      profile: { ...located.profile, documents_skipped_at: "2026-09-13T09:00:00Z" },
+    };
+    expect(firstIncompleteStep(located)).toBe(5);
+    expect(firstIncompleteStep(skipped)).toBe(6);
+    expect(firstIncompleteStep({ ...skipped, hasCv: true })).toBe(6);
+    expect(isStepAccessible(6, skipped)).toBe(true);
   });
 
   it("requires every profile field, blank strings included", () => {

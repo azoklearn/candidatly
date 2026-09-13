@@ -16,7 +16,7 @@ export async function loadOnboarding(supabase: SupabaseClient<Database>, userId:
     supabase
       .from("profiles")
       .select(
-        "first_name, last_name, phone, school, degree_label, diploma_level, target_contract, availability_date, domain_free_text, rome_codes, location_label, location_lat, location_lng, insee_code, search_radius_km, onboarding_completed",
+        "first_name, last_name, phone, school, degree_label, diploma_level, target_contract, availability_date, domain_free_text, rome_codes, location_label, location_lat, location_lng, insee_code, search_radius_km, onboarding_completed, documents_skipped_at",
       )
       .eq("user_id", userId)
       .single(),

@@ -24,6 +24,7 @@ export type OnboardingProfile = Pick<
   | "location_lat"
   | "location_lng"
   | "onboarding_completed"
+  | "documents_skipped_at"
 >;
 
 export type OnboardingSnapshot = { profile: OnboardingProfile; hasCv: boolean; hasLetter: boolean };
@@ -43,7 +44,8 @@ export function completedSteps({ profile, hasCv, hasLetter }: OnboardingSnapshot
   }
   if (profile.rome_codes.length > 0) done.add(3);
   if (profile.location_lat !== null && profile.location_lng !== null) done.add(4);
-  if (hasCv && hasLetter) done.add(5);
+  // The documents are optional: the step is done once both are there or the student skipped it (C89).
+  if ((hasCv && hasLetter) || profile.documents_skipped_at !== null) done.add(5);
   if (profile.onboarding_completed) done.add(6);
   return done;
 }

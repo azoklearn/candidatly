@@ -388,3 +388,18 @@ export async function finishOnboarding(): Promise<void> {
   // What the search found, then the plans (C82).
   redirect("/forfait");
 }
+
+/** The student skips the CV and the letter (C89); both can be added later from the account. */
+export async function skipDocuments(): Promise<void> {
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  const { error } = await supabase
+    .from("profiles")
+    .update({ documents_skipped_at: new Date().toISOString() })
+    .eq("user_id", userId);
+  if (error) {
+    log.error("documents_skip_failed", { code: error.code });
+    redirect("/onboarding/5");
+  }
+  redirect(`/onboarding/${LAST_STEP}`);
+}

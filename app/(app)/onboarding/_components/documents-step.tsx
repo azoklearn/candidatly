@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
-import { registerDocument, saveLetterText, type FormState } from "../actions";
+import { registerDocument, saveLetterText, skipDocuments, type FormState } from "../actions";
 import type { DocumentSummary } from "../data";
 import { FieldError, FieldHint, textareaClassName } from "./fields";
 
@@ -200,7 +201,21 @@ export function DocumentsStep({
           Continuer
         </Link>
       ) : (
-        <FieldHint>Ajoutez votre CV et votre lettre pour continuer.</FieldHint>
+        <div className="grid gap-3">
+          <FieldHint>
+            Avec votre CV, les correspondances sont plus précises. Avec votre lettre, nous
+            l’adaptons à chaque entreprise.
+          </FieldHint>
+          <form action={skipDocuments}>
+            <SubmitButton variant="outline" size="lg" pendingLabel="Un instant…">
+              Passer cette étape
+            </SubmitButton>
+          </form>
+          <FieldHint>
+            Vous pourrez les ajouter plus tard depuis votre compte. Sans lettre de base, la lettre
+            adaptée à chaque offre n’est pas disponible.
+          </FieldHint>
+        </div>
       )}
     </div>
   );

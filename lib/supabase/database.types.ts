@@ -644,6 +644,7 @@ export type Database = {
           diploma_level:
             | Database["public"]["Enums"]["profiles_diploma_level"]
             | null
+          documents_skipped_at: string | null
           domain_free_text: string | null
           email: string | null
           first_name: string | null
@@ -674,6 +675,7 @@ export type Database = {
           diploma_level?:
             | Database["public"]["Enums"]["profiles_diploma_level"]
             | null
+          documents_skipped_at?: string | null
           domain_free_text?: string | null
           email?: string | null
           first_name?: string | null
@@ -704,6 +706,7 @@ export type Database = {
           diploma_level?:
             | Database["public"]["Enums"]["profiles_diploma_level"]
             | null
+          documents_skipped_at?: string | null
           domain_free_text?: string | null
           email?: string | null
           first_name?: string | null

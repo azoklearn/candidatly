@@ -66,7 +66,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
 
   const { data: offer } = await supabase.from("offers").select("*").eq("id", id).maybeSingle();
   if (!offer) notFound();
-  const [{ data: match }, { data: application }] = await Promise.all([
+  const [{ data: match }, { data: application }, { data: baseLetter }] = await Promise.all([
     supabase
       .from("matches")
       .select("score, score_reasons")
@@ -78,6 +78,14 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
       .select("id")
       .eq("user_id", userId)
       .eq("offer_id", id)
+      .maybeSingle(),
+    // The tailored letter starts from the student's base letter, which is optional (C89).
+    supabase
+      .from("documents")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("kind", "cover_letter_base")
+      .eq("is_current", true)
       .maybeSingle(),
   ]);
   const parsed = JobOfferReadSchema.safeParse(offer.raw);
@@ -177,6 +185,16 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                       Voir les forfaits
                     </Link>
                   )}
+                </div>
+              ) : !baseLetter ? (
+                <div className="grid gap-3 rounded-2xl border border-dashed border-foreground/20 p-4 text-sm">
+                  <p>
+                    Ajoutez votre lettre de motivation de base : nous l’adapterons à cette
+                    entreprise en gardant votre style.
+                  </p>
+                  <Link href="/account" className={buttonVariants({ variant: "shiny" })}>
+                    Ajouter ma lettre
+                  </Link>
                 </div>
               ) : (
                 <form action={prepareApplication.bind(null, offer.id)}>
