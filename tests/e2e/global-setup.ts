@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 import { toSearchKey } from "../../lib/offers/search-keys";
 
-import { adminClient, OFFER_TITLE, STATE_FILE, type E2EState } from "./support";
+import { ADMIN_EMAIL, adminClient, OFFER_TITLE, STATE_FILE, type E2EState } from "./support";
 
 /** Search of the seeded students, for the hiring companies shown next to their offers. */
 const STUDENT_SEARCH = {
@@ -131,6 +131,29 @@ export default async function globalSetup() {
       login: `/auth/confirm?type=email&next=/offers&token_hash=${link.data.properties.hashed_token}`,
     };
   }
+  // The admin dashboard is opened by an account whose address is in ADMIN_EMAILS. Its
+  // address is fixed, so a leftover from a failed run is removed first.
+  const existing = await db.auth.admin.listUsers({ perPage: 1000 });
+  for (const user of (existing.data?.users ?? []).filter((u) => u.email === ADMIN_EMAIL)) {
+    await db.auth.admin.deleteUser(user.id);
+  }
+  // A plain account goes with it: it must get a 404 on the same page. Each account keeps
+  // its own link, because generating a second one cancels the first.
+  for (const [role, email] of [
+    ["admin", ADMIN_EMAIL],
+    ["outsider", `e2e-outsider-${run}@example.com`],
+  ] as const) {
+    const created = await db.auth.admin.createUser({ email, email_confirm: true });
+    if (created.error) throw created.error;
+    const link = await db.auth.admin.generateLink({ type: "magiclink", email });
+    if (link.error) throw link.error;
+    users[role] = {
+      id: created.data.user.id,
+      email,
+      login: `/auth/confirm?type=email&next=/admin&token_hash=${link.data.properties.hashed_token}`,
+    };
+  }
+
   const hiring = await db.from("hiring_companies").insert(
     [1, 2].map((n) => ({
       source: "api_alternance" as const,

@@ -7,6 +7,7 @@ export const PROTECTED_PREFIXES = [
   "/credits",
   "/account",
   "/forfait",
+  "/admin",
 ] as const;
 export const AUTH_PAGES = ["/login", "/signup"] as const;
 export const DEFAULT_AFTER_LOGIN = "/offers";

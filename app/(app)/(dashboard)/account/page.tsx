@@ -8,8 +8,10 @@ import { ProfileForm } from "@/app/(app)/onboarding/_components/profile-form";
 import { RomeStep } from "@/app/(app)/onboarding/_components/rome-step";
 import { loadOnboarding } from "@/app/(app)/onboarding/data";
 import { buttonVariants } from "@/components/ui/button";
+import { isAdminEmail } from "@/lib/admin/emails";
 import { requireUserId } from "@/lib/auth/session";
 import { loadAccess } from "@/lib/billing/access";
+import { getAdminEmails } from "@/lib/env";
 import { formatDate } from "@/lib/format";
 import { PLANS } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
@@ -96,6 +98,13 @@ export default async function AccountPage() {
               Choisir un forfait
             </Link>
           )}
+        </Section>
+      ) : null}
+      {isAdminEmail(email, getAdminEmails()) ? (
+        <Section title="Administration">
+          <Link href="/admin" className={buttonVariants({ variant: "outline" }) + " w-fit"}>
+            Ouvrir le tableau de bord
+          </Link>
         </Section>
       ) : null}
       <Section title="Profil">

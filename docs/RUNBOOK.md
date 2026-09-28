@@ -68,6 +68,21 @@ Donner l'accès complet à un compte sans abonnement (owner, testeurs) : `update
 
 Si un paiement n'active rien : `select type, processed_at, created_at from billing_events order by created_at desc limit 10;`. Un événement sans `processed_at` a échoué et Whop le renvoie pendant 3 jours ; une adhésion achetée hors du site (sans métadonnée `user_id`) est ignorée et journalisée `membership_not_linked`.
 
+## Page admin
+
+`/admin` montre l'état du service (comptes, abonnements, revenu mensuel, offres, candidatures). Elle est
+en lecture seule et n'est ouverte qu'aux adresses listées dans `ADMIN_EMAILS`.
+
+1. En local : `ADMIN_EMAILS=votre.adresse@exemple.fr` dans `.env.local` (plusieurs adresses séparées par
+   des virgules).
+2. En production : la même variable dans Vercel (`Project Settings` puis `Environment Variables`), puis
+   un nouveau déploiement.
+3. Sans la variable, la page répond 404 pour tout le monde, y compris l'owner. Le lien vers la page
+   apparaît sur `/compte` uniquement pour les adresses autorisées.
+
+Les chiffres sont lus avec la clé secrète Supabase, donc sans RLS : ne jamais ouvrir cette page à une
+adresse qui n'est pas la vôtre.
+
 ## Mettre le MVP en ligne
 
 Adresse publique depuis le 11 septembre 2026 : https://candidatly.app (DNS chez Vercel), qui redirige vers https://www.candidatly.app. Utilisez l'adresse `www` partout où une adresse est demandée : `NEXT_PUBLIC_SITE_URL`, Site URL de Supabase, secret Vault `candidatly_site_url`. Les Redirect URLs de Supabase doivent lister `/auth/callback` et `/auth/confirm` pour `https://www.candidatly.app` et pour `https://candidatly.vercel.app`, qui reste active.

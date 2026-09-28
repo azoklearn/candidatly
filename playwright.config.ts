@@ -7,6 +7,8 @@ import { defineConfig, devices } from "@playwright/test";
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 const PORT = 3100;
+// Fixed, because the server starts before the seeding: tests/e2e/global-setup.ts.
+const ADMIN_EMAIL = "e2e-admin@example.com";
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -24,7 +26,8 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 300_000,
     // No paywall and no call to Whop during the tests (lib/env.ts, isBillingConfigured).
-    env: { BILLING_DISABLED: "1" },
+    // The admin dashboard opens for the seeded admin account only.
+    env: { BILLING_DISABLED: "1", ADMIN_EMAILS: ADMIN_EMAIL },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

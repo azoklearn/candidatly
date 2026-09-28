@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { parseAdminEmails } from "@/lib/admin/emails";
 import { ConfigError } from "@/lib/errors";
 
 /**
@@ -147,6 +148,12 @@ export function parseCronEnv(source: EnvSource): CronEnv {
 }
 
 export const getCronEnv = memoize(() => parseCronEnv(process.env));
+
+/**
+ * Accounts allowed on /admin (docs/RUNBOOK.md, « Page admin »). Without ADMIN_EMAILS the
+ * page answers 404 for everyone, including the owner.
+ */
+export const getAdminEmails = memoize(() => parseAdminEmails(process.env.ADMIN_EMAILS));
 
 /** Vercel sets VERCEL_URL on its deployments: server-side analytics events exist only there. */
 export function isVercelAnalyticsAvailable(): boolean {
