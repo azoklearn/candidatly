@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, type ReactNode } from "react";
+import { useTransition, type ReactNode, type Ref } from "react";
 
 /**
  * Form that calls a useActionState dispatcher without React's automatic reset,
@@ -10,14 +10,18 @@ export function ActionForm({
   action,
   className,
   children,
+  ref,
 }: {
   action: (formData: FormData) => void;
   className?: string;
   children: ReactNode;
+  /** Set when a step submits the form itself, for example after a click on a city. */
+  ref?: Ref<HTMLFormElement>;
 }) {
   const [, startTransition] = useTransition();
   return (
     <form
+      ref={ref}
       className={className}
       noValidate
       onSubmit={(event) => {

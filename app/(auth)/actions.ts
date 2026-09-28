@@ -10,6 +10,7 @@ import { isGoogleSignInEnabled } from "@/lib/auth/providers";
 import { authRedirectBase, DEFAULT_AFTER_LOGIN, safeNextPath } from "@/lib/auth/routes";
 import { getPublicEnv, isSupabaseConfigured } from "@/lib/env";
 import { applyDraftAfterAuth } from "@/lib/onboarding/apply-draft";
+import { saveDraft } from "@/lib/onboarding/draft-cookie";
 import { logger } from "@/lib/logger";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -76,10 +77,18 @@ export async function signIn(_previous: AuthFormState, formData: FormData): Prom
   redirect(fromDraft ?? safeNextPath(String(formData.get("next") ?? ""), DEFAULT_AFTER_LOGIN));
 }
 
+const NameSchema = z.string().trim().min(1).max(80);
+
 export async function signUp(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const parsed = readCredentials(formData);
   if (!parsed.success) return { fieldErrors: toFieldErrors(parsed.error) };
   if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED };
+  // The account step of the questionnaire asks for the name too (docs/QUESTIONS.md C92).
+  const firstName = NameSchema.safeParse(formData.get("first_name") ?? "");
+  const lastName = NameSchema.safeParse(formData.get("last_name") ?? "");
+  if (firstName.success && lastName.success) {
+    await saveDraft({ first_name: firstName.data, last_name: lastName.data });
+  }
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp(parsed.data);

@@ -124,3 +124,33 @@ export async function resolvePlace(
   const [best] = await searchPlaces(choice.label, { ...options, autocomplete: false, limit: 1 });
   return best && best.citycode === choice.citycode ? best : null;
 }
+
+/**
+ * The city under a pair of coordinates, for the "use my position" button of the
+ * questionnaire (docs/QUESTIONS.md C92).
+ */
+export async function reversePlace(
+  lat: number,
+  lng: number,
+  options: Omit<SearchPlacesOptions, "autocomplete" | "limit" | "type"> = {},
+): Promise<GeocodedPlace | null> {
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  const baseUrl = (options.baseUrl ?? getGeocodingEnv().GEOCODING_API_BASE_URL).replace(/\/+$/, "");
+  const url = new URL(`${baseUrl}/reverse`);
+  url.searchParams.set("lat", lat.toFixed(6));
+  url.searchParams.set("lon", lng.toFixed(6));
+  url.searchParams.set("type", "municipality");
+  url.searchParams.set("limit", "1");
+
+  const { data } = await fetchJson({
+    source: SOURCE,
+    url,
+    schema: SearchResponseSchema,
+    headers: { "User-Agent": USER_AGENT },
+    timeoutMs: TIMEOUT_MS,
+    signal: options.signal,
+    fetchImpl: options.fetchImpl,
+    retry: { maxRetries: 1 },
+  });
+  return data.features.flatMap(toPlace)[0] ?? null;
+}

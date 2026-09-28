@@ -6,20 +6,30 @@ import { signUp } from "@/app/(auth)/actions";
 import { CredentialsForm } from "@/app/(auth)/credentials-form";
 import { GoogleButton, OrSeparator } from "@/app/(auth)/google-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { isGoogleSignInEnabled } from "@/lib/auth/providers";
 import { currentUserId } from "@/lib/auth/session";
 import { isSupabaseConfigured } from "@/lib/env";
 import { draftSnapshot } from "@/lib/onboarding/draft";
 import { readDraft } from "@/lib/onboarding/draft-cookie";
-import { firstIncompleteStep, LAST_STEP, VISITOR_LAST_STEP } from "@/lib/onboarding/state";
+import {
+  ACCOUNT_STEP,
+  DOCUMENTS_STEP,
+  firstIncompleteStep,
+  LAST_STEP,
+  VISITOR_LAST_STEP,
+} from "@/lib/onboarding/state";
 import { createClient } from "@/lib/supabase/server";
+
+import { stepLabel } from "../_components/step-header";
 
 import { loadOnboarding } from "../data";
 
 export const metadata: Metadata = { title: "Créer mon compte" };
 
-const NEXT_STEP = `/onboarding/${VISITOR_LAST_STEP + 1}`;
-const STEP_NUMBER = VISITOR_LAST_STEP + 1;
+const NEXT_STEP = `/onboarding/${DOCUMENTS_STEP}`;
+const STEP_NUMBER = ACCOUNT_STEP;
 
 /**
  * The account is asked once the questions are answered (docs/QUESTIONS.md C91): the
@@ -45,9 +55,7 @@ export default async function AccountStepPage() {
     <main className="mx-auto w-full max-w-2xl px-4 py-10">
       <header className="fade-up mb-8 grid gap-4">
         <div className="flex items-center justify-between">
-          <span className="eyebrow">
-            Étape {STEP_NUMBER} sur {LAST_STEP}
-          </span>
+          <span className="eyebrow">{stepLabel(STEP_NUMBER)}</span>
           <Link
             href={`/onboarding/${VISITOR_LAST_STEP}`}
             className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
@@ -83,7 +91,18 @@ export default async function AccountStepPage() {
             <OrSeparator />
           </>
         ) : null}
-        <CredentialsForm action={signUp} mode="sign-up" next={NEXT_STEP} />
+        <CredentialsForm action={signUp} mode="sign-up" next={NEXT_STEP}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="first_name">Prénom</Label>
+              <Input id="first_name" name="first_name" autoComplete="given-name" required />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="last_name">Nom</Label>
+              <Input id="last_name" name="last_name" autoComplete="family-name" required />
+            </div>
+          </div>
+        </CredentialsForm>
         <p className="text-sm text-muted-foreground">
           Vous avez déjà un compte ?{" "}
           <Link

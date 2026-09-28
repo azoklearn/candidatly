@@ -13,12 +13,11 @@ import {
 import { firstIncompleteStep, VISITOR_LAST_STEP } from "@/lib/onboarding/state";
 
 const answered: OnboardingDraft = {
-  first_name: "Camille",
-  last_name: "Martin",
-  school: "IUT de Lyon",
-  degree_label: "BUT Informatique",
-  diploma_level: "bac+3",
+  target_contract: "alternance",
+  contract_chosen_at: "2026-09-28T09:00:00Z",
+  domain_free_text: "Informatique et numérique",
   rome_codes: ["M1805"],
+  diploma_level: "bac+3",
   location_label: "Lyon",
   location_lat: 45.76,
   location_lng: 4.84,
@@ -52,7 +51,7 @@ describe("questionnaire draft", () => {
   });
 
   it("follows the same progress rules as a profile", () => {
-    expect(firstIncompleteStep(draftSnapshot({}))).toBe(2);
+    expect(firstIncompleteStep(draftSnapshot({}))).toBe(1);
     expect(firstIncompleteStep(draftSnapshot({ ...answered, rome_codes: [] }))).toBe(3);
     // Everything a visitor can answer is answered: the account comes next.
     expect(firstIncompleteStep(draftSnapshot(answered))).toBe(VISITOR_LAST_STEP + 1);

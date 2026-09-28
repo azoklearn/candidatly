@@ -1,14 +1,19 @@
 import Link from "next/link";
 
-import { LAST_STEP, stepTitle } from "@/lib/onboarding/state";
+import { LAST_STEP, stepTitle, VISITOR_LAST_STEP } from "@/lib/onboarding/state";
+
+/** Five questions, then the account and the documents: the count shown says so. */
+export function stepLabel(step: number): string {
+  if (step <= VISITOR_LAST_STEP) return `Question ${step} sur ${VISITOR_LAST_STEP}`;
+  if (step === LAST_STEP) return "Dernière étape";
+  return "Encore un instant";
+}
 
 export function StepHeader({ step }: { step: number }) {
   return (
     <header className="fade-up mb-8 grid gap-4">
       <div className="flex items-center justify-between">
-        <span className="eyebrow">
-          Étape {step} sur {LAST_STEP}
-        </span>
+        <span className="eyebrow">{stepLabel(step)}</span>
         {step > 1 ? (
           <Link
             href={`/onboarding/${step - 1}`}

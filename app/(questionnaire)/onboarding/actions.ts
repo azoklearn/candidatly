@@ -19,12 +19,20 @@ import {
   normalizeExtractedText,
 } from "@/lib/documents/extract-text";
 import { ExternalApiError, ValidationError } from "@/lib/errors";
-import { resolvePlace } from "@/lib/geocoding/geocode";
+import { resolvePlace, reversePlace } from "@/lib/geocoding/geocode";
 import { requestOffersRefresh } from "@/lib/offers/request-refresh";
 import { logger } from "@/lib/logger";
 import { allowAction, RATE_LIMITED_MESSAGE } from "@/lib/rate-limit";
+import { DEFAULT_RADIUS_KM, findPresetCity, RADIUS_OPTIONS } from "@/lib/onboarding/cities";
+import { findDomain } from "@/lib/onboarding/domains";
 import { readDraft, saveDraft } from "@/lib/onboarding/draft-cookie";
-import { ACCOUNT_STEP_PATH, firstIncompleteStep, LAST_STEP } from "@/lib/onboarding/state";
+import {
+  ACCOUNT_STEP,
+  ACCOUNT_STEP_PATH,
+  DOCUMENTS_STEP,
+  firstIncompleteStep,
+  LAST_STEP,
+} from "@/lib/onboarding/state";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database, TablesInsert } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
@@ -66,12 +74,94 @@ function toFieldErrors(error: z.ZodError): Record<string, string> {
   return result;
 }
 
+const optional = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, { error: `${max} caractères maximum.` })
+    .transform((value) => value || null);
+
 const required = (max: number) =>
   z
     .string()
     .trim()
     .min(1, { error: "Ce champ est obligatoire." })
     .max(max, { error: `${max} caractères maximum.` });
+
+const ContractSchema = z.enum(["alternance", "stage", "both"]);
+
+/** Step 1: one click on the kind of contract (docs/QUESTIONS.md C92). */
+export async function saveContract(formData: FormData): Promise<void> {
+  const parsed = ContractSchema.safeParse(read(formData, "value"));
+  if (!parsed.success) redirect("/onboarding/1");
+  const { supabase, userId } = await onboardingContext(formData);
+  const values = {
+    target_contract: parsed.data,
+    contract_chosen_at: new Date().toISOString(),
+  };
+  if (userId) {
+    const { error } = await supabase.from("profiles").update(values).eq("user_id", userId);
+    if (error) log.error("contract_update_failed", { code: error.code });
+  } else {
+    await saveDraft(values);
+  }
+  redirect("/onboarding/2");
+}
+
+/** Step 2: the domain is stored as its label, the field the account page shows as free text. */
+export async function saveDomain(formData: FormData): Promise<void> {
+  const domain = findDomain(read(formData, "value"));
+  if (!domain) redirect("/onboarding/2");
+  const { supabase, userId } = await onboardingContext(formData);
+  if (userId) {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ domain_free_text: domain.label })
+      .eq("user_id", userId);
+    if (error) log.error("domain_update_failed", { code: error.code });
+  } else {
+    await saveDraft({ domain_free_text: domain.label });
+  }
+  redirect("/onboarding/3");
+}
+
+const LevelSchema = z.enum(["bac", "bac+2", "bac+3", "bac+4", "bac+5"]);
+
+/** Step 4: the level of the course being prepared, one click. */
+export async function saveLevel(formData: FormData): Promise<void> {
+  const parsed = LevelSchema.safeParse(read(formData, "value"));
+  if (!parsed.success) redirect("/onboarding/4");
+  const { supabase, userId } = await onboardingContext(formData);
+  if (userId) {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ diploma_level: parsed.data })
+      .eq("user_id", userId);
+    if (error) log.error("level_update_failed", { code: error.code });
+  } else {
+    await saveDraft({ diploma_level: parsed.data });
+  }
+  redirect("/onboarding/5");
+}
+
+const IdentitySchema = z.object({ first_name: required(80), last_name: required(80) });
+
+/** Step 6 for a student who already had an account: only the name is missing. */
+export async function saveIdentity(_previous: FormState, formData: FormData): Promise<FormState> {
+  const parsed = IdentitySchema.safeParse({
+    first_name: read(formData, "first_name"),
+    last_name: read(formData, "last_name"),
+  });
+  if (!parsed.success) return { fieldErrors: toFieldErrors(parsed.error) };
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  const { error } = await supabase.from("profiles").update(parsed.data).eq("user_id", userId);
+  if (error) {
+    log.error("identity_update_failed", { code: error.code });
+    return { error: GENERIC_ERROR };
+  }
+  redirect(`/onboarding/${DOCUMENTS_STEP}`);
+}
 
 const ProfileSchema = z.object({
   first_name: required(80),
@@ -83,8 +173,9 @@ const ProfileSchema = z.object({
       error: "Numéro invalide, par exemple 06 12 34 56 78.",
     })
     .transform((value) => value || null),
-  school: required(120),
-  degree_label: required(120),
+  // School and course are optional since the questionnaire became clicks only (C92).
+  school: optional(120),
+  degree_label: optional(120),
   diploma_level: z.enum(["bac", "bac+2", "bac+3", "bac+4", "bac+5"], {
     error: "Choisissez le niveau du diplôme préparé.",
   }),
@@ -116,21 +207,16 @@ export async function saveProfile(_previous: FormState, formData: FormData): Pro
     ),
   );
   if (!parsed.success) return { fieldErrors: toFieldErrors(parsed.error) };
-  const { supabase, userId } = await onboardingContext(formData);
-  if (userId) {
-    const { error } = await supabase.from("profiles").update(parsed.data).eq("user_id", userId);
-    if (error) {
-      log.error("profile_update_failed", { code: error.code });
-      return { error: GENERIC_ERROR };
-    }
-  } else {
-    await saveDraft(parsed.data);
+  // Since the questionnaire became clicks only (C92), the long form belongs to the account page.
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  const { error } = await supabase.from("profiles").update(parsed.data).eq("user_id", userId);
+  if (error) {
+    log.error("profile_update_failed", { code: error.code });
+    return { error: GENERIC_ERROR };
   }
-  if (read(formData, "mode") === "account") {
-    revalidatePath("/account");
-    return { saved: true };
-  }
-  redirect("/onboarding/3");
+  revalidatePath("/account");
+  return { saved: true };
 }
 
 const DomainSchema = z
@@ -231,44 +317,84 @@ export async function saveRome(_previous: FormState, formData: FormData): Promis
   redirect("/onboarding/4");
 }
 
-const RADIUS_OPTIONS = [10, 20, 30, 50, 100] as const;
-const LocationSchema = z.object({
+const AddressSchema = z.object({
   label: z.string().trim().min(3).max(200),
   citycode: z.string().regex(/^[0-9][0-9AB][0-9]{3}$/),
-  radius: z.coerce
-    .number()
-    .refine((value) => (RADIUS_OPTIONS as readonly number[]).includes(value)),
 });
 
+type PlaceValues = {
+  location_label: string;
+  location_lat: number;
+  location_lng: number;
+  insee_code: string | null;
+  search_radius_km: number;
+};
+
+function readRadius(formData: FormData): number {
+  const value = Number(read(formData, "radius"));
+  return (RADIUS_OPTIONS as readonly number[]).includes(value) ? value : DEFAULT_RADIUS_KM;
+}
+
+/**
+ * Step 5, in three shapes (docs/QUESTIONS.md C92): a city of the list, which calls nothing,
+ * the position of the browser, read back through the geocoder, or a typed address.
+ */
 export async function saveLocation(_previous: FormState, formData: FormData): Promise<FormState> {
-  const parsed = LocationSchema.safeParse({
-    label: read(formData, "label"),
-    citycode: read(formData, "citycode"),
-    radius: read(formData, "radius"),
-  });
-  if (!parsed.success)
-    return { error: "Choisissez une adresse ou une ville dans la liste proposée." };
+  const radius = readRadius(formData);
   const { supabase, userId } = await onboardingContext(formData);
-  if (!userId && !(await allowAnonymousAction("save_location", await headers()))) {
-    return { error: RATE_LIMITED_MESSAGE };
+  const preset = findPresetCity(read(formData, "city"));
+  let values: PlaceValues | null = preset
+    ? {
+        location_label: preset.label,
+        location_lat: preset.lat,
+        location_lng: preset.lng,
+        insee_code: preset.insee,
+        search_radius_km: radius,
+      }
+    : null;
+
+  if (!values) {
+    if (!userId && !(await allowAnonymousAction("save_location", await headers()))) {
+      return { error: RATE_LIMITED_MESSAGE };
+    }
+    const lat = Number(read(formData, "lat"));
+    const lng = Number(read(formData, "lng"));
+    const fromPosition =
+      read(formData, "lat") !== "" && Number.isFinite(lat) && Number.isFinite(lng);
+    const address = fromPosition
+      ? null
+      : AddressSchema.safeParse({
+          label: read(formData, "label"),
+          citycode: read(formData, "citycode"),
+        });
+    if (address && !address.success) {
+      return { error: "Choisissez une ville de la liste ou une adresse proposée." };
+    }
+    let place;
+    try {
+      place = fromPosition ? await reversePlace(lat, lng) : await resolvePlace(address!.data!);
+    } catch (error) {
+      log.warn("geocoding_unavailable", {
+        status: error instanceof ExternalApiError ? error.status : null,
+      });
+      return { error: "Le service d’adresses ne répond pas. Réessayez dans un instant." };
+    }
+    if (!place) {
+      return {
+        error: fromPosition
+          ? "Nous n’avons pas reconnu votre position. Choisissez une ville."
+          : "Adresse introuvable. Choisissez une proposition de la liste.",
+      };
+    }
+    values = {
+      location_label: place.label,
+      location_lat: place.lat,
+      location_lng: place.lng,
+      insee_code: place.citycode,
+      search_radius_km: radius,
+    };
   }
-  let place;
-  try {
-    place = await resolvePlace({ label: parsed.data.label, citycode: parsed.data.citycode });
-  } catch (error) {
-    log.warn("geocoding_unavailable", {
-      status: error instanceof ExternalApiError ? error.status : null,
-    });
-    return { error: "Le service d’adresses ne répond pas. Réessayez dans un instant." };
-  }
-  if (!place) return { error: "Adresse introuvable. Choisissez une proposition de la liste." };
-  const values = {
-    location_label: place.label,
-    location_lat: place.lat,
-    location_lng: place.lng,
-    insee_code: place.citycode,
-    search_radius_km: parsed.data.radius,
-  };
+
   if (!userId) {
     await saveDraft(values);
     // The account comes right after the questions (docs/QUESTIONS.md C91).
@@ -284,7 +410,7 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
     revalidatePath("/account");
     return { saved: true };
   }
-  redirect("/onboarding/5");
+  redirect(`/onboarding/${ACCOUNT_STEP}`);
 }
 
 type Kind = "cv" | "cover_letter_base";
@@ -368,7 +494,7 @@ export async function registerDocument(
     extracted_text: text,
   });
   if (!saved) return { ok: false, error: GENERIC_ERROR };
-  revalidatePath("/onboarding/5");
+  revalidatePath(`/onboarding/${DOCUMENTS_STEP}`);
   revalidatePath("/account");
   return { ok: true };
 }
@@ -394,7 +520,7 @@ export async function saveLetterText(_previous: FormState, formData: FormData): 
     extracted_text: text,
   });
   if (!saved) return { error: GENERIC_ERROR };
-  revalidatePath("/onboarding/5");
+  revalidatePath(`/onboarding/${DOCUMENTS_STEP}`);
   revalidatePath("/account");
   return { saved: true };
 }
@@ -433,7 +559,7 @@ export async function skipDocuments(): Promise<void> {
     .eq("user_id", userId);
   if (error) {
     log.error("documents_skip_failed", { code: error.code });
-    redirect("/onboarding/5");
+    redirect(`/onboarding/${DOCUMENTS_STEP}`);
   }
   redirect(`/onboarding/${LAST_STEP}`);
 }

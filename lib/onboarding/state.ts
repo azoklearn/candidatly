@@ -1,32 +1,37 @@
 import type { Tables } from "@/lib/supabase/database.types";
 
-/** Onboarding steps (brief section 5.1) and progress rules. Step 1, the account, is done at sign-up. */
+/**
+ * The questionnaire (docs/QUESTIONS.md C92): five questions answered with clicks, then the
+ * account, then the CV and the letter. Visitors go through the first five without an
+ * account; the answers wait in a cookie (C91).
+ */
 
 export const ONBOARDING_STEPS = [
-  { step: 1, title: "Bienvenue !" },
-  { step: 2, title: "Parlons de vous" },
-  { step: 3, title: "Quel métier vous attire ?" },
-  { step: 4, title: "Où voulez-vous travailler ?" },
-  { step: 5, title: "Votre CV et votre lettre" },
-  { step: 6, title: "C’est prêt !" },
+  { step: 1, title: "Vous cherchez quoi ?" },
+  { step: 2, title: "Quel domaine vous attire ?" },
+  { step: 3, title: "Quels métiers visez-vous ?" },
+  { step: 4, title: "Où en êtes-vous dans vos études ?" },
+  { step: 5, title: "Où voulez-vous travailler ?" },
+  { step: 6, title: "Votre compte" },
+  { step: 7, title: "Votre CV et votre lettre" },
+  { step: 8, title: "C’est prêt !" },
 ] as const;
 
 export const LAST_STEP = ONBOARDING_STEPS.length;
-/**
- * Visitors answer the first four steps without an account (docs/QUESTIONS.md C91); the CV,
- * the letter and the end of the questionnaire need a profile to write to.
- */
-export const VISITOR_LAST_STEP = 4;
+/** Everything a visitor can answer before the account exists. */
+export const VISITOR_LAST_STEP = 5;
+export const ACCOUNT_STEP = 6;
+export const DOCUMENTS_STEP = 7;
 export const ACCOUNT_STEP_PATH = "/onboarding/compte";
 
 export type OnboardingProfile = Pick<
   Tables<"profiles">,
   | "first_name"
   | "last_name"
-  | "school"
-  | "degree_label"
-  | "diploma_level"
+  | "contract_chosen_at"
+  | "domain_free_text"
   | "rome_codes"
+  | "diploma_level"
   | "location_lat"
   | "location_lng"
   | "onboarding_completed"
@@ -38,21 +43,16 @@ export type OnboardingSnapshot = { profile: OnboardingProfile; hasCv: boolean; h
 const filled = (value: string | null) => (value ?? "").trim().length > 0;
 
 export function completedSteps({ profile, hasCv, hasLetter }: OnboardingSnapshot): Set<number> {
-  const done = new Set<number>([1]);
-  if (
-    filled(profile.first_name) &&
-    filled(profile.last_name) &&
-    filled(profile.school) &&
-    filled(profile.degree_label) &&
-    profile.diploma_level !== null
-  ) {
-    done.add(2);
-  }
+  const done = new Set<number>();
+  if (profile.contract_chosen_at !== null) done.add(1);
+  if (filled(profile.domain_free_text)) done.add(2);
   if (profile.rome_codes.length > 0) done.add(3);
-  if (profile.location_lat !== null && profile.location_lng !== null) done.add(4);
+  if (profile.diploma_level !== null) done.add(4);
+  if (profile.location_lat !== null && profile.location_lng !== null) done.add(5);
+  if (filled(profile.first_name) && filled(profile.last_name)) done.add(ACCOUNT_STEP);
   // The documents are optional: the step is done once both are there or the student skipped it (C89).
-  if ((hasCv && hasLetter) || profile.documents_skipped_at !== null) done.add(5);
-  if (profile.onboarding_completed) done.add(6);
+  if ((hasCv && hasLetter) || profile.documents_skipped_at !== null) done.add(DOCUMENTS_STEP);
+  if (profile.onboarding_completed) done.add(LAST_STEP);
   return done;
 }
 

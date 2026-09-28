@@ -660,6 +660,7 @@ export type Database = {
           billing_exempt: boolean
           chosen_billing: string | null
           chosen_plan: string | null
+          contract_chosen_at: string | null
           created_at: string
           degree_label: string | null
           diploma_level:
@@ -691,6 +692,7 @@ export type Database = {
           billing_exempt?: boolean
           chosen_billing?: string | null
           chosen_plan?: string | null
+          contract_chosen_at?: string | null
           created_at?: string
           degree_label?: string | null
           diploma_level?:
@@ -722,6 +724,7 @@ export type Database = {
           billing_exempt?: boolean
           chosen_billing?: string | null
           chosen_plan?: string | null
+          contract_chosen_at?: string | null
           created_at?: string
           degree_label?: string | null
           diploma_level?:

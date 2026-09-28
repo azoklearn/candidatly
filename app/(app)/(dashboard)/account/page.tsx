@@ -108,7 +108,7 @@ export default async function AccountPage() {
         </Section>
       ) : null}
       <Section title="Profil">
-        <ProfileForm profile={data.profile} mode="account" />
+        <ProfileForm profile={data.profile} />
       </Section>
       <Section
         title="Métiers recherchés"

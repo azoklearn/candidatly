@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, type ReactNode } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -13,9 +13,11 @@ type CredentialsFormProps = {
   action: (state: AuthFormState, formData: FormData) => Promise<AuthFormState>;
   mode: "sign-in" | "sign-up";
   next?: string;
+  /** Fields shown before the address, for example the name at the end of the questionnaire. */
+  children?: ReactNode;
 };
 
-export function CredentialsForm({ action, mode, next }: CredentialsFormProps) {
+export function CredentialsForm({ action, mode, next, children }: CredentialsFormProps) {
   const [state, formAction, pending] = useActionState(action, {});
   // Controlled, so the address survives the automatic form reset after each submission.
   const [email, setEmail] = useState("");
@@ -37,6 +39,7 @@ export function CredentialsForm({ action, mode, next }: CredentialsFormProps) {
           <AlertDescription>{state.error}</AlertDescription>
         </Alert>
       ) : null}
+      {children}
       <div className="grid gap-2">
         <Label htmlFor="email">Adresse email</Label>
         <Input

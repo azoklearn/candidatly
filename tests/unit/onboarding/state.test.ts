@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  ACCOUNT_STEP,
   completedSteps,
   firstIncompleteStep,
   isStepAccessible,
+  LAST_STEP,
   parseStep,
   type OnboardingSnapshot,
 } from "@/lib/onboarding/state";
@@ -12,10 +14,10 @@ const empty: OnboardingSnapshot = {
   profile: {
     first_name: null,
     last_name: null,
-    school: null,
-    degree_label: null,
-    diploma_level: null,
+    contract_chosen_at: null,
+    domain_free_text: null,
     rome_codes: [],
+    diploma_level: null,
     location_lat: null,
     location_lng: null,
     onboarding_completed: false,
@@ -25,73 +27,92 @@ const empty: OnboardingSnapshot = {
   hasLetter: false,
 };
 
-const withProfile: OnboardingSnapshot = {
+const answered: OnboardingSnapshot = {
   ...empty,
   profile: {
     ...empty.profile,
-    first_name: "Camille",
-    last_name: "Martin",
-    school: "IUT de Lyon",
-    degree_label: "BUT Informatique",
+    contract_chosen_at: "2026-09-28T09:00:00Z",
+    domain_free_text: "Informatique et numérique",
+    rome_codes: ["M1805"],
     diploma_level: "bac+3",
+    location_lat: 45.76,
+    location_lng: 4.84,
   },
 };
 
 describe("onboarding progress", () => {
-  it("starts at the profile step right after sign-up", () => {
-    expect([...completedSteps(empty)]).toEqual([1]);
-    expect(firstIncompleteStep(empty)).toBe(2);
+  it("starts at the first question", () => {
+    expect([...completedSteps(empty)]).toEqual([]);
+    expect(firstIncompleteStep(empty)).toBe(1);
   });
 
-  it("moves forward as each step is filled in", () => {
-    expect(firstIncompleteStep(withProfile)).toBe(3);
-    const withRome = { ...withProfile, profile: { ...withProfile.profile, rome_codes: ["M1805"] } };
-    expect(firstIncompleteStep(withRome)).toBe(4);
-    const located = {
-      ...withRome,
-      profile: { ...withRome.profile, location_lat: 45.76, location_lng: 4.84 },
+  it("moves forward one question at a time", () => {
+    const contract = {
+      ...empty,
+      profile: { ...empty.profile, contract_chosen_at: "2026-09-28T09:00:00Z" },
     };
-    expect(firstIncompleteStep(located)).toBe(5);
-    expect(firstIncompleteStep({ ...located, hasCv: true })).toBe(5);
-    expect(firstIncompleteStep({ ...located, hasCv: true, hasLetter: true })).toBe(6);
+    expect(firstIncompleteStep(contract)).toBe(2);
+    const domain = {
+      ...contract,
+      profile: { ...contract.profile, domain_free_text: "Informatique et numérique" },
+    };
+    expect(firstIncompleteStep(domain)).toBe(3);
+    const jobs = { ...domain, profile: { ...domain.profile, rome_codes: ["M1805"] } };
+    expect(firstIncompleteStep(jobs)).toBe(4);
+    const level = { ...jobs, profile: { ...jobs.profile, diploma_level: "bac+3" as const } };
+    expect(firstIncompleteStep(level)).toBe(5);
+    const located = {
+      ...level,
+      profile: { ...level.profile, location_lat: 45.76, location_lng: 4.84 },
+    };
+    // Everything a visitor can answer: the account comes next.
+    expect(firstIncompleteStep(located)).toBe(ACCOUNT_STEP);
+  });
+
+  it("asks the name once, then the documents", () => {
+    const named = {
+      ...answered,
+      profile: { ...answered.profile, first_name: "Camille", last_name: "Martin" },
+    };
+    expect(firstIncompleteStep(named)).toBe(ACCOUNT_STEP + 1);
+    expect(firstIncompleteStep({ ...named, hasCv: true })).toBe(ACCOUNT_STEP + 1);
+    expect(firstIncompleteStep({ ...named, hasCv: true, hasLetter: true })).toBe(LAST_STEP);
   });
 
   it("lets students skip the CV and the letter (C89)", () => {
-    const located = {
-      ...withProfile,
+    const named = {
+      ...answered,
       profile: {
-        ...withProfile.profile,
-        rome_codes: ["M1805"],
-        location_lat: 45.76,
-        location_lng: 4.84,
+        ...answered.profile,
+        first_name: "Camille",
+        last_name: "Martin",
+        documents_skipped_at: "2026-09-13T09:00:00Z",
       },
     };
-    const skipped = {
-      ...located,
-      profile: { ...located.profile, documents_skipped_at: "2026-09-13T09:00:00Z" },
-    };
-    expect(firstIncompleteStep(located)).toBe(5);
-    expect(firstIncompleteStep(skipped)).toBe(6);
-    expect(firstIncompleteStep({ ...skipped, hasCv: true })).toBe(6);
-    expect(isStepAccessible(6, skipped)).toBe(true);
+    expect(firstIncompleteStep(named)).toBe(LAST_STEP);
+    expect(isStepAccessible(LAST_STEP, named)).toBe(true);
   });
 
-  it("requires every profile field, blank strings included", () => {
+  it("ignores blank answers", () => {
     expect(
-      firstIncompleteStep({ ...withProfile, profile: { ...withProfile.profile, school: "  " } }),
+      firstIncompleteStep({
+        ...answered,
+        profile: { ...answered.profile, domain_free_text: "  " },
+      }),
     ).toBe(2);
   });
 
   it("lets users revisit earlier steps but not skip ahead", () => {
-    expect(isStepAccessible(1, withProfile)).toBe(true);
-    expect(isStepAccessible(3, withProfile)).toBe(true);
-    expect(isStepAccessible(4, withProfile)).toBe(false);
-    expect(isStepAccessible(0, withProfile)).toBe(false);
+    expect(isStepAccessible(1, answered)).toBe(true);
+    expect(isStepAccessible(5, answered)).toBe(true);
+    expect(isStepAccessible(ACCOUNT_STEP, answered)).toBe(true);
+    expect(isStepAccessible(ACCOUNT_STEP + 1, answered)).toBe(false);
+    expect(isStepAccessible(0, answered)).toBe(false);
   });
 
   it("parses step numbers from the URL", () => {
     expect(parseStep("3")).toBe(3);
-    expect(parseStep("7")).toBeNull();
+    expect(parseStep(String(LAST_STEP + 1))).toBeNull();
     expect(parseStep("abc")).toBeNull();
     expect(parseStep("2.5")).toBeNull();
   });
