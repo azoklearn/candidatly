@@ -32,3 +32,6 @@ supabase/.temp/
 *.pem
 npm-debug.log*
 .idea/
+# Added by `vercel link`; .env.example stays tracked.
+.vercel
+.env*.local
