@@ -9,7 +9,13 @@ const QUESTIONS = [
   "Votre CV et votre lettre de motivation",
 ];
 
-export function WelcomeStep({ firstName }: { firstName: string | null }) {
+export function WelcomeStep({
+  firstName,
+  visitor = false,
+}: {
+  firstName: string | null;
+  visitor?: boolean;
+}) {
   return (
     <div className="grid gap-6">
       <p className="text-lg text-muted-foreground">
@@ -24,6 +30,11 @@ export function WelcomeStep({ firstName }: { firstName: string | null }) {
           </li>
         ))}
       </ul>
+      {visitor ? (
+        <p className="text-sm text-muted-foreground">
+          Deux minutes, sans compte. Vous créerez le vôtre à la fin pour garder vos réponses.
+        </p>
+      ) : null}
       <Link
         href="/onboarding/2"
         className={`${buttonVariants({ variant: "shiny", size: "lg" })} h-12 w-fit px-7 text-base`}

@@ -1,0 +1,100 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+
+import { signUp } from "@/app/(auth)/actions";
+import { CredentialsForm } from "@/app/(auth)/credentials-form";
+import { GoogleButton, OrSeparator } from "@/app/(auth)/google-button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { isGoogleSignInEnabled } from "@/lib/auth/providers";
+import { currentUserId } from "@/lib/auth/session";
+import { isSupabaseConfigured } from "@/lib/env";
+import { draftSnapshot } from "@/lib/onboarding/draft";
+import { readDraft } from "@/lib/onboarding/draft-cookie";
+import { firstIncompleteStep, LAST_STEP, VISITOR_LAST_STEP } from "@/lib/onboarding/state";
+import { createClient } from "@/lib/supabase/server";
+
+import { loadOnboarding } from "../data";
+
+export const metadata: Metadata = { title: "Créer mon compte" };
+
+const NEXT_STEP = `/onboarding/${VISITOR_LAST_STEP + 1}`;
+const STEP_NUMBER = VISITOR_LAST_STEP + 1;
+
+/**
+ * The account is asked once the questions are answered (docs/QUESTIONS.md C91): the
+ * answers are waiting in a cookie and land on the profile as soon as it exists.
+ */
+export default async function AccountStepPage() {
+  const supabase = await createClient();
+  const userId = await currentUserId(supabase);
+  if (userId) {
+    const data = await loadOnboarding(supabase, userId);
+    redirect(
+      data.profile.onboarding_completed
+        ? "/offers"
+        : `/onboarding/${firstIncompleteStep(data.snapshot)}`,
+    );
+  }
+  const draft = await readDraft();
+  const pending = firstIncompleteStep(draftSnapshot(draft));
+  if (pending <= VISITOR_LAST_STEP) redirect(`/onboarding/${pending}`);
+  const google = await isGoogleSignInEnabled();
+
+  return (
+    <main className="mx-auto w-full max-w-2xl px-4 py-10">
+      <header className="fade-up mb-8 grid gap-4">
+        <div className="flex items-center justify-between">
+          <span className="eyebrow">
+            Étape {STEP_NUMBER} sur {LAST_STEP}
+          </span>
+          <Link
+            href={`/onboarding/${VISITOR_LAST_STEP}`}
+            className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
+            <span aria-hidden>← </span>Retour
+          </Link>
+        </div>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-foreground/10" aria-hidden>
+          <div
+            className="h-full rounded-full bg-linear-to-r from-brand-soft to-brand transition-[width] duration-500"
+            style={{ width: `${(STEP_NUMBER / LAST_STEP) * 100}%` }}
+          />
+        </div>
+        <h1 className="page-title">
+          Créez votre <em>compte</em>
+        </h1>
+        <p className="text-muted-foreground">
+          Vos réponses sont gardées. Votre compte sert à retrouver vos offres, vos lettres et le
+          suivi de vos candidatures.
+        </p>
+      </header>
+      <div className="grid gap-4">
+        {!isSupabaseConfigured() ? (
+          <Alert variant="destructive">
+            <AlertDescription>
+              La connexion est indisponible : ce site n’est pas encore relié à sa base de données.
+            </AlertDescription>
+          </Alert>
+        ) : null}
+        {google ? (
+          <>
+            <GoogleButton next={NEXT_STEP} />
+            <OrSeparator />
+          </>
+        ) : null}
+        <CredentialsForm action={signUp} mode="sign-up" next={NEXT_STEP} />
+        <p className="text-sm text-muted-foreground">
+          Vous avez déjà un compte ?{" "}
+          <Link
+            href={`/login?next=${encodeURIComponent(NEXT_STEP)}`}
+            className="font-medium text-foreground underline underline-offset-4"
+          >
+            Se connecter
+          </Link>
+          . Vos réponses seront reprises.
+        </p>
+      </div>
+    </main>
+  );
+}

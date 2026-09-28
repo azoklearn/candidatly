@@ -63,7 +63,7 @@ app/
   (marketing)/page.tsx          accueil provisoire (landing complète en phase 5)
   (auth)/                       login, signup, auth/callback (code OAuth ou PKCE), auth/confirm (token_hash), actions.ts
   (app)/layout.tsx              session obligatoire, vérifiée côté serveur
-  (app)/onboarding/[step]/      parcours d'inscription (phase 2)
+  (questionnaire)/onboarding/   questionnaire ouvert aux visiteurs : [step]/ (1 à 6) et compte/ (création du compte, C91)
   (app)/(dashboard)/            onboarding terminé obligatoire : offers, applications, credits, account
   layout.tsx, not-found.tsx, globals.css
 proxy.ts                        rafraîchit la session Supabase et redirige les visiteurs non connectés
@@ -79,7 +79,7 @@ tests/                          unit/ (Vitest), fixtures/ (réponses API réelle
 docs/                           BRIEF, UNDERSTANDING, QUESTIONS, API_*, ROME, RUNBOOK, reference/
 ```
 
-Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`, `lib/matching`, `lib/offers` (synchronisation, filtres, rafraîchissement), `lib/onboarding`, `lib/rome`, `lib/text`, `lib/cron`, `app/api/geocode`, `app/api/cron/sync-offers`, `scripts/import-rome.ts`, `tests/db`. Ajouts de la phase 3 : `lib/enrichment` (répertoire des entreprises, site web, fiche, cache), `lib/letters` (adaptation, différences), `components/company-card.tsx`, `app/(app)/(dashboard)/applications/[id]`. Ajouts de la phase 4 : `lib/rate-limit.ts`, `lib/letters/follow-up.ts`, `app/(app)/(dashboard)/account`, `app/api/account/export`, `app/(marketing)` (pages légales), `app/(landing)` (page d'accueil de l'owner, CSS isolé sous `.lp`, C77), `tests/e2e`. Ajouts du 28 septembre 2026 : `lib/admin` (adresses autorisées, chiffres, lecture avec la clé secrète) et `app/(app)/admin` (tableau de bord interne, C90).
+Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`, `lib/matching`, `lib/offers` (synchronisation, filtres, rafraîchissement), `lib/onboarding`, `lib/rome`, `lib/text`, `lib/cron`, `app/api/geocode`, `app/api/cron/sync-offers`, `scripts/import-rome.ts`, `tests/db`. Ajouts de la phase 3 : `lib/enrichment` (répertoire des entreprises, site web, fiche, cache), `lib/letters` (adaptation, différences), `components/company-card.tsx`, `app/(app)/(dashboard)/applications/[id]`. Ajouts de la phase 4 : `lib/rate-limit.ts`, `lib/letters/follow-up.ts`, `app/(app)/(dashboard)/account`, `app/api/account/export`, `app/(marketing)` (pages légales), `app/(landing)` (page d'accueil de l'owner, CSS isolé sous `.lp`, C77), `tests/e2e`. Ajouts du 28 septembre 2026 : `lib/onboarding/draft*` et `lib/anon-rate-limit.ts` (questionnaire avant le compte, C91), `lib/admin` (adresses autorisées, chiffres, lecture avec la clé secrète) et `app/(app)/admin` (tableau de bord interne, C90).
 
 ## 6. Conventions
 
@@ -223,3 +223,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-12 : accroche « Trouve ton alternance en quelques clics » qui se retape au clavier en alternant alternance et stage (C86), et carte « Contacter le recruteur » sur la fiche d'offre : téléphone cliquable quand l'API en donne un, site de l'entreprise, colonne `phone` pour les entreprises à fort potentiel d'embauche (C87).
 - 2026-09-11 : événements personnalisés Vercel (C85) : parcours d'inscription, forfaits, paiement, candidatures et clics clés, noms dans `lib/analytics.ts`, envoi serveur par `trackServerEvent`, clics par `TrackedLink`. Enregistrés seulement sur l'offre Vercel Pro.
 - 2026-09-28 : les forfaits s'ouvrent de nouveau sur l'annuel. Page admin `/admin` (C90) : chiffres du service, liste des comptes, derniers paiements et recherches, en lecture seule, réservée aux adresses de `ADMIN_EMAILS` ; lien depuis la page Compte, test de bout en bout du 404 pour les autres comptes.
+- 2026-09-28 : le questionnaire s'ouvre aux visiteurs (C91). Les étapes 1 à 4 se répondent sans compte, les réponses attendent dans un cookie http-only validé par Zod, puis `/onboarding/compte` crée le compte et recopie les réponses sur le profil (aussi à la connexion et au retour de Google). Référentiel ROME lu avec la clé secrète pour les visiteurs, géocodage ouvert avec une limite par adresse IP hachée (`anon_rate_limits`). Correction trouvée au passage : sur l'étape 2, le bouton « Suivant » du deuxième écran envoyait le formulaire au lieu d'afficher la dernière question.

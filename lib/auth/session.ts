@@ -10,3 +10,9 @@ export async function requireUserId(supabase: SupabaseClient<Database>): Promise
   if (!userId) redirect("/login");
   return userId;
 }
+
+/** The signed-in user's id, or null for a visitor: the questionnaire is open to both. */
+export async function currentUserId(supabase: SupabaseClient<Database>): Promise<string | null> {
+  const { data } = await supabase.auth.getClaims();
+  return data?.claims.sub ?? null;
+}

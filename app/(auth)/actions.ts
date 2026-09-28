@@ -9,6 +9,7 @@ import { trackServerEvent } from "@/lib/analytics-server";
 import { isGoogleSignInEnabled } from "@/lib/auth/providers";
 import { authRedirectBase, DEFAULT_AFTER_LOGIN, safeNextPath } from "@/lib/auth/routes";
 import { getPublicEnv, isSupabaseConfigured } from "@/lib/env";
+import { applyDraftAfterAuth } from "@/lib/onboarding/apply-draft";
 import { logger } from "@/lib/logger";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -60,7 +61,7 @@ export async function signIn(_previous: AuthFormState, formData: FormData): Prom
   if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
     log.info("sign_in_failed", { code: error.code });
     return {
@@ -70,7 +71,9 @@ export async function signIn(_previous: AuthFormState, formData: FormData): Prom
           : "Email ou mot de passe incorrect.",
     };
   }
-  redirect(safeNextPath(String(formData.get("next") ?? ""), DEFAULT_AFTER_LOGIN));
+  // Answers given before signing in are copied onto the profile (docs/QUESTIONS.md C91).
+  const fromDraft = data.user ? await applyDraftAfterAuth(supabase, data.user.id) : null;
+  redirect(fromDraft ?? safeNextPath(String(formData.get("next") ?? ""), DEFAULT_AFTER_LOGIN));
 }
 
 export async function signUp(_previous: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -103,7 +106,10 @@ export async function signUp(_previous: AuthFormState, formData: FormData): Prom
     }
   }
   await trackServerEvent(EVENTS.signup, { methode: "email" });
-  redirect("/onboarding/1");
+  const { data: session } = await supabase.auth.getClaims();
+  const userId = session?.claims.sub;
+  const fromDraft = userId ? await applyDraftAfterAuth(supabase, userId) : null;
+  redirect(fromDraft ?? safeNextPath(String(formData.get("next") ?? ""), "/onboarding/1"));
 }
 
 async function confirmNewAccount(userId: string): Promise<boolean> {

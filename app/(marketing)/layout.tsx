@@ -21,7 +21,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
             </Link>
             {/* Wrapped: the button's own inline-flex would override `hidden` on phones. */}
             <span className="hidden sm:inline-flex">
-              <Link href="/signup" className={buttonVariants({ size: "sm" })}>
+              <Link href="/onboarding/1" className={buttonVariants({ size: "sm" })}>
                 Trouver mon stage/alternance
               </Link>
             </span>

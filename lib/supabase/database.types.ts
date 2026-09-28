@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      anon_rate_limits: {
+        Row: {
+          action: string
+          client_hash: string
+          hits: number
+          window_start: string
+        }
+        Insert: {
+          action: string
+          client_hash: string
+          hits?: number
+          window_start: string
+        }
+        Update: {
+          action?: string
+          client_hash?: string
+          hits?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       applications: {
         Row: {
           cover_letter_diff: Json | null
@@ -1030,6 +1051,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_anon_rate_limit: {
+        Args: {
+          p_action: string
+          p_client_hash: string
+          p_limit: number
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
       check_rate_limit: {
         Args: { p_action: string; p_limit: number; p_window_seconds: number }
         Returns: boolean

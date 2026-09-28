@@ -12,6 +12,12 @@ export const ONBOARDING_STEPS = [
 ] as const;
 
 export const LAST_STEP = ONBOARDING_STEPS.length;
+/**
+ * Visitors answer the first four steps without an account (docs/QUESTIONS.md C91); the CV,
+ * the letter and the end of the questionnaire need a profile to write to.
+ */
+export const VISITOR_LAST_STEP = 4;
+export const ACCOUNT_STEP_PATH = "/onboarding/compte";
 
 export type OnboardingProfile = Pick<
   Tables<"profiles">,

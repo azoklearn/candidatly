@@ -209,11 +209,13 @@ export function ProfileForm({
           </Button>
         ) : null}
         {stepped && screen < lastScreen ? (
-          <Button type="button" size="lg" onClick={next}>
+          // Keys, so React replaces the node instead of turning this one into a submit
+          // button while the click is still being handled: it would send the form.
+          <Button key="next" type="button" size="lg" onClick={next}>
             Suivant
           </Button>
         ) : (
-          <Button type="submit" size="lg" disabled={pending}>
+          <Button key="submit" type="submit" size="lg" disabled={pending}>
             {pending ? "Enregistrement…" : mode === "account" ? "Enregistrer" : "Continuer"}
           </Button>
         )}

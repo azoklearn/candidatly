@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { DocumentsStep } from "@/app/(app)/onboarding/_components/documents-step";
-import { LocationStep } from "@/app/(app)/onboarding/_components/location-step";
-import { ProfileForm } from "@/app/(app)/onboarding/_components/profile-form";
-import { RomeStep } from "@/app/(app)/onboarding/_components/rome-step";
-import { loadOnboarding } from "@/app/(app)/onboarding/data";
+import { DocumentsStep } from "@/app/(questionnaire)/onboarding/_components/documents-step";
+import { LocationStep } from "@/app/(questionnaire)/onboarding/_components/location-step";
+import { ProfileForm } from "@/app/(questionnaire)/onboarding/_components/profile-form";
+import { RomeStep } from "@/app/(questionnaire)/onboarding/_components/rome-step";
+import { loadOnboarding } from "@/app/(questionnaire)/onboarding/data";
 import { buttonVariants } from "@/components/ui/button";
 import { isAdminEmail } from "@/lib/admin/emails";
 import { requireUserId } from "@/lib/auth/session";

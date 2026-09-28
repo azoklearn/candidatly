@@ -1,7 +1,7 @@
 /** Route rules shared by the session proxy, the layouts and the auth actions. */
 
+// The questionnaire is open to visitors (docs/QUESTIONS.md C91): it is not listed here.
 export const PROTECTED_PREFIXES = [
-  "/onboarding",
   "/offers",
   "/applications",
   "/credits",

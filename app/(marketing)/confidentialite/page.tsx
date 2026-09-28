@@ -113,10 +113,13 @@ export default function PrivacyPage() {
       </p>
       <h2>Cookies</h2>
       <p>
-        Candidatly n’utilise que les cookies nécessaires à votre session de connexion. La mesure
-        d’audience (Vercel Web Analytics) ne dépose aucun cookie : les visites sont comptées de
-        façon agrégée, et nous retirons des adresses de pages les identifiants et les paramètres
-        avant tout envoi. Aucun traceur publicitaire n’est utilisé.
+        Candidatly n’utilise que les cookies nécessaires à votre session de connexion et, si vous
+        répondez au questionnaire avant de créer votre compte, un cookie qui garde vos réponses
+        pendant 7 jours : il est déposé sur votre navigateur, effacé dès que vos réponses rejoignent
+        votre profil, et vous pouvez le supprimer à tout moment. La mesure d’audience (Vercel Web
+        Analytics) ne dépose aucun cookie : les visites sont comptées de façon agrégée, et nous
+        retirons des adresses de pages les identifiants et les paramètres avant tout envoi. Aucun
+        traceur publicitaire n’est utilisé.
       </p>
       <h2>Sécurité</h2>
       <p>

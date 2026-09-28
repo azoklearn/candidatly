@@ -118,7 +118,7 @@ export function PricingTable({
                 </form>
               ) : (
                 <Link
-                  href="/signup"
+                  href="/onboarding/1"
                   className={cn(
                     buttonVariants({ variant: featured ? "shiny" : "default", size: "lg" }),
                     "w-full",

@@ -2,6 +2,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -9,7 +10,8 @@ import { getAnthropicClient, getModels } from "@/lib/ai/client";
 import { EVENTS } from "@/lib/analytics";
 import { trackServerEvent } from "@/lib/analytics-server";
 import { suggestRomeCodes, toSearchTerms, type RomeSuggestion } from "@/lib/ai/rome-mapping";
-import { requireUserId } from "@/lib/auth/session";
+import { currentUserId, requireUserId } from "@/lib/auth/session";
+import { allowAnonymousAction } from "@/lib/anon-rate-limit";
 import {
   DOCUMENT_MIME_TYPES,
   MAX_DOCUMENT_BYTES,
@@ -21,7 +23,9 @@ import { resolvePlace } from "@/lib/geocoding/geocode";
 import { requestOffersRefresh } from "@/lib/offers/request-refresh";
 import { logger } from "@/lib/logger";
 import { allowAction, RATE_LIMITED_MESSAGE } from "@/lib/rate-limit";
-import { firstIncompleteStep, LAST_STEP } from "@/lib/onboarding/state";
+import { readDraft, saveDraft } from "@/lib/onboarding/draft-cookie";
+import { ACCOUNT_STEP_PATH, firstIncompleteStep, LAST_STEP } from "@/lib/onboarding/state";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database, TablesInsert } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
 
@@ -39,6 +43,19 @@ const PHONE = /^(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}$/;
 const log = logger.child({ area: "onboarding" });
 
 const read = (formData: FormData, key: string) => String(formData.get(key) ?? "");
+
+/**
+ * The questionnaire is open before the account exists (docs/QUESTIONS.md C91): a visitor's
+ * answers go to a cookie, and the reference data is read with the service key, since the
+ * ROME tables are readable by signed-in users only.
+ */
+async function onboardingContext(formData: FormData) {
+  const supabase = await createClient();
+  const userId = await currentUserId(supabase);
+  // The account page always runs with a session behind it.
+  if (!userId && read(formData, "mode") === "account") redirect("/login");
+  return { supabase, userId, reference: userId ? supabase : createAdminClient() };
+}
 
 function toFieldErrors(error: z.ZodError): Record<string, string> {
   const result: Record<string, string> = {};
@@ -99,12 +116,15 @@ export async function saveProfile(_previous: FormState, formData: FormData): Pro
     ),
   );
   if (!parsed.success) return { fieldErrors: toFieldErrors(parsed.error) };
-  const supabase = await createClient();
-  const userId = await requireUserId(supabase);
-  const { error } = await supabase.from("profiles").update(parsed.data).eq("user_id", userId);
-  if (error) {
-    log.error("profile_update_failed", { code: error.code });
-    return { error: GENERIC_ERROR };
+  const { supabase, userId } = await onboardingContext(formData);
+  if (userId) {
+    const { error } = await supabase.from("profiles").update(parsed.data).eq("user_id", userId);
+    if (error) {
+      log.error("profile_update_failed", { code: error.code });
+      return { error: GENERIC_ERROR };
+    }
+  } else {
+    await saveDraft(parsed.data);
   }
   if (read(formData, "mode") === "account") {
     revalidatePath("/account");
@@ -127,10 +147,16 @@ export async function suggestRome(
   if (!parsed.success)
     return { fieldErrors: { domain_free_text: parsed.error.issues[0]?.message ?? "" } };
   const text = parsed.data;
-  const supabase = await createClient();
-  const userId = await requireUserId(supabase);
-  if (!(await allowAction(supabase, "suggest_rome"))) return { error: RATE_LIMITED_MESSAGE };
-  await supabase.from("profiles").update({ domain_free_text: text }).eq("user_id", userId);
+  const { supabase, userId, reference } = await onboardingContext(formData);
+  const allowed = userId
+    ? await allowAction(supabase, "suggest_rome")
+    : await allowAnonymousAction("suggest_rome", await headers());
+  if (!allowed) return { error: RATE_LIMITED_MESSAGE };
+  if (userId) {
+    await supabase.from("profiles").update({ domain_free_text: text }).eq("user_id", userId);
+  } else {
+    await saveDraft({ domain_free_text: text });
+  }
 
   const terms = toSearchTerms(text);
   if (terms.length === 0) {
@@ -138,7 +164,10 @@ export async function suggestRome(
       error: "Précisez votre domaine, par exemple « développement web » ou « comptabilité ».",
     };
   }
-  const candidates = await supabase.rpc("search_rome_candidates", { p_terms: terms, p_limit: 30 });
+  const candidates = await reference.rpc("search_rome_candidates", {
+    p_terms: terms,
+    p_limit: 30,
+  });
   if (candidates.error) {
     log.error("rome_search_failed", { code: candidates.error.code });
     return { error: GENERIC_ERROR };
@@ -146,13 +175,12 @@ export async function suggestRome(
   if (candidates.data.length === 0) {
     return { error: "Aucun métier trouvé pour ces mots. Essayez d’autres termes." };
   }
-  const profile = await supabase
-    .from("profiles")
-    .select("degree_label")
-    .eq("user_id", userId)
-    .single();
+  const diplomaLabel = userId
+    ? (await supabase.from("profiles").select("degree_label").eq("user_id", userId).single()).data
+        ?.degree_label
+    : (await readDraft()).degree_label;
   const result = await suggestRomeCodes(
-    { text, candidates: candidates.data, diplomaLabel: profile.data?.degree_label ?? null },
+    { text, candidates: candidates.data, diplomaLabel: diplomaLabel ?? null },
     { client: getAnthropicClient(), model: getModels().light, logger: log },
   );
   log.info("rome_suggested", {
@@ -173,9 +201,8 @@ export async function saveRome(_previous: FormState, formData: FormData): Promis
     ...new Set(formData.getAll("rome_codes").map(String)),
   ]);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? GENERIC_ERROR };
-  const supabase = await createClient();
-  const userId = await requireUserId(supabase);
-  const known = await supabase
+  const { supabase, userId, reference } = await onboardingContext(formData);
+  const known = await reference
     .from("rome_codes")
     .select("code, rome_version")
     .in("code", parsed.data)
@@ -183,18 +210,20 @@ export async function saveRome(_previous: FormState, formData: FormData): Promis
   if (known.error || known.data.length !== parsed.data.length) {
     return { error: "Un des métiers choisis n’existe pas dans la nomenclature officielle." };
   }
-  const { error } = await supabase
-    .from("profiles")
-    .update({
-      rome_codes: parsed.data,
-      rome_version: Math.max(...known.data.map((row) => row.rome_version)),
-    })
-    .eq("user_id", userId);
-  if (error) {
-    log.error("rome_update_failed", { code: error.code });
-    return { error: GENERIC_ERROR };
+  const values = {
+    rome_codes: parsed.data,
+    rome_version: Math.max(...known.data.map((row) => row.rome_version)),
+  };
+  if (userId) {
+    const { error } = await supabase.from("profiles").update(values).eq("user_id", userId);
+    if (error) {
+      log.error("rome_update_failed", { code: error.code });
+      return { error: GENERIC_ERROR };
+    }
+  } else {
+    await saveDraft(values);
   }
-  if (read(formData, "mode") === "account") {
+  if (userId && read(formData, "mode") === "account") {
     await requestOffersRefresh(userId);
     revalidatePath("/account");
     return { saved: true };
@@ -219,6 +248,10 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
   });
   if (!parsed.success)
     return { error: "Choisissez une adresse ou une ville dans la liste proposée." };
+  const { supabase, userId } = await onboardingContext(formData);
+  if (!userId && !(await allowAnonymousAction("save_location", await headers()))) {
+    return { error: RATE_LIMITED_MESSAGE };
+  }
   let place;
   try {
     place = await resolvePlace({ label: parsed.data.label, citycode: parsed.data.citycode });
@@ -229,18 +262,19 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
     return { error: "Le service d’adresses ne répond pas. Réessayez dans un instant." };
   }
   if (!place) return { error: "Adresse introuvable. Choisissez une proposition de la liste." };
-  const supabase = await createClient();
-  const userId = await requireUserId(supabase);
-  const { error } = await supabase
-    .from("profiles")
-    .update({
-      location_label: place.label,
-      location_lat: place.lat,
-      location_lng: place.lng,
-      insee_code: place.citycode,
-      search_radius_km: parsed.data.radius,
-    })
-    .eq("user_id", userId);
+  const values = {
+    location_label: place.label,
+    location_lat: place.lat,
+    location_lng: place.lng,
+    insee_code: place.citycode,
+    search_radius_km: parsed.data.radius,
+  };
+  if (!userId) {
+    await saveDraft(values);
+    // The account comes right after the questions (docs/QUESTIONS.md C91).
+    redirect(ACCOUNT_STEP_PATH);
+  }
+  const { error } = await supabase.from("profiles").update(values).eq("user_id", userId);
   if (error) {
     log.error("location_update_failed", { code: error.code });
     return { error: GENERIC_ERROR };

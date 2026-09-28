@@ -31,7 +31,9 @@ describe("route guards", () => {
   it("protects the signed-in area only", () => {
     expect(isProtectedPath("/offers")).toBe(true);
     expect(isProtectedPath("/offers/123")).toBe(true);
-    expect(isProtectedPath("/onboarding/2")).toBe(true);
+    // The questionnaire is open to visitors (docs/QUESTIONS.md C91).
+    expect(isProtectedPath("/onboarding/2")).toBe(false);
+    expect(isProtectedPath("/admin")).toBe(true);
     expect(isProtectedPath("/offersx")).toBe(false);
     expect(isProtectedPath("/")).toBe(false);
     expect(isProtectedPath("/login")).toBe(false);

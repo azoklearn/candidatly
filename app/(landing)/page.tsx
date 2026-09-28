@@ -64,7 +64,7 @@ export default async function HomePage({
           </Link>
           <TrackedLink
             className="header-cta"
-            href="/signup"
+            href="/onboarding/1"
             event={EVENTS.signupClicked}
             properties={{ emplacement: "en-tete" }}
           >
@@ -100,7 +100,7 @@ export default async function HomePage({
             <div className="hero-actions">
               <TrackedLink
                 className="shiny-cta"
-                href="/signup"
+                href="/onboarding/1"
                 event={EVENTS.signupClicked}
                 properties={{ emplacement: "hero" }}
               >
@@ -197,7 +197,7 @@ export default async function HomePage({
               </ul>
               <TrackedLink
                 className="button button-dark"
-                href="/signup"
+                href="/onboarding/1"
                 event={EVENTS.signupClicked}
                 properties={{ emplacement: "offres" }}
               >
@@ -343,7 +343,7 @@ export default async function HomePage({
             <div className="final-actions">
               <TrackedLink
                 className="shiny-cta"
-                href="/signup"
+                href="/onboarding/1"
                 event={EVENTS.signupClicked}
                 properties={{ emplacement: "final" }}
               >
