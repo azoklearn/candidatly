@@ -19,10 +19,10 @@ test("the landing page and the legal pages are public", async ({ page }) => {
     page.getByRole("heading", { level: 1, name: "Un forfait pour chaque recherche" }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: /^Choisir / })).toHaveCount(3);
-  // Monthly is shown first; the annual view adds the struck monthly price.
-  await expect(page.getByText("soit 0,50 € par jour")).toBeVisible();
-  await page.getByRole("radio", { name: /Annuel/ }).click();
+  // Annual is shown first with its struck monthly price; monthly is one click away.
   await expect(page.getByText("soit 0,41 € par jour")).toBeVisible();
+  await page.getByRole("radio", { name: "Mensuel" }).click();
+  await expect(page.getByText("soit 0,50 € par jour")).toBeVisible();
   for (const [path, title] of [
     ["/mentions-legales", "Mentions légales"],
     ["/confidentialite", "Politique de confidentialité"],

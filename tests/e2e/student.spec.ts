@@ -69,8 +69,8 @@ test("a student prepares, sends and tracks an application, then exports their da
   const data = await response.json();
   expect(data.profile.first_name).toBe("Camille");
   expect(data.profile.chosen_plan).toBe("plus");
-  // The plans open on monthly billing, so that is what the choice records.
-  expect(data.profile.chosen_billing).toBe("monthly");
+  // The plans open on annual billing, so that is what the choice records.
+  expect(data.profile.chosen_billing).toBe("annual");
   expect(data.applications).toHaveLength(1);
   expect(data.applications[0].status).toBe("replied_positive");
 });

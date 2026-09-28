@@ -18,8 +18,8 @@ import {
 const BILLING_LABELS: Record<Billing, string> = { monthly: "Mensuel", annual: "Annuel" };
 
 /**
- * The three plans with a monthly / annual switch (monthly first, as the owner asked on
- * 12 September 2026). Without `choose`, the buttons lead to sign-up; with it, they record
+ * The three plans with a monthly / annual switch (annual first, as the owner asked on
+ * 28 September 2026). Without `choose`, the buttons lead to sign-up; with it, they record
  * the plan (C82).
  */
 export function PricingTable({
@@ -29,7 +29,7 @@ export function PricingTable({
   badge: FeaturedBadge;
   choose?: (formData: FormData) => Promise<void>;
 }) {
-  const [billing, setBilling] = useState<Billing>("monthly");
+  const [billing, setBilling] = useState<Billing>("annual");
 
   return (
     <div className="grid gap-8">
