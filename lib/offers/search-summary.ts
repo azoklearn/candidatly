@@ -1,4 +1,7 @@
-/** Sentence shown after the questionnaire, before the plans (docs/QUESTIONS.md C82). */
+/**
+ * Sentence shown after the questionnaire, before the plans (docs/QUESTIONS.md C82). It says
+ * "tu", like the questionnaire it follows (C93).
+ */
 
 export type SearchSummary = {
   before: string;
@@ -13,15 +16,15 @@ const counted = (count: number, one: string, many: string) =>
   `${formatCount(count)} ${count > 1 ? many : one}`;
 
 function companiesPhrase(companies: number): string {
-  return ` qui ${companies > 1 ? "recrutent" : "recrute"} des alternants près de chez vous`;
+  return ` qui ${companies > 1 ? "recrutent" : "recrute"} des alternants près de chez toi`;
 }
 
 export function searchSummary(offers: number, companies: number): SearchSummary {
   if (offers > 0) {
     return {
-      before: "Nous avons trouvé ",
+      before: "On a trouvé ",
       highlight: counted(offers, "offre", "offres"),
-      after: offers > 1 ? " qui correspondent à votre profil" : " qui correspond à votre profil",
+      after: offers > 1 ? " qui collent à ton profil" : " qui colle à ton profil",
       extra:
         companies > 0
           ? `Et ${counted(companies, "entreprise", "entreprises")}${companiesPhrase(companies)}.`
@@ -30,14 +33,14 @@ export function searchSummary(offers: number, companies: number): SearchSummary 
   }
   if (companies > 0) {
     return {
-      before: "Nous avons trouvé ",
+      before: "On a trouvé ",
       highlight: counted(companies, "entreprise", "entreprises"),
       after: companiesPhrase(companies),
       extra: null,
     };
   }
   return {
-    before: "Votre recherche est ",
+    before: "Ta recherche est ",
     highlight: "lancée",
     after: "",
     extra: "De nouvelles offres sont publiées chaque jour.",

@@ -14,7 +14,7 @@ export default async function OnboardingLayout({ children }: { children: ReactNo
   return (
     <div className="min-h-svh">
       <div className="app-grain" aria-hidden />
-      <header className="mx-auto flex w-full max-w-2xl items-center justify-between px-4 pt-6">
+      <header className="mx-auto flex w-full max-w-2xl items-center justify-between px-4 pt-4 sm:pt-6">
         <BrandLink />
         {signedIn ? null : (
           <Link

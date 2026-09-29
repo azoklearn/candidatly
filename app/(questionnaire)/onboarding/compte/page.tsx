@@ -52,7 +52,7 @@ export default async function AccountStepPage() {
   const google = await isGoogleSignInEnabled();
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-10">
+    <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:py-10">
       <header className="fade-up mb-8 grid gap-4">
         <div className="flex items-center justify-between">
           <span className="eyebrow">{stepLabel(STEP_NUMBER)}</span>
@@ -70,11 +70,11 @@ export default async function AccountStepPage() {
           />
         </div>
         <h1 className="page-title">
-          Créez votre <em>compte</em>
+          Crée ton <em>compte</em>
         </h1>
         <p className="text-muted-foreground">
-          Vos réponses sont gardées. Votre compte sert à retrouver vos offres, vos lettres et le
-          suivi de vos candidatures.
+          Tes réponses sont gardées. Ton compte te sert à retrouver tes offres, tes lettres et le
+          suivi de tes candidatures.
         </p>
       </header>
       <div className="grid gap-4">
@@ -104,14 +104,14 @@ export default async function AccountStepPage() {
           </div>
         </CredentialsForm>
         <p className="text-sm text-muted-foreground">
-          Vous avez déjà un compte ?{" "}
+          Tu as déjà un compte ?{" "}
           <Link
             href={`/login?next=${encodeURIComponent(NEXT_STEP)}`}
             className="font-medium text-foreground underline underline-offset-4"
           >
             Se connecter
           </Link>
-          . Vos réponses seront reprises.
+          . Tes réponses sont reprises.
         </p>
       </div>
     </main>

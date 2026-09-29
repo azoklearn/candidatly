@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useState, type CSSProperties } from "react";
 
 import { ActionForm } from "@/components/action-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -39,20 +39,20 @@ export function JobStep({
   return (
     <ActionForm action={action} className="grid gap-5">
       <p className="text-sm text-muted-foreground">
-        {domainLabel} · choisissez jusqu’à {MAX_CODES} métiers.{" "}
+        {domainLabel} · choisis-en jusqu’à {MAX_CODES}.{" "}
         <Link href="/onboarding/2" className="underline underline-offset-4">
           Changer de domaine
         </Link>
       </p>
       <ul className="grid gap-2 sm:grid-cols-2">
-        {jobs.map((job) => {
+        {jobs.map((job, index) => {
           const isChecked = checked.includes(job.code);
           const full = !isChecked && checked.length >= MAX_CODES;
           return (
-            <li key={job.code}>
+            <li key={job.code} className="q-in" style={{ "--i": index } as CSSProperties}>
               <label
                 className={cn(
-                  "flex h-full cursor-pointer items-start gap-3 rounded-2xl border bg-card p-4 text-sm transition-colors hover:bg-muted/40",
+                  "q-card flex h-full min-h-16 cursor-pointer items-start gap-3 rounded-2xl border bg-card p-4 text-sm hover:bg-muted/40",
                   isChecked && "border-foreground bg-primary/5",
                   full && "cursor-not-allowed opacity-50",
                 )}

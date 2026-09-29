@@ -65,15 +65,15 @@ describe("featuredBadge", () => {
 describe("searchSummary", () => {
   it("counts the offers first, then the companies", () => {
     expect(searchSummary(37, 150)).toEqual({
-      before: "Nous avons trouvé ",
+      before: "On a trouvé ",
       highlight: "37 offres",
-      after: " qui correspondent à votre profil",
-      extra: "Et 150 entreprises qui recrutent des alternants près de chez vous.",
+      after: " qui collent à ton profil",
+      extra: "Et 150 entreprises qui recrutent des alternants près de chez toi.",
     });
-    expect(searchSummary(1, 0).after).toBe(" qui correspond à votre profil");
+    expect(searchSummary(1, 0).after).toBe(" qui colle à ton profil");
     expect(searchSummary(0, 1)).toMatchObject({
       highlight: "1 entreprise",
-      after: " qui recrute des alternants près de chez vous",
+      after: " qui recrute des alternants près de chez toi",
     });
   });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useRef, useState, type CSSProperties } from "react";
 import { z } from "zod";
 
 import { ActionForm } from "@/components/action-form";
@@ -72,7 +72,7 @@ export function CityStep({
   function useMyPosition() {
     setPositionError(null);
     if (!navigator.geolocation) {
-      setPositionError("Votre navigateur ne donne pas votre position. Choisissez une ville.");
+      setPositionError("Ton navigateur ne donne pas ta position. Choisis une ville.");
       return;
     }
     setLocating(true);
@@ -86,7 +86,7 @@ export function CityStep({
       },
       () => {
         setLocating(false);
-        setPositionError("Nous n’avons pas pu lire votre position. Choisissez une ville.");
+        setPositionError("On n’a pas pu lire ta position. Choisis une ville.");
       },
       { timeout: 10_000, maximumAge: 60_000 },
     );
@@ -129,7 +129,7 @@ export function CityStep({
       <input type="hidden" name="radius" value={radius} readOnly />
 
       <fieldset className="grid gap-2">
-        <legend className="mb-2 text-sm font-medium">Jusqu’à quelle distance ?</legend>
+        <legend className="mb-2 text-sm font-medium">Jusqu’où tu peux aller ?</legend>
         <div className="flex flex-wrap gap-2">
           {RADIUS_OPTIONS.map((option) => (
             <button
@@ -138,7 +138,7 @@ export function CityStep({
               onClick={() => setRadius(option)}
               aria-pressed={radius === option}
               className={cn(
-                "rounded-full border px-4 py-1.5 text-sm transition-colors hover:bg-muted/60",
+                "q-card min-h-11 rounded-full border px-4 py-2 text-sm hover:bg-muted/60",
                 radius === option && "border-foreground bg-foreground text-background",
               )}
             >
@@ -163,16 +163,17 @@ export function CityStep({
       </div>
 
       <div className="grid gap-3">
-        <p className="text-sm font-medium">Ou choisissez une ville</p>
+        <p className="text-sm font-medium">Ou choisis ta ville</p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {PRESET_CITIES.map((city) => (
+          {PRESET_CITIES.map((city, index) => (
             <button
               key={city.id}
               type="button"
               disabled={busy}
+              style={{ "--i": index } as CSSProperties}
               onClick={() => submitWith({ city: city.id })}
               className={cn(
-                "rounded-2xl border bg-card p-3 text-sm font-medium transition-colors hover:border-foreground hover:bg-muted/40 disabled:opacity-60",
+                "q-card q-in min-h-14 rounded-2xl border bg-card p-3 text-sm font-medium hover:border-foreground hover:bg-muted/40 disabled:opacity-60",
                 initialLabel === city.label && "border-foreground bg-primary/5",
               )}
             >
@@ -184,7 +185,7 @@ export function CityStep({
 
       {other ? (
         <div className="grid gap-2">
-          <Label htmlFor="place">Votre ville ou votre adresse</Label>
+          <Label htmlFor="place">Ta ville ou ton adresse</Label>
           <Input
             id="place"
             value={query}
@@ -194,7 +195,7 @@ export function CityStep({
             placeholder="Par exemple : Angers, ou 10 rue de la Paix, Angers"
           />
           <p id="place-status" className="text-sm text-muted-foreground" aria-live="polite">
-            {searching ? "Recherche…" : "Tapez au moins 3 caractères, puis choisissez."}
+            {searching ? "Recherche…" : "Tape au moins 3 lettres, puis choisis."}
           </p>
           {places.length > 0 ? (
             <ul className="grid gap-1 rounded-xl border p-1">
@@ -226,7 +227,7 @@ export function CityStep({
           onClick={() => setOther(true)}
           className="w-fit text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
         >
-          Une autre ville ?
+          Ma ville n’est pas là
         </button>
       )}
 

@@ -46,7 +46,7 @@ export type RomeSuggestState = FormState & {
 };
 export type DocumentResult = { ok: true } | { ok: false; error: string };
 
-const GENERIC_ERROR = "Une erreur est survenue. Réessayez dans un instant.";
+const GENERIC_ERROR = "Une erreur est survenue. Réessaie dans un instant.";
 const PHONE = /^(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}$/;
 const log = logger.child({ area: "onboarding" });
 
@@ -279,8 +279,8 @@ export async function suggestRome(
 
 const RomeSelectionSchema = z
   .array(z.string().regex(/^[A-Z]\d{4}$/))
-  .min(1, { error: "Choisissez au moins un métier." })
-  .max(5, { error: "Choisissez 5 métiers au maximum." });
+  .min(1, { error: "Choisis au moins un métier." })
+  .max(5, { error: "5 métiers au maximum." });
 
 export async function saveRome(_previous: FormState, formData: FormData): Promise<FormState> {
   const parsed = RomeSelectionSchema.safeParse([
@@ -368,7 +368,7 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
           citycode: read(formData, "citycode"),
         });
     if (address && !address.success) {
-      return { error: "Choisissez une ville de la liste ou une adresse proposée." };
+      return { error: "Choisis une ville de la liste ou une adresse proposée." };
     }
     let place;
     try {
@@ -377,13 +377,13 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
       log.warn("geocoding_unavailable", {
         status: error instanceof ExternalApiError ? error.status : null,
       });
-      return { error: "Le service d’adresses ne répond pas. Réessayez dans un instant." };
+      return { error: "Le service d’adresses ne répond pas. Réessaie dans un instant." };
     }
     if (!place) {
       return {
         error: fromPosition
-          ? "Nous n’avons pas reconnu votre position. Choisissez une ville."
-          : "Adresse introuvable. Choisissez une proposition de la liste.",
+          ? "On n’a pas reconnu ta position. Choisis une ville."
+          : "Adresse introuvable. Choisis une proposition de la liste.",
       };
     }
     values = {
@@ -525,7 +525,14 @@ export async function saveLetterText(_previous: FormState, formData: FormData): 
   return { saved: true };
 }
 
-export async function finishOnboarding(): Promise<void> {
+export type FinishResult = { ok: true } | { ok: false; error: string };
+
+/**
+ * Runs the real work behind the analysis screen (docs/QUESTIONS.md C93): the bonus, the
+ * completion flag and the first search. The screen navigates once it answers; a missing
+ * answer sends the student back to its question.
+ */
+export async function finishOnboarding(): Promise<FinishResult> {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
   const { snapshot } = await loadOnboarding(supabase, userId);
@@ -540,13 +547,12 @@ export async function finishOnboarding(): Promise<void> {
     .eq("user_id", userId);
   if (error) {
     log.error("onboarding_completion_failed", { code: error.code });
-    redirect(`/onboarding/${LAST_STEP}?error=1`);
+    return { ok: false, error: "L’analyse n’a pas abouti. Réessaie dans un instant." };
   }
   const refresh = await requestOffersRefresh(userId);
   log.info("onboarding_completed", { refresh });
   await trackServerEvent(EVENTS.onboardingDone);
-  // What the search found, then the plans (C82).
-  redirect("/forfait");
+  return { ok: true };
 }
 
 /** The student skips the CV and the letter (C89); both can be added later from the account. */

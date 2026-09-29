@@ -13,11 +13,11 @@ export function OfferTeaser({ cards }: { cards: TeaserCard[] }) {
       <div className="grid justify-items-center gap-1 text-center">
         <p className="eyebrow">Aperçu</p>
         <h2 id="apercu" className="section-title">
-          Vos offres attendent <em>derrière le flou</em>
+          Tes offres attendent <em>derrière le flou</em>
         </h2>
         <p className="max-w-xl text-sm text-muted-foreground">
           Ville, contrat, fraîcheur et correspondance sont visibles. Les intitulés et les employeurs
-          s’affichent avec votre forfait.
+          s’affichent avec ton forfait.
         </p>
       </div>
       <ul className="grid gap-3 sm:grid-cols-2">

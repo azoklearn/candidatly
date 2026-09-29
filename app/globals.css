@@ -371,6 +371,94 @@
   .fade-up {
     animation: fade-up 0.5s both ease-out;
   }
+
+  /* Questionnaire (docs/QUESTIONS.md C93): answered with the thumb, one question per screen. */
+  .q-card {
+    transition:
+      transform 140ms var(--ease-out-strong),
+      border-color 140ms ease,
+      background-color 140ms ease;
+  }
+  .q-card:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .q-card:hover {
+      transform: translateY(-1px);
+    }
+  }
+  /* Each answer arrives just after the previous one: --i carries its rank. */
+  .q-in {
+    animation: q-in 320ms both var(--ease-out-strong);
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .analysis-ring {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 132px;
+    height: 132px;
+    border-radius: 50%;
+    background: conic-gradient(var(--brand) calc(var(--p, 0) * 1%), var(--muted) 0);
+    transition: background 420ms linear;
+  }
+  .analysis-ring::after {
+    content: "";
+    position: absolute;
+    inset: 9px;
+    border-radius: 50%;
+    background: var(--card);
+  }
+  .analysis-ring > * {
+    position: relative;
+    z-index: 1;
+  }
+  .analysis-line {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0.35;
+    transition:
+      opacity 220ms ease,
+      transform 220ms var(--ease-out-strong);
+    transform: translateY(2px);
+  }
+  .analysis-line[data-state="active"],
+  .analysis-line[data-state="done"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .analysis-check {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: 0.7rem;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      transform 240ms var(--ease-out-strong);
+  }
+  .analysis-line[data-state="done"] .analysis-check {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+    transform: scale(1.06);
+  }
+  .analysis-line[data-state="active"] .analysis-check {
+    border-color: var(--brand);
+    animation: analysis-pulse 1.1s ease-in-out infinite;
+  }
+}
+
+:root {
+  /* Stronger than the built-in curves: enters feel immediate (docs/QUESTIONS.md C93). */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 @keyframes shiny-sweep {
@@ -448,6 +536,27 @@
   }
 }
 
+@keyframes q-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes analysis-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(23, 100, 216, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(23, 100, 216, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .shiny-cta::after,
   .skeleton,
@@ -455,11 +564,15 @@
   .loader-orbit .brand-mark,
   .loader-bar::after,
   .pulse-dot,
-  .fade-up {
+  .fade-up,
+  .q-in,
+  .analysis-line[data-state="active"] .analysis-check {
     animation: none;
   }
   .card-lift:hover,
-  .shiny-cta:hover {
+  .shiny-cta:hover,
+  .q-card:hover,
+  .q-card:active {
     transform: none;
   }
   .loader-messages > span {

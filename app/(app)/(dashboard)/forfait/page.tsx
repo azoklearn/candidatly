@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PricingTable } from "@/components/pricing-table";
+import { ShareResult } from "@/components/share-result";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { requireUserId } from "@/lib/auth/session";
@@ -53,14 +54,15 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
   if (preview.error) throw new DatabaseError("matches.preview", preview.error);
   if (profile.error) throw new DatabaseError("profiles.select", profile.error);
   const companies = profile.data ? await countHiringCompanies(supabase, profile.data) : 0;
-  const summary = searchSummary(offers.count ?? 0, companies);
+  const offerCount = offers.count ?? 0;
+  const summary = searchSummary(offerCount, companies);
   const current = access.paywall ? access.subscription : null;
   const currentName = PLANS.find((plan) => plan.id === current?.plan)?.name;
 
   return (
     <div className="grid gap-12">
       <header className="fade-up grid justify-items-center gap-3 text-center">
-        <p className="eyebrow">Votre recherche est prête</p>
+        <p className="eyebrow">Ta recherche est prête</p>
         <h1 className="page-title max-w-3xl">
           {summary.before}
           <em>{summary.highlight}</em>
@@ -69,15 +71,20 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
         {summary.extra ? <p className="text-muted-foreground">{summary.extra}</p> : null}
         <p className="max-w-xl text-muted-foreground">
           {current
-            ? `Votre forfait ${currentName} est actif.`
-            : "Choisissez votre forfait pour les découvrir et candidater."}
+            ? `Ton forfait ${currentName} est actif.`
+            : "Choisis ton forfait pour les découvrir et candidater."}
         </p>
+        {offerCount > 0 ? (
+          <ShareResult
+            text={`J’ai trouvé ${offerCount} ${offerCount > 1 ? "offres d’alternance" : "offre d’alternance"} près de chez moi en 2 minutes avec Candidatly.`}
+          />
+        ) : null}
       </header>
 
       {params.paiement === "indisponible" ? (
         <Alert variant="destructive" className="mx-auto max-w-xl">
           <AlertDescription>
-            Le paiement n’a pas pu démarrer. Réessayez dans un instant.
+            Le paiement n’a pas pu démarrer. Réessaie dans un instant.
           </AlertDescription>
         </Alert>
       ) : null}

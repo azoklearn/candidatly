@@ -84,7 +84,7 @@ Ajouts de la phase 2 : `lib/ai` (mapping ROME), `lib/documents`, `lib/geocoding`
 ## 6. Conventions
 
 ### Langue
-- Textes UI en français (accents corrects, vouvoiement). Code, commentaires, messages de commit en anglais.
+- Textes UI en français (accents corrects). Vouvoiement dans l'application ; tutoiement dans le tunnel d'entrée (accueil, questionnaire, page compte du questionnaire, page des forfaits), d'où viennent les visiteurs TikTok (C93). Code, commentaires, messages de commit en anglais.
 - Pas de tirets cadratins dans les textes générés ni dans la doc. Dans le JSX, apostrophe typographique `’` (la règle `react/no-unescaped-entities` refuse `'`).
 
 ### Nommage
@@ -225,3 +225,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-09-28 : les forfaits s'ouvrent de nouveau sur l'annuel. Page admin `/admin` (C90) : chiffres du service, liste des comptes, derniers paiements et recherches, en lecture seule, réservée aux adresses de `ADMIN_EMAILS` ; lien depuis la page Compte, test de bout en bout du 404 pour les autres comptes.
 - 2026-09-28 : le questionnaire s'ouvre aux visiteurs (C91). Les étapes 1 à 4 se répondent sans compte, les réponses attendent dans un cookie http-only validé par Zod, puis `/onboarding/compte` crée le compte et recopie les réponses sur le profil (aussi à la connexion et au retour de Google). Référentiel ROME lu avec la clé secrète pour les visiteurs, géocodage ouvert avec une limite par adresse IP hachée (`anon_rate_limits`). Correction trouvée au passage : sur l'étape 2, le bouton « Suivant » du deuxième écran envoyait le formulaire au lieu d'afficher la dernière question.
 - 2026-09-28 : questionnaire simplifié en cinq questions cliquables (C92) : contrat, domaine, métiers du domaine, niveau, ville (position, grandes villes enregistrées, ou recherche d'adresse). Le nom est demandé à la création du compte, l'école et la formation deviennent facultatives et vivent sur la page Compte. `profiles.contract_chosen_at` distingue une réponse de la valeur par défaut.
+- 2026-09-29 : questionnaire pensé pour le trafic TikTok (C93) : tutoiement dans tout le tunnel, cartes d'au moins 64 px qui s'enfoncent au doigt et arrivent en cascade, barre de progression collée en haut sur mobile, écran d'analyse animé à la dernière étape (anneau de progression et cinq étapes qui se cochent pendant que la recherche tourne), bouton « Partager mon résultat » sur la page des forfaits. Parcours complet vérifié sur un écran de téléphone, du premier clic à la page des forfaits.

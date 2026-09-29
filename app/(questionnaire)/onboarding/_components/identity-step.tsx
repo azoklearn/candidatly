@@ -24,7 +24,7 @@ export function IdentityStep({
   return (
     <ActionForm action={action} className="grid gap-5">
       <p className="text-sm text-muted-foreground">
-        Votre nom apparaîtra sur vos lettres de motivation.
+        Ton nom apparaîtra sur tes lettres de motivation.
       </p>
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="grid gap-2">

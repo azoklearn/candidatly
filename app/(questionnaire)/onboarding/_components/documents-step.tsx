@@ -53,7 +53,7 @@ function FileUpload({
       setStatus({
         state: "error",
         message:
-          kind === "cv" ? "Le CV doit être un PDF." : "Utilisez un PDF ou un fichier Word (.docx).",
+          kind === "cv" ? "Le CV doit être un PDF." : "Utilise un PDF ou un fichier Word (.docx).",
       });
       return;
     }
@@ -68,7 +68,7 @@ function FileUpload({
       .storage.from("documents")
       .upload(path, file, { contentType: mimeType });
     if (uploaded.error) {
-      setStatus({ state: "error", message: "L’envoi du fichier a échoué. Réessayez." });
+      setStatus({ state: "error", message: "L’envoi du fichier a échoué. Réessaie." });
       return;
     }
     const result = await registerDocument({
@@ -128,7 +128,7 @@ function LetterText() {
   const [state, action, pending] = useActionState<FormState, FormData>(saveLetterText, {});
   return (
     <ActionForm action={action} className="grid gap-2">
-      <Label htmlFor="letter">Ou collez le texte de votre lettre</Label>
+      <Label htmlFor="letter">Ou colle le texte de ta lettre</Label>
       <textarea
         id="letter"
         name="letter"
@@ -166,7 +166,7 @@ export function DocumentsStep({
   return (
     <div className="grid gap-10">
       <section className="grid gap-3">
-        <h2 className="font-medium">Votre CV</h2>
+        <h2 className="font-medium">Ton CV</h2>
         <FieldHint>
           Au format PDF, 5 Mo au maximum. Il est stocké de façon privée et chiffrée.
         </FieldHint>
@@ -176,15 +176,15 @@ export function DocumentsStep({
           kind="cv"
           accept=".pdf,application/pdf"
           allowed={[PDF]}
-          label={cv ? "Remplacer le CV" : "Choisir votre CV"}
+          label={cv ? "Remplacer le CV" : "Choisir ton CV"}
         />
       </section>
       <section className="grid gap-3">
-        <h2 className="font-medium">Votre lettre de motivation de base</h2>
+        <h2 className="font-medium">Ta lettre de motivation de base</h2>
         <FieldHint>
-          C’est elle que nous adapterons à chaque offre, en gardant votre style. PDF, Word ou texte
-          collé. Astuce : écrivez [entreprise] et [poste] là où ils doivent apparaître, nous les
-          remplirons pour chaque offre.
+          C’est elle qu’on adapte à chaque offre, en gardant ton style. PDF, Word ou texte collé.
+          Astuce : écrivez [entreprise] et [poste] là où ils doivent apparaître, nous les remplirons
+          pour chaque offre.
         </FieldHint>
         <CurrentDocument document={letter} />
         <FileUpload
@@ -203,8 +203,8 @@ export function DocumentsStep({
       ) : (
         <div className="grid gap-3">
           <FieldHint>
-            Avec votre CV, les correspondances sont plus précises. Avec votre lettre, nous
-            l’adaptons à chaque entreprise.
+            Avec ton CV, les correspondances sont plus précises. Avec ta lettre, on l’adaptons à
+            chaque entreprise.
           </FieldHint>
           <form action={skipDocuments}>
             <SubmitButton variant="outline" size="lg" pendingLabel="Un instant…">
@@ -212,7 +212,7 @@ export function DocumentsStep({
             </SubmitButton>
           </form>
           <FieldHint>
-            Vous pourrez les ajouter plus tard depuis votre compte. Sans lettre de base, la lettre
+            Tu pourras les ajouter plus tard depuis ton compte. Sans lettre de base, la lettre
             adaptée à chaque offre n’est pas disponible.
           </FieldHint>
         </div>

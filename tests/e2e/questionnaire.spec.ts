@@ -72,7 +72,7 @@ test("the answers of a visitor land on the profile created at the end", async ({
   const db = adminClient();
   try {
     await page.goto("/onboarding/compte");
-    await expect(page.getByRole("heading", { level: 1, name: "Créez votre compte" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Crée ton compte" })).toBeVisible();
     await page.getByLabel("Prénom").fill("Alex");
     await page.getByLabel("Nom", { exact: true }).fill("Visiteur");
     await page.getByLabel("Adresse email").fill(email);

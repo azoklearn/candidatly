@@ -13,5 +13,5 @@ test("a student signs up and lands on the questionnaire without any email", asyn
     .locator('button[type="submit"]')
     .click();
   await expect(page).toHaveURL(/\/onboarding\/1$/);
-  await expect(page.getByRole("heading", { name: "Vous cherchez quoi ?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Tu cherches quoi ?" })).toBeVisible();
 });

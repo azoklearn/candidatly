@@ -18,7 +18,7 @@ import {
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-import { BonusStep } from "../_components/bonus-step";
+import { AnalysisStep } from "../_components/analysis-step";
 import { ContractStep } from "../_components/contract-step";
 import { CityStep } from "../_components/city-step";
 import { DocumentsStep } from "../_components/documents-step";
@@ -50,7 +50,7 @@ async function jobsOfDomain(domain: JobDomain): Promise<JobOption[]> {
 
 function Shell({ step, children }: { step: number; children: ReactNode }) {
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-10">
+    <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:py-10">
       <StepHeader step={step} />
       {children}
     </main>
@@ -135,7 +135,7 @@ export default async function OnboardingStepPage({
         <IdentityStep firstName={data.profile.first_name} lastName={data.profile.last_name} />
       ) : null}
       {step === 7 ? <DocumentsStep userId={userId} cv={data.cv} letter={data.letter} /> : null}
-      {step === 8 ? <BonusStep failed={Boolean((await searchParams).error)} /> : null}
+      {step === 8 ? <AnalysisStep failed={Boolean((await searchParams).error)} /> : null}
     </Shell>
   );
 }

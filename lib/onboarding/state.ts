@@ -1,20 +1,21 @@
 import type { Tables } from "@/lib/supabase/database.types";
 
 /**
- * The questionnaire (docs/QUESTIONS.md C92): five questions answered with clicks, then the
- * account, then the CV and the letter. Visitors go through the first five without an
- * account; the answers wait in a cookie (C91).
+ * The questionnaire (docs/QUESTIONS.md C92 and C93): five questions answered with the
+ * thumb, then the account, the CV and the letter, and the analysis screen. Visitors go
+ * through the first five without an account; the answers wait in a cookie (C91). The
+ * questionnaire says "tu", like the landing page visitors arrive from.
  */
 
 export const ONBOARDING_STEPS = [
-  { step: 1, title: "Vous cherchez quoi ?" },
-  { step: 2, title: "Quel domaine vous attire ?" },
-  { step: 3, title: "Quels métiers visez-vous ?" },
-  { step: 4, title: "Où en êtes-vous dans vos études ?" },
-  { step: 5, title: "Où voulez-vous travailler ?" },
-  { step: 6, title: "Votre compte" },
-  { step: 7, title: "Votre CV et votre lettre" },
-  { step: 8, title: "C’est prêt !" },
+  { step: 1, title: "Tu cherches quoi ?" },
+  { step: 2, title: "C’est quoi ton domaine ?" },
+  { step: 3, title: "Quels métiers ?" },
+  { step: 4, title: "T’en es où dans tes études ?" },
+  { step: 5, title: "Tu veux bosser où ?" },
+  { step: 6, title: "Ton compte" },
+  { step: 7, title: "Ton CV et ta lettre" },
+  { step: 8, title: "Analyse en cours" },
 ] as const;
 
 export const LAST_STEP = ONBOARDING_STEPS.length;
