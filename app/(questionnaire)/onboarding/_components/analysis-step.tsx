@@ -25,29 +25,8 @@ const LINES = [
 const LINE_MS = 850;
 /** The animation always plays out, even when the server answers first. */
 const MIN_MS = LINES.length * LINE_MS;
-const COUNT_MS = 700;
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-const count = (value: number) => new Intl.NumberFormat("fr-FR").format(value);
-
-/** Counts up to the real number, quickly: the figure itself is never invented. */
-function CountUp({ value }: { value: number }) {
-  const [shown, setShown] = useState(0);
-  useEffect(() => {
-    // Nothing to count up to: the display already starts at zero.
-    if (value <= 0) return;
-    const startedAt = performance.now();
-    let frame = 0;
-    const tick = (time: number) => {
-      const ratio = Math.min(1, (time - startedAt) / COUNT_MS);
-      setShown(Math.round(value * ratio));
-      if (ratio < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [value]);
-  return <span className="tabular-nums">{count(shown)}</span>;
-}
 
 export function AnalysisStep({ next, cta }: { next: string; cta: string }) {
   const [done, setDone] = useState(0);
@@ -81,29 +60,28 @@ export function AnalysisStep({ next, cta }: { next: string; cta: string }) {
 
   if (result?.ok) {
     const { offers, companies } = result.counts;
-    const big = offers > 0 ? offers : companies;
-    const caption =
+    // No figure on this screen (owner, 29 September 2026): the wording only says what was
+    // really found, and stays true when the search came back empty.
+    const found = offers > 0 || companies > 0;
+    const headline = found ? "prête" : "lancée";
+    const message =
       offers > 0
-        ? `${offers > 1 ? "offres qui collent" : "offre qui colle"} à ton profil`
-        : `${companies > 1 ? "entreprises qui recrutent" : "entreprise qui recrute"} des alternants près de chez toi`;
+        ? "On a trouvé des offres qui pourraient t’intéresser !"
+        : companies > 0
+          ? "On a trouvé des entreprises qui recrutent près de chez toi !"
+          : "De nouvelles offres sont publiées chaque jour.";
     const extra =
-      offers > 0 && companies > 0
-        ? `Et ${count(companies)} ${companies > 1 ? "entreprises qui recrutent" : "entreprise qui recrute"} des alternants près de chez toi.`
-        : big === 0
-          ? "De nouvelles offres sont publiées chaque jour."
-          : null;
+      offers > 0 && companies > 0 ? "Et des entreprises qui recrutent près de chez toi." : null;
     return (
       <div className="q-in grid justify-items-center gap-6 py-2 text-center">
         <h1 className="page-title">
-          Ta {big > 0 ? "sélection" : "recherche"} est <em>{big > 0 ? "prête" : "lancée"}</em>
+          Ta {found ? "sélection" : "recherche"} est <em>{headline}</em>
         </h1>
-        {big > 0 ? (
-          <p className="text-6xl font-bold tracking-[-0.05em] text-brand sm:text-7xl">
-            <CountUp value={big} />
-          </p>
-        ) : null}
+        <div className="analysis-ring" style={{ "--p": 100 } as CSSProperties} aria-hidden>
+          <span className="text-3xl font-bold text-brand">✓</span>
+        </div>
         <div className="grid gap-2">
-          {big > 0 ? <p className="section-title">{caption}</p> : null}
+          <p className="section-title">{message}</p>
           {extra ? <p className="text-sm text-muted-foreground">{extra}</p> : null}
         </div>
         <Link

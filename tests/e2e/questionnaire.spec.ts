@@ -73,8 +73,8 @@ test("the answers of a visitor land on the profile created at the end", async ({
   try {
     await page.goto("/onboarding/compte");
     await expect(page.getByRole("heading", { level: 1, name: "Crée ton compte" })).toBeVisible();
-    // What the analysis found stays on screen, as the reason to sign up (C94).
-    await expect(page.getByText(/7 offres t’attendent/)).toBeVisible();
+    // The promise of the analysis stays on screen, without a figure (C94).
+    await expect(page.getByText(/Tes offres t’attendent/)).toBeVisible();
     await page.getByLabel("Prénom").fill("Alex");
     await page.getByLabel("Nom", { exact: true }).fill("Visiteur");
     await page.getByLabel("Adresse email").fill(email);

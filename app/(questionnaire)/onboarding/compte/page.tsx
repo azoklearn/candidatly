@@ -77,7 +77,7 @@ export default async function AccountStepPage() {
         </h1>
         <p className="text-muted-foreground">
           {found > 0
-            ? `${found} ${found > 1 ? "offres t’attendent" : "offre t’attend"} : ton compte sert à les retrouver, avec tes lettres et le suivi de tes candidatures.`
+            ? "Tes offres t’attendent : ton compte sert à les retrouver, avec tes lettres et le suivi de tes candidatures."
             : "Tes réponses sont gardées. Ton compte te sert à retrouver tes offres, tes lettres et le suivi de tes candidatures."}
         </p>
       </header>
