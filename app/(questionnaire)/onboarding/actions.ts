@@ -20,15 +20,17 @@ import {
 } from "@/lib/documents/extract-text";
 import { ExternalApiError, ValidationError } from "@/lib/errors";
 import { resolvePlace, reversePlace } from "@/lib/geocoding/geocode";
+import { analyseSearch, type AnalysisCounts } from "@/lib/offers/analysis";
 import { requestOffersRefresh } from "@/lib/offers/request-refresh";
+import { createApiAlternanceProvider } from "@/lib/providers/api-alternance";
 import { logger } from "@/lib/logger";
 import { allowAction, RATE_LIMITED_MESSAGE } from "@/lib/rate-limit";
 import { DEFAULT_RADIUS_KM, findPresetCity, RADIUS_OPTIONS } from "@/lib/onboarding/cities";
 import { findDomain } from "@/lib/onboarding/domains";
+import { draftProfileValuesForAnalysis } from "@/lib/onboarding/draft";
 import { readDraft, saveDraft } from "@/lib/onboarding/draft-cookie";
 import {
-  ACCOUNT_STEP,
-  ACCOUNT_STEP_PATH,
+  ANALYSIS_PATH,
   DOCUMENTS_STEP,
   firstIncompleteStep,
   LAST_STEP,
@@ -397,8 +399,8 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
 
   if (!userId) {
     await saveDraft(values);
-    // The account comes right after the questions (docs/QUESTIONS.md C91).
-    redirect(ACCOUNT_STEP_PATH);
+    // The analysis comes right after the questions, the account after it (C94).
+    redirect(ANALYSIS_PATH);
   }
   const { error } = await supabase.from("profiles").update(values).eq("user_id", userId);
   if (error) {
@@ -410,7 +412,7 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
     revalidatePath("/account");
     return { saved: true };
   }
-  redirect(`/onboarding/${ACCOUNT_STEP}`);
+  redirect(ANALYSIS_PATH);
 }
 
 type Kind = "cv" | "cover_letter_base";
@@ -525,14 +527,55 @@ export async function saveLetterText(_previous: FormState, formData: FormData): 
   return { saved: true };
 }
 
-export type FinishResult = { ok: true } | { ok: false; error: string };
+export type AnalysisResult = { ok: true; counts: AnalysisCounts } | { ok: false; error: string };
 
 /**
- * Runs the real work behind the analysis screen (docs/QUESTIONS.md C93): the bonus, the
- * completion flag and the first search. The screen navigates once it answers; a missing
- * answer sends the student back to its question.
+ * The work behind the analysis screen (docs/QUESTIONS.md C94), run before the account
+ * exists: the search of the questionnaire, then the count of the offers that match and of
+ * the companies hiring nearby. A missing answer sends the student back to its question.
  */
-export async function finishOnboarding(): Promise<FinishResult> {
+export async function analyseQuestionnaire(): Promise<AnalysisResult> {
+  const supabase = await createClient();
+  const userId = await currentUserId(supabase);
+  const profile = userId
+    ? (await loadOnboarding(supabase, userId)).profile
+    : draftProfileValuesForAnalysis(await readDraft());
+  if (
+    profile.rome_codes.length === 0 ||
+    profile.location_lat === null ||
+    profile.location_lng === null
+  ) {
+    redirect("/onboarding/1");
+  }
+  // Visitors pay no account: the search behind them is limited by address (C91).
+  const allowSearch = userId ? true : await allowAnonymousAction("analyse", await headers());
+  try {
+    const counts = await analyseSearch({
+      db: createAdminClient(),
+      provider: createApiAlternanceProvider({ logger: log }),
+      profile: {
+        romeCodes: profile.rome_codes,
+        lat: profile.location_lat,
+        lng: profile.location_lng,
+        radiusKm: profile.search_radius_km,
+        diplomaLevel: profile.diploma_level,
+      },
+      now: new Date(),
+      allowSearch,
+      logger: log,
+    });
+    if (!userId) {
+      await saveDraft({ found_offers: counts.offers, found_companies: counts.companies });
+    }
+    return { ok: true, counts };
+  } catch (error) {
+    log.error("analysis_failed", { error });
+    return { ok: false, error: "L’analyse n’a pas abouti. Réessaie dans un instant." };
+  }
+}
+
+/** Grants the bonus, marks the questionnaire done and runs the student's own first search. */
+async function completeOnboarding(): Promise<never> {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
   const { snapshot } = await loadOnboarding(supabase, userId);
@@ -547,12 +590,18 @@ export async function finishOnboarding(): Promise<FinishResult> {
     .eq("user_id", userId);
   if (error) {
     log.error("onboarding_completion_failed", { code: error.code });
-    return { ok: false, error: "L’analyse n’a pas abouti. Réessaie dans un instant." };
+    redirect(`/onboarding/${LAST_STEP}?error=1`);
   }
+  // The search of the questionnaire already warmed the cache: this mostly scores offers.
   const refresh = await requestOffersRefresh(userId);
   log.info("onboarding_completed", { refresh });
   await trackServerEvent(EVENTS.onboardingDone);
-  return { ok: true };
+  redirect("/forfait");
+}
+
+/** Last step: the student keeps their documents and goes to their results. */
+export async function finishOnboarding(): Promise<void> {
+  await completeOnboarding();
 }
 
 /** The student skips the CV and the letter (C89); both can be added later from the account. */
@@ -565,7 +614,7 @@ export async function skipDocuments(): Promise<void> {
     .eq("user_id", userId);
   if (error) {
     log.error("documents_skip_failed", { code: error.code });
-    redirect(`/onboarding/${DOCUMENTS_STEP}`);
+    redirect(`/onboarding/${DOCUMENTS_STEP}?error=1`);
   }
-  redirect(`/onboarding/${LAST_STEP}`);
+  await completeOnboarding();
 }

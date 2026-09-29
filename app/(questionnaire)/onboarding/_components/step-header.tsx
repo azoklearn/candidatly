@@ -6,7 +6,7 @@ import { LAST_STEP, stepTitle, VISITOR_LAST_STEP } from "@/lib/onboarding/state"
 export function stepLabel(step: number): string {
   if (step <= VISITOR_LAST_STEP) return `Question ${step} sur ${VISITOR_LAST_STEP}`;
   if (step === LAST_STEP) return "Dernière étape";
-  return "Encore un instant";
+  return "Plus qu’un pas";
 }
 
 export function StepHeader({ step }: { step: number }) {

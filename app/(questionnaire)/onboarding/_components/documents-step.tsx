@@ -1,16 +1,22 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { ActionForm } from "@/components/action-form";
+import { PendingOverlay } from "@/components/pending-overlay";
 import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
-import { registerDocument, saveLetterText, skipDocuments, type FormState } from "../actions";
+import {
+  finishOnboarding,
+  registerDocument,
+  saveLetterText,
+  skipDocuments,
+  type FormState,
+} from "../actions";
 import type { DocumentSummary } from "../data";
 import { FieldError, FieldHint, textareaClassName } from "./fields";
 
@@ -156,11 +162,14 @@ export function DocumentsStep({
   cv,
   letter,
   showContinue = true,
+  failed = false,
 }: {
   userId: string;
   cv: DocumentSummary | null;
   letter: DocumentSummary | null;
   showContinue?: boolean;
+  /** The last attempt to open the results did not go through. */
+  failed?: boolean;
 }) {
   const ready = cv !== null && letter !== null;
   return (
@@ -183,8 +192,8 @@ export function DocumentsStep({
         <h2 className="font-medium">Ta lettre de motivation de base</h2>
         <FieldHint>
           C’est elle qu’on adapte à chaque offre, en gardant ton style. PDF, Word ou texte collé.
-          Astuce : écrivez [entreprise] et [poste] là où ils doivent apparaître, nous les remplirons
-          pour chaque offre.
+          Astuce : écris [entreprise] et [poste] là où ils doivent apparaître, on les remplit pour
+          chaque offre.
         </FieldHint>
         <CurrentDocument document={letter} />
         <FileUpload
@@ -196,18 +205,25 @@ export function DocumentsStep({
         />
         <LetterText />
       </section>
+      {failed && showContinue ? (
+        <Alert variant="destructive">
+          <AlertDescription>Ça n’a pas abouti. Réessaie dans un instant.</AlertDescription>
+        </Alert>
+      ) : null}
       {!showContinue ? null : ready ? (
-        <Link href="/onboarding/6" className={buttonVariants({ size: "lg" }) + " w-fit"}>
-          Continuer
-        </Link>
+        <form action={finishOnboarding}>
+          <SubmitButton variant="shiny" size="lg" pendingLabel="On ouvre tes offres…">
+            Voir mes offres
+          </SubmitButton>
+        </form>
       ) : (
         <div className="grid gap-3">
           <FieldHint>
-            Avec ton CV, les correspondances sont plus précises. Avec ta lettre, on l’adaptons à
+            Avec ton CV, les correspondances sont plus précises. Avec ta lettre, on l’adapte à
             chaque entreprise.
           </FieldHint>
           <form action={skipDocuments}>
-            <SubmitButton variant="outline" size="lg" pendingLabel="Un instant…">
+            <SubmitButton variant="outline" size="lg" pendingLabel="On ouvre tes offres…">
               Passer cette étape
             </SubmitButton>
           </form>
@@ -217,6 +233,20 @@ export function DocumentsStep({
           </FieldHint>
         </div>
       )}
+      {showContinue ? (
+        <PendingOverlay
+          title={
+            <>
+              On ouvre <em>tes offres</em>
+            </>
+          }
+          messages={[
+            "On met ta sélection à jour…",
+            "On classe les offres par correspondance…",
+            "On prépare ton espace…",
+          ]}
+        />
+      ) : null}
     </div>
   );
 }

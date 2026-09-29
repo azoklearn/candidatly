@@ -1,10 +1,10 @@
 import type { Tables } from "@/lib/supabase/database.types";
 
 /**
- * The questionnaire (docs/QUESTIONS.md C92 and C93): five questions answered with the
- * thumb, then the account, the CV and the letter, and the analysis screen. Visitors go
- * through the first five without an account; the answers wait in a cookie (C91). The
- * questionnaire says "tu", like the landing page visitors arrive from.
+ * The questionnaire (docs/QUESTIONS.md C92 to C94): five questions answered with the
+ * thumb, the analysis screen, then the account and the documents. Visitors go through the
+ * questions and the analysis without an account; their answers wait in a cookie (C91).
+ * The questionnaire says "tu", like the landing page visitors arrive from.
  */
 
 export const ONBOARDING_STEPS = [
@@ -15,7 +15,6 @@ export const ONBOARDING_STEPS = [
   { step: 5, title: "Tu veux bosser où ?" },
   { step: 6, title: "Ton compte" },
   { step: 7, title: "Ton CV et ta lettre" },
-  { step: 8, title: "Analyse en cours" },
 ] as const;
 
 export const LAST_STEP = ONBOARDING_STEPS.length;
@@ -24,6 +23,11 @@ export const VISITOR_LAST_STEP = 5;
 export const ACCOUNT_STEP = 6;
 export const DOCUMENTS_STEP = 7;
 export const ACCOUNT_STEP_PATH = "/onboarding/compte";
+/**
+ * The analysis sits between the questions and the account (docs/QUESTIONS.md C94): the
+ * student sees what the search found before being asked to sign up.
+ */
+export const ANALYSIS_PATH = "/onboarding/analyse";
 
 export type OnboardingProfile = Pick<
   Tables<"profiles">,
@@ -53,7 +57,6 @@ export function completedSteps({ profile, hasCv, hasLetter }: OnboardingSnapshot
   if (filled(profile.first_name) && filled(profile.last_name)) done.add(ACCOUNT_STEP);
   // The documents are optional: the step is done once both are there or the student skipped it (C89).
   if ((hasCv && hasLetter) || profile.documents_skipped_at !== null) done.add(DOCUMENTS_STEP);
-  if (profile.onboarding_completed) done.add(LAST_STEP);
   return done;
 }
 

@@ -32,6 +32,9 @@ export const DraftSchema = z
     location_lng: z.number(),
     insee_code: z.string().max(5).nullable(),
     search_radius_km: z.number().int(),
+    // What the analysis found, shown on the account screen (docs/QUESTIONS.md C94).
+    found_offers: z.number().int().min(0),
+    found_companies: z.number().int().min(0),
   })
   .partial();
 
@@ -77,10 +80,32 @@ export function draftSnapshot(draft: OnboardingDraft): OnboardingSnapshot {
   return { profile, hasCv: false, hasLetter: false };
 }
 
+/** The draft keys that are profile columns; the others (the counts) stay in the cookie. */
+const PROFILE_FIELDS = [
+  "first_name",
+  "last_name",
+  "phone",
+  "school",
+  "degree_label",
+  "diploma_level",
+  "target_contract",
+  "contract_chosen_at",
+  "availability_date",
+  "domain_free_text",
+  "rome_codes",
+  "rome_version",
+  "location_label",
+  "location_lat",
+  "location_lng",
+  "insee_code",
+  "search_radius_km",
+] as const satisfies readonly (keyof OnboardingDraft)[];
+
 /** What to write on the profile once the account exists: only the answers that were given. */
 export function draftProfileUpdate(draft: OnboardingDraft): TablesUpdate<"profiles"> {
   const update: TablesUpdate<"profiles"> = {};
-  for (const [key, value] of Object.entries(draft)) {
+  for (const key of PROFILE_FIELDS) {
+    const value = draft[key];
     if (value !== undefined) Object.assign(update, { [key]: value });
   }
   return update;
@@ -97,5 +122,16 @@ export function draftProfileValues(draft: OnboardingDraft) {
     diploma_level: draft.diploma_level ?? null,
     target_contract: draft.target_contract ?? "alternance",
     availability_date: draft.availability_date ?? null,
+  };
+}
+
+/** The answers the analysis needs, read from the draft (docs/QUESTIONS.md C94). */
+export function draftProfileValuesForAnalysis(draft: OnboardingDraft) {
+  return {
+    rome_codes: draft.rome_codes ?? [],
+    location_lat: draft.location_lat ?? null,
+    location_lng: draft.location_lng ?? null,
+    search_radius_km: draft.search_radius_km ?? 30,
+    diploma_level: draft.diploma_level ?? null,
   };
 }

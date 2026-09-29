@@ -9,7 +9,8 @@ import { draftSnapshot, type OnboardingDraft } from "@/lib/onboarding/draft";
 import { readDraft } from "@/lib/onboarding/draft-cookie";
 import {
   ACCOUNT_STEP,
-  ACCOUNT_STEP_PATH,
+  ANALYSIS_PATH,
+  DOCUMENTS_STEP,
   firstIncompleteStep,
   isStepAccessible,
   parseStep,
@@ -18,7 +19,6 @@ import {
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-import { AnalysisStep } from "../_components/analysis-step";
 import { ContractStep } from "../_components/contract-step";
 import { CityStep } from "../_components/city-step";
 import { DocumentsStep } from "../_components/documents-step";
@@ -59,7 +59,7 @@ function Shell({ step, children }: { step: number; children: ReactNode }) {
 
 /** A visitor answers the five questions; the answers wait in a cookie (C91). */
 async function VisitorStep({ step, draft }: { step: number; draft: OnboardingDraft }) {
-  if (step > VISITOR_LAST_STEP) redirect(ACCOUNT_STEP_PATH);
+  if (step > VISITOR_LAST_STEP) redirect(ANALYSIS_PATH);
   const snapshot = draftSnapshot(draft);
   if (!isStepAccessible(step, snapshot)) redirect(`/onboarding/${firstIncompleteStep(snapshot)}`);
   const domain = findDomainByLabel(draft.domain_free_text);
@@ -134,8 +134,14 @@ export default async function OnboardingStepPage({
       {step === ACCOUNT_STEP ? (
         <IdentityStep firstName={data.profile.first_name} lastName={data.profile.last_name} />
       ) : null}
-      {step === 7 ? <DocumentsStep userId={userId} cv={data.cv} letter={data.letter} /> : null}
-      {step === 8 ? <AnalysisStep failed={Boolean((await searchParams).error)} /> : null}
+      {step === DOCUMENTS_STEP ? (
+        <DocumentsStep
+          userId={userId}
+          cv={data.cv}
+          letter={data.letter}
+          failed={Boolean((await searchParams).error)}
+        />
+      ) : null}
     </Shell>
   );
 }

@@ -16,6 +16,8 @@ const DRAFT = {
   rome_codes: ["M1805"],
   rome_version: 61,
   diploma_level: "bac+3",
+  found_offers: 7,
+  found_companies: 12,
   location_label: "Lyon",
   location_lat: 45.758,
   location_lng: 4.835,
@@ -38,9 +40,9 @@ test("a visitor answers the questions with clicks, without an account", async ({
   await expect(page).toHaveURL(/\/onboarding\/4$/);
   await page.getByRole("button", { name: /^Bac\+3/ }).click();
   await expect(page).toHaveURL(/\/onboarding\/5$/);
-  // Choosing a city of the list calls no address service.
-  await page.getByRole("button", { name: "Lyon", exact: true }).click();
-  await expect(page).toHaveURL(/\/onboarding\/compte$/);
+  // The cities of the list carry their own coordinates: choosing one calls no service.
+  // The test stops here: the next screen really searches the offers of that city.
+  await expect(page.getByRole("button", { name: "Lyon", exact: true })).toBeVisible();
 
   // The answers travel in one http-only cookie.
   const cookie = (await page.context().cookies()).find(
@@ -52,8 +54,6 @@ test("a visitor answers the questions with clicks, without an account", async ({
     domain_free_text: "Informatique et numérique",
     rome_codes: ["M1855"],
     diploma_level: "bac+3",
-    location_label: "Lyon",
-    insee_code: "69123",
   });
 });
 
@@ -73,6 +73,8 @@ test("the answers of a visitor land on the profile created at the end", async ({
   try {
     await page.goto("/onboarding/compte");
     await expect(page.getByRole("heading", { level: 1, name: "Crée ton compte" })).toBeVisible();
+    // What the analysis found stays on screen, as the reason to sign up (C94).
+    await expect(page.getByText(/7 offres t’attendent/)).toBeVisible();
     await page.getByLabel("Prénom").fill("Alex");
     await page.getByLabel("Nom", { exact: true }).fill("Visiteur");
     await page.getByLabel("Adresse email").fill(email);

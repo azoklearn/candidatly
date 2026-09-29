@@ -15,6 +15,7 @@ export const ANON_RATE_LIMITS = {
   geocode: [40, 60],
   suggest_rome: [15, 600],
   save_location: [20, 3600],
+  analyse: [10, 3600],
 } as const satisfies Record<string, readonly [number, number]>;
 
 export type AnonRateLimitedAction = keyof typeof ANON_RATE_LIMITS;

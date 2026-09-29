@@ -15,6 +15,7 @@ import { draftSnapshot } from "@/lib/onboarding/draft";
 import { readDraft } from "@/lib/onboarding/draft-cookie";
 import {
   ACCOUNT_STEP,
+  ANALYSIS_PATH,
   DOCUMENTS_STEP,
   firstIncompleteStep,
   LAST_STEP,
@@ -49,6 +50,8 @@ export default async function AccountStepPage() {
   const draft = await readDraft();
   const pending = firstIncompleteStep(draftSnapshot(draft));
   if (pending <= VISITOR_LAST_STEP) redirect(`/onboarding/${pending}`);
+  // What the analysis found, so the reason to sign up stays on screen (C94).
+  const found = draft.found_offers ?? 0;
   const google = await isGoogleSignInEnabled();
 
   return (
@@ -57,7 +60,7 @@ export default async function AccountStepPage() {
         <div className="flex items-center justify-between">
           <span className="eyebrow">{stepLabel(STEP_NUMBER)}</span>
           <Link
-            href={`/onboarding/${VISITOR_LAST_STEP}`}
+            href={ANALYSIS_PATH}
             className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
             <span aria-hidden>← </span>Retour
@@ -73,8 +76,9 @@ export default async function AccountStepPage() {
           Crée ton <em>compte</em>
         </h1>
         <p className="text-muted-foreground">
-          Tes réponses sont gardées. Ton compte te sert à retrouver tes offres, tes lettres et le
-          suivi de tes candidatures.
+          {found > 0
+            ? `${found} ${found > 1 ? "offres t’attendent" : "offre t’attend"} : ton compte sert à les retrouver, avec tes lettres et le suivi de tes candidatures.`
+            : "Tes réponses sont gardées. Ton compte te sert à retrouver tes offres, tes lettres et le suivi de tes candidatures."}
         </p>
       </header>
       <div className="grid gap-4">
