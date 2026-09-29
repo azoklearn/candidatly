@@ -25,7 +25,7 @@ export default async function AnalysisPage() {
   const supabase = await createClient();
   const userId = await currentUserId(supabase);
   let next = ACCOUNT_STEP_PATH;
-  let cta = "Créer mon compte";
+  let cta = "Voir les offres";
 
   if (userId) {
     const data = await loadOnboarding(supabase, userId);
