@@ -41,7 +41,13 @@ export async function POST(request: NextRequest) {
     return fail("Trop de CV analysés en peu de temps. Réessaie dans quelques minutes.", 429);
   }
 
-  const form = await request.formData();
+  let form: FormData;
+  try {
+    form = await request.formData();
+  } catch {
+    // Not a file upload at all: answer like any other missing file.
+    return fail("Choisis un fichier PDF ou Word.", 400);
+  }
   const file = form.get("cv");
   if (!(file instanceof File)) return fail("Choisis un fichier PDF ou Word.", 400);
   if (file.size > MAX_SCAN_BYTES) return fail("Ton CV dépasse 4 Mo.", 400);
