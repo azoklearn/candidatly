@@ -113,17 +113,34 @@ test("the answers of a visitor land on the profile created at the end", async ({
 });
 
 test("a CV dropped on the landing page fills the questionnaire", async ({ page }) => {
+  // The analysis screen would call the offers API: the test stops right after the scan.
+  await page.route("**/onboarding/analyse**", (route) => route.abort());
   await page.goto("/");
   // The scan reads the file on the server and keeps only the answers it suggests (C95).
-  await page.setInputFiles('input[type="file"]', "tests/fixtures/documents/cv.pdf");
-  await page.waitForURL(/\/onboarding\/(\d|analyse)/, { timeout: 30_000 });
+  await page.setInputFiles('input[type="file"]', "tests/fixtures/documents/cv-alternance.pdf");
+  await expect
+    .poll(
+      async () =>
+        (await page.context().cookies()).find((item) => item.name === "jobgpt_questionnaire")
+          ?.value,
+      { timeout: 30_000 },
+    )
+    .toBeTruthy();
   const cookie = (await page.context().cookies()).find(
     (item) => item.name === "jobgpt_questionnaire",
   );
   const draft = JSON.parse(decodeURIComponent(cookie?.value ?? "{}"));
-  // Whatever the CV says, nothing of its text is kept, only questionnaire answers.
-  expect(
-    Object.keys(draft).every((key) => !key.includes("text") || key === "domain_free_text"),
-  ).toBe(true);
-  expect(draft.scan_summary ?? "").not.toContain("@");
+  // What the CV of Camille Durand says: apprenticeship, Bac+3, web developer, Lyon.
+  expect(draft).toMatchObject({
+    target_contract: "alternance",
+    diploma_level: "bac+3",
+    domain_free_text: "Informatique et numérique",
+    insee_code: "69123",
+    scan_summary: "Bac+3 · Informatique et numérique · Lyon",
+  });
+  expect(draft.rome_codes).toContain("M1855");
+  // Nothing of the CV itself is kept: no name, no address, no email.
+  const stored = JSON.stringify(draft);
+  expect(stored).not.toContain("Camille");
+  expect(stored).not.toContain("@");
 });

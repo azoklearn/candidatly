@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>CV Camille Durand</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; width: 210mm; min-height: 297mm; padding: 18mm 16mm;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #15263a; font-size: 10.5pt; line-height: 1.5;
+  }
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16mm;
+    border-bottom: 2px solid #1764d8; padding-bottom: 6mm; margin-bottom: 7mm; }
+  h1 { margin: 0 0 2mm; font-size: 24pt; letter-spacing: -0.02em; }
+  .role { margin: 0; color: #1764d8; font-weight: 600; font-size: 11.5pt; }
+  .contact { text-align: right; font-size: 9.5pt; color: #41627d; line-height: 1.6; white-space: nowrap; }
+  .layout { display: flex; gap: 12mm; }
+  main { flex: 1 1 62%; }
+  aside { flex: 0 0 32%; }
+  h2 { margin: 0 0 3mm; font-size: 10pt; text-transform: uppercase; letter-spacing: 0.12em; color: #1764d8; }
+  section { margin-bottom: 7mm; }
+  .item { margin-bottom: 5mm; }
+  .item h3 { margin: 0; font-size: 11pt; }
+  .item .meta { margin: 0 0 1.5mm; color: #41627d; font-size: 9.5pt; }
+  .item ul { margin: 0; padding-left: 4.5mm; }
+  .item li { margin-bottom: 1mm; }
+  aside ul { margin: 0 0 5mm; padding-left: 4.5mm; }
+  .tags { display: flex; flex-wrap: wrap; gap: 2mm; margin-bottom: 5mm; }
+  .tags span { border: 1px solid #c8d9e8; border-radius: 3mm; padding: 1mm 2.5mm; font-size: 9pt; }
+  .goal { background: #f1f6fd; border-left: 3px solid #1764d8; padding: 3mm 4mm; margin-bottom: 7mm; font-size: 10pt; }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Camille Durand</h1>
+      <p class="role">Étudiante en BUT Informatique — recherche une alternance</p>
+    </div>
+    <div class="contact">
+      camille.durand@example.com<br>
+      06 12 34 56 78<br>
+      24 rue de la République, 69002 Lyon<br>
+      Permis B · mobile sur Lyon et alentours
+    </div>
+  </header>
+
+  <p class="goal">
+    Recherche une <strong>alternance de développeuse web</strong> à partir de septembre, rythme
+    3 semaines en entreprise / 1 semaine à l’école, pour deux ans.
+  </p>
+
+  <div class="layout">
+    <main>
+      <section>
+        <h2>Formation</h2>
+        <div class="item">
+          <h3>BUT Informatique, parcours réalisation d’applications</h3>
+          <p class="meta">IUT Lyon 1 · 2023 — 2026 (3e année)</p>
+          <ul>
+            <li>Développement web, bases de données, qualité logicielle, gestion de projet</li>
+            <li>Projet fil rouge : application de gestion d’une bibliothèque associative</li>
+          </ul>
+        </div>
+        <div class="item">
+          <h3>Baccalauréat général, spécialités mathématiques et NSI</h3>
+          <p class="meta">Lycée Édouard Herriot, Lyon · 2023 · mention bien</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Expériences</h2>
+        <div class="item">
+          <h3>Stage développement web — Atelier Numérique</h3>
+          <p class="meta">Villeurbanne · avril à juin 2025 · 10 semaines</p>
+          <ul>
+            <li>Développement de l’espace client d’un site e-commerce en React et TypeScript</li>
+            <li>Écriture des tests automatisés, revue de code avec deux développeurs seniors</li>
+            <li>Migration de la base de données PostgreSQL et reprise des données</li>
+          </ul>
+        </div>
+        <div class="item">
+          <h3>Job étudiant — vendeuse polyvalente</h3>
+          <p class="meta">Librairie du Centre, Lyon · 2023 — 2024 · samedis</p>
+          <ul>
+            <li>Conseil client, tenue de caisse, réception des commandes</li>
+          </ul>
+        </div>
+        <div class="item">
+          <h3>Projets personnels</h3>
+          <ul>
+            <li>Site de suivi de lectures (Next.js, Supabase), 120 utilisateurs</li>
+            <li>Contribution à un projet open source de calendrier en JavaScript</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <aside>
+      <section>
+        <h2>Compétences</h2>
+        <div class="tags">
+          <span>JavaScript</span><span>TypeScript</span><span>React</span><span>Next.js</span>
+          <span>Node.js</span><span>SQL</span><span>PostgreSQL</span><span>Git</span>
+          <span>Docker</span><span>Figma</span>
+        </div>
+        <h2>Méthodes</h2>
+        <ul>
+          <li>Développement agile, Scrum</li>
+          <li>Tests unitaires et intégration continue</li>
+          <li>Accessibilité web</li>
+        </ul>
+        <h2>Langues</h2>
+        <ul>
+          <li>Français — langue maternelle</li>
+          <li>Anglais — B2, lu, écrit, parlé</li>
+          <li>Espagnol — notions</li>
+        </ul>
+        <h2>Centres d’intérêt</h2>
+        <ul>
+          <li>Escalade en club</li>
+          <li>Bénévolat au Repair Café de Lyon</li>
+          <li>Photographie argentique</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</body>
+</html>
