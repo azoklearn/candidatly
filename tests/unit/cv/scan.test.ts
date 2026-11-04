@@ -5,13 +5,16 @@ import {
   detectCity,
   detectContract,
   detectDiplomaLevel,
+  detectEmail,
+  detectName,
   scanCvText,
   scanSummary,
 } from "@/lib/cv/scan";
 import { bestDomainForCandidates } from "@/lib/onboarding/domains";
 
 const CV = [
-  "Camille Martin — 15 rue de la République, 69002 Lyon",
+  "Camille Martin",
+  "15 rue de la République, 69002 Lyon · camille.martin@example.com",
   "Étudiante en BUT Informatique, 3e année, à la recherche d’une alternance",
   "Compétences : développement web, React, TypeScript, PostgreSQL, Git",
   "2024 : stage de deux mois, développement d’une application interne",
@@ -45,10 +48,30 @@ describe("reading a CV", () => {
     expect(terms.every((term) => /^[\p{L}\p{N}]+$/u.test(term))).toBe(true);
   });
 
+  it("takes the name at the top, in two or three words", () => {
+    expect(detectName("Camille Durand\nÉtudiante en BUT Informatique")).toEqual({
+      firstName: "Camille",
+      lastName: "Durand",
+    });
+    expect(detectName("MARIE DUPONT-LEROY\nCommerciale")).toEqual({
+      firstName: "Marie",
+      lastName: "Dupont-Leroy",
+    });
+    // A heading, a job title or a line with digits is never a name.
+    expect(detectName("Curriculum Vitae\nDéveloppeur Web\n06 12 34 56 78")).toBeNull();
+    expect(detectName("Alternance recherchée")).toBeNull();
+  });
+
+  it("takes the first address of the CV", () => {
+    expect(detectEmail("Contact : Camille.Durand@Example.com,")).toBe("camille.durand@example.com");
+    expect(detectEmail("Pas d’adresse ici")).toBeNull();
+  });
+
   it("reads a whole CV at once", () => {
     const scan = scanCvText(CV);
     expect(scan).toMatchObject({ diplomaLevel: "bac+3", contract: "alternance" });
     expect(scan.city?.label).toBe("Lyon");
+    expect(scan.name).toEqual({ firstName: "Camille", lastName: "Martin" });
   });
 
   it("writes the summary from what was found, and nothing else", () => {

@@ -101,6 +101,7 @@ export async function POST(request: NextRequest) {
     city: scan.city?.label ?? null,
   });
   const answers = {
+    ...(scan.name ? { first_name: scan.name.firstName, last_name: scan.name.lastName } : {}),
     ...(scan.contract
       ? {
           target_contract:
@@ -122,12 +123,17 @@ export async function POST(request: NextRequest) {
       : {}),
   };
 
-  const draft = await saveDraft({ ...answers, ...(summary ? { scan_summary: summary } : {}) });
+  const draft = await saveDraft({
+    ...answers,
+    ...(summary ? { scan_summary: summary } : {}),
+    ...(scan.email ? { scan_email: scan.email } : {}),
+  });
   if (userId) {
     const { error } = await supabase.from("profiles").update(answers).eq("user_id", userId);
     if (error) log.warn("profile_update_failed", { code: error.code });
   }
   log.info("cv_scanned", {
+    named: scan.name !== null,
     level: scan.diplomaLevel,
     contract: scan.contract,
     domain: domain?.domain.id ?? null,

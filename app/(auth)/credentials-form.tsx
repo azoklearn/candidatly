@@ -13,14 +13,22 @@ type CredentialsFormProps = {
   action: (state: AuthFormState, formData: FormData) => Promise<AuthFormState>;
   mode: "sign-in" | "sign-up";
   next?: string;
+  /** Address read on the CV, if there was one (docs/QUESTIONS.md C97). */
+  defaultEmail?: string;
   /** Fields shown before the address, for example the name at the end of the questionnaire. */
   children?: ReactNode;
 };
 
-export function CredentialsForm({ action, mode, next, children }: CredentialsFormProps) {
+export function CredentialsForm({
+  action,
+  mode,
+  next,
+  defaultEmail,
+  children,
+}: CredentialsFormProps) {
   const [state, formAction, pending] = useActionState(action, {});
   // Controlled, so the address survives the automatic form reset after each submission.
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(defaultEmail ?? "");
   const isSignUp = mode === "sign-up";
 
   if (state.message) {

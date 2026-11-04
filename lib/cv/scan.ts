@@ -10,10 +10,14 @@ import type { ProfileDiplomaLevel } from "@/lib/providers/types";
 
 export type ContractGuess = "alternance" | "stage" | "job_etudiant";
 
+export type CvName = { firstName: string; lastName: string };
+
 export type CvScan = {
   diplomaLevel: ProfileDiplomaLevel | null;
   contract: ContractGuess | null;
   city: PresetCity | null;
+  name: CvName | null;
+  email: string | null;
   terms: string[];
 };
 
@@ -60,11 +64,56 @@ export function cvSearchTerms(text: string): string[] {
   return extractKeywords(text, { max: 10 });
 }
 
+/** Words that start a heading or a job title, never a name. */
+const NOT_A_NAME =
+  /(curriculum|vitae|^cv\b|[ée]tudiant|recherche|alternance|stage|apprenti|d[ée]veloppeu|ing[ée]nieu|assistant|charg[ée]|technicien|profil|contact|exp[ée]rience|formation|comp[ée]tence|langue|projet|permis)/i;
+
+function titleCase(word: string): string {
+  return word
+    .toLocaleLowerCase("fr-FR")
+    .replace(
+      /(^|[-'’])(\p{L})/gu,
+      (_match, separator: string, letter: string) => separator + letter.toLocaleUpperCase("fr-FR"),
+    );
+}
+
+/**
+ * The name written at the top of the CV, so the account form comes already filled. Two or
+ * three capitalised words, in the first lines, away from any heading: anything else is
+ * left to the student.
+ */
+export function detectName(text: string): CvName | null {
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 12);
+  for (const line of lines) {
+    if (line.length > 40 || /[0-9@]/.test(line) || NOT_A_NAME.test(line)) continue;
+    const words = line.split(/[\s,]+/).filter(Boolean);
+    if (words.length < 2 || words.length > 3) continue;
+    if (!words.every((word) => /^\p{Lu}[\p{L}'’-]+$/u.test(word))) continue;
+    const [first, ...rest] = words;
+    if (!first) continue;
+    return { firstName: titleCase(first), lastName: rest.map(titleCase).join(" ") };
+  }
+  return null;
+}
+
+const EMAIL = /[\w.+-]+@[\w-]+\.[\w.-]{2,}/;
+
+export function detectEmail(text: string): string | null {
+  const found = text.match(EMAIL)?.[0] ?? null;
+  return found ? found.replace(/[.,;]$/, "").toLowerCase() : null;
+}
+
 export function scanCvText(text: string): CvScan {
   return {
     diplomaLevel: detectDiplomaLevel(text),
     contract: detectContract(text),
     city: detectCity(text),
+    name: detectName(text),
+    email: detectEmail(text),
     terms: cvSearchTerms(text),
   };
 }

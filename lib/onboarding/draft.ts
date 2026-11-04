@@ -37,6 +37,8 @@ export const DraftSchema = z
     found_companies: z.number().int().min(0),
     /** What the CV scan read, shown back to the student (docs/QUESTIONS.md C95). */
     scan_summary: z.string().max(140),
+    /** Address read on the CV, only to fill the sign-up form (C97). */
+    scan_email: z.email().max(160),
   })
   .partial();
 

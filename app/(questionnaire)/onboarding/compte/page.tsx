@@ -52,6 +52,7 @@ export default async function AccountStepPage() {
   if (pending <= VISITOR_LAST_STEP) redirect(`/onboarding/${pending}`);
   // What the analysis found, so the reason to sign up stays on screen (C94).
   const found = draft.found_offers ?? 0;
+  const prefilled = Boolean(draft.first_name || draft.scan_email);
   const google = await isGoogleSignInEnabled();
 
   return (
@@ -89,21 +90,43 @@ export default async function AccountStepPage() {
             </AlertDescription>
           </Alert>
         ) : null}
+        {prefilled ? (
+          <p className="text-sm text-muted-foreground">
+            On a repris ce qu’on a lu sur ton CV. Corrige si besoin.
+          </p>
+        ) : null}
         {google ? (
           <>
             <GoogleButton next={NEXT_STEP} />
             <OrSeparator />
           </>
         ) : null}
-        <CredentialsForm action={signUp} mode="sign-up" next={NEXT_STEP}>
+        <CredentialsForm
+          action={signUp}
+          mode="sign-up"
+          next={NEXT_STEP}
+          defaultEmail={draft.scan_email}
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="first_name">Prénom</Label>
-              <Input id="first_name" name="first_name" autoComplete="given-name" required />
+              <Input
+                id="first_name"
+                name="first_name"
+                autoComplete="given-name"
+                defaultValue={draft.first_name ?? ""}
+                required
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="last_name">Nom</Label>
-              <Input id="last_name" name="last_name" autoComplete="family-name" required />
+              <Input
+                id="last_name"
+                name="last_name"
+                autoComplete="family-name"
+                defaultValue={draft.last_name ?? ""}
+                required
+              />
             </div>
           </div>
         </CredentialsForm>

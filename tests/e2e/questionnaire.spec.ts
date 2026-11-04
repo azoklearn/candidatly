@@ -139,8 +139,19 @@ test("a CV dropped on the landing page fills the questionnaire", async ({ page }
     scan_summary: "Bac+3 · Informatique et numérique · Lyon",
   });
   expect(draft.rome_codes).toContain("M1855");
-  // Nothing of the CV itself is kept: no name, no address, no email.
+  // The name and the address fill the sign-up form (C97); the rest of the CV is dropped.
+  expect(draft).toMatchObject({
+    first_name: "Camille",
+    last_name: "Durand",
+    scan_email: "camille.durand@example.com",
+  });
   const stored = JSON.stringify(draft);
-  expect(stored).not.toContain("Camille");
-  expect(stored).not.toContain("@");
+  expect(stored).not.toContain("Atelier");
+  expect(stored).not.toContain("06 12 34 56 78");
+
+  // The account screen opens with what the CV gave.
+  await page.goto("/onboarding/compte");
+  await expect(page.getByLabel("Prénom")).toHaveValue("Camille");
+  await expect(page.getByLabel("Nom", { exact: true })).toHaveValue("Durand");
+  await expect(page.getByLabel("Adresse email")).toHaveValue("camille.durand@example.com");
 });
