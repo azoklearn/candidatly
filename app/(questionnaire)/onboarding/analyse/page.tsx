@@ -13,6 +13,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 
 import { AnalysisStep } from "../_components/analysis-step";
+import { ScanNote } from "../_components/scan-note";
 import { loadOnboarding } from "../data";
 
 export const metadata: Metadata = { title: "Analyse" };
@@ -24,6 +25,7 @@ export const metadata: Metadata = { title: "Analyse" };
 export default async function AnalysisPage() {
   const supabase = await createClient();
   const userId = await currentUserId(supabase);
+  const draft = await readDraft();
   let next = ACCOUNT_STEP_PATH;
   let cta = "Voir les offres";
 
@@ -35,7 +37,7 @@ export default async function AnalysisPage() {
     next = `/onboarding/${Math.min(step, LAST_STEP)}`;
     cta = "Continuer";
   } else {
-    const pending = firstIncompleteStep(draftSnapshot(await readDraft()));
+    const pending = firstIncompleteStep(draftSnapshot(draft));
     if (pending <= VISITOR_LAST_STEP) redirect(`/onboarding/${pending}`);
   }
 
@@ -47,6 +49,7 @@ export default async function AnalysisPage() {
           <div className="h-full w-[71%] rounded-full bg-linear-to-r from-brand-soft to-brand" />
         </div>
       </header>
+      <ScanNote summary={draft.scan_summary ?? null} />
       <AnalysisStep next={next} cta={cta} />
     </main>
   );

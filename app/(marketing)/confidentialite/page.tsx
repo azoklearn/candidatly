@@ -8,8 +8,8 @@ export default function PrivacyPage() {
   return (
     <LegalPage title="Politique de confidentialité" updated="11 septembre 2026">
       <p>
-        Cette page explique quelles données Candidatly traite, pourquoi, avec qui, combien de temps,
-        et comment exercer vos droits.
+        Cette page explique quelles données JobGPT traite, pourquoi, avec qui, combien de temps, et
+        comment exercer vos droits.
       </p>
       <h2>Responsable du traitement</h2>
       <p>[Nom ou raison sociale de l’éditeur], joignable à [adresse email de contact].</p>
@@ -66,8 +66,8 @@ export default function PrivacyPage() {
         </li>
         <li>Vercel : hébergement de l’application et mesure d’audience (Vercel Web Analytics).</li>
         <li>
-          Whop : paiement des forfaits. Whop reçoit votre identifiant Candidatly et les informations
-          de paiement que vous saisissez sur sa page, jamais vos documents.
+          Whop : paiement des forfaits. Whop reçoit votre identifiant JobGPT et les informations de
+          paiement que vous saisissez sur sa page, jamais vos documents.
         </li>
         <li>
           API Alternance : reçoit vos critères de recherche (métiers, zone, niveau), jamais votre
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
         </li>
       </ul>
       <p>
-        Vous envoyez vous-même vos candidatures sur le site de chaque offre : Candidatly ne transmet
+        Vous envoyez vous-même vos candidatures sur le site de chaque offre : JobGPT ne transmet
         rien aux recruteurs.
       </p>
       <h2>Durées de conservation</h2>
@@ -113,7 +113,7 @@ export default function PrivacyPage() {
       </p>
       <h2>Cookies</h2>
       <p>
-        Candidatly n’utilise que les cookies nécessaires à votre session de connexion et, si vous
+        JobGPT n’utilise que les cookies nécessaires à votre session de connexion et, si vous
         répondez au questionnaire avant de créer votre compte, un cookie qui garde vos réponses
         pendant 7 jours : il est déposé sur votre navigateur, effacé dès que vos réponses rejoignent
         votre profil, et vous pouvez le supprimer à tout moment. La mesure d’audience (Vercel Web

@@ -26,6 +26,7 @@ import { DomainStep } from "../_components/domain-step";
 import { IdentityStep } from "../_components/identity-step";
 import { JobStep, type JobOption } from "../_components/job-step";
 import { LevelStep } from "../_components/level-step";
+import { ScanNote } from "../_components/scan-note";
 import { StepHeader } from "../_components/step-header";
 import { loadOnboarding } from "../data";
 
@@ -48,10 +49,19 @@ async function jobsOfDomain(domain: JobDomain): Promise<JobOption[]> {
   });
 }
 
-function Shell({ step, children }: { step: number; children: ReactNode }) {
+function Shell({
+  step,
+  summary,
+  children,
+}: {
+  step: number;
+  summary?: string | null;
+  children: ReactNode;
+}) {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:py-10">
       <StepHeader step={step} />
+      <ScanNote summary={summary ?? null} />
       {children}
     </main>
   );
@@ -66,7 +76,7 @@ async function VisitorStep({ step, draft }: { step: number; draft: OnboardingDra
   if (step === 3 && !domain) redirect("/onboarding/2");
 
   return (
-    <Shell step={step}>
+    <Shell step={step} summary={draft.scan_summary ?? null}>
       {step === 1 ? (
         <ContractStep chosen={draft.contract_chosen_at ? (draft.target_contract ?? null) : null} />
       ) : null}
@@ -100,7 +110,8 @@ export default async function OnboardingStepPage({
   if (step === null) notFound();
   const supabase = await createClient();
   const userId = await currentUserId(supabase);
-  if (!userId) return <VisitorStep step={step} draft={await readDraft()} />;
+  const draft = await readDraft();
+  if (!userId) return <VisitorStep step={step} draft={draft} />;
 
   const data = await loadOnboarding(supabase, userId);
   if (data.profile.onboarding_completed) redirect("/offers");
@@ -110,7 +121,7 @@ export default async function OnboardingStepPage({
   if (step === 3 && !domain) redirect("/onboarding/2");
 
   return (
-    <Shell step={step}>
+    <Shell step={step} summary={draft.scan_summary ?? null}>
       {step === 1 ? (
         <ContractStep
           chosen={data.profile.contract_chosen_at ? data.profile.target_contract : null}

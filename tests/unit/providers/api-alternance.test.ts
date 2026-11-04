@@ -174,7 +174,7 @@ describe("ApiAlternanceProvider.search", () => {
     });
     const headers = new Headers(call.init?.headers);
     expect(headers.get("authorization")).toBe(`Bearer ${KEY}`);
-    expect(headers.get("user-agent")).toMatch(/^Candidatly\//);
+    expect(headers.get("user-agent")).toMatch(/^JobGPT\//);
   });
 
   it("normalises the real offers of the fixture", async () => {

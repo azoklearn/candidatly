@@ -40,7 +40,7 @@ export function LoadingScreen({
       className={cn("fade-up grid justify-items-center gap-5 py-16 text-center", className)}
     >
       <div className="loader-orbit" aria-hidden>
-        <span className="brand-mark">C</span>
+        <span className="brand-mark">J</span>
       </div>
       <div className="grid gap-2">
         <p className="section-title">{title}</p>

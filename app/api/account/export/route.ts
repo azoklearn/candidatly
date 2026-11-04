@@ -61,7 +61,7 @@ export async function GET() {
   return new NextResponse(JSON.stringify(body, null, 2), {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Content-Disposition": `attachment; filename="candidatly-mes-donnees-${exportedAt.slice(0, 10)}.json"`,
+      "Content-Disposition": `attachment; filename="jobgpt-mes-donnees-${exportedAt.slice(0, 10)}.json"`,
       "Cache-Control": "no-store",
     },
   });

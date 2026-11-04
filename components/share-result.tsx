@@ -19,7 +19,7 @@ export function ShareResult({ text }: { text: string }) {
     track(EVENTS.resultShared);
     if (typeof navigator.share === "function") {
       try {
-        await navigator.share({ title: "Candidatly", text, url });
+        await navigator.share({ title: "JobGPT", text, url });
         return;
       } catch {
         // Sheet closed without sharing: fall back to the clipboard.

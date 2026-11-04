@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col items-center justify-center gap-4 px-6 text-center">
       <span className="brand-mark" aria-hidden>
-        C
+        J
       </span>
       <h1 className="page-title">
         Page <em>introuvable</em>

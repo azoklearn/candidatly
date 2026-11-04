@@ -10,7 +10,7 @@ import type { TablesUpdate } from "@/lib/supabase/database.types";
  * than what they typed, and the cookie is dropped as soon as it is applied.
  */
 
-export const DRAFT_COOKIE = "candidatly_questionnaire";
+export const DRAFT_COOKIE = "jobgpt_questionnaire";
 export const DRAFT_MAX_AGE_SECONDS = 7 * 24 * 3600;
 
 export const DraftSchema = z
@@ -21,7 +21,7 @@ export const DraftSchema = z
     school: z.string().max(120),
     degree_label: z.string().max(120),
     diploma_level: z.enum(["bac", "bac+2", "bac+3", "bac+4", "bac+5"]),
-    target_contract: z.enum(["alternance", "stage", "both"]),
+    target_contract: z.enum(["alternance", "stage", "job_etudiant", "both"]),
     contract_chosen_at: z.string().max(40),
     availability_date: z.string().max(10).nullable(),
     domain_free_text: z.string().max(500),
@@ -35,6 +35,8 @@ export const DraftSchema = z
     // What the analysis found, shown on the account screen (docs/QUESTIONS.md C94).
     found_offers: z.number().int().min(0),
     found_companies: z.number().int().min(0),
+    /** What the CV scan read, shown back to the student (docs/QUESTIONS.md C95). */
+    scan_summary: z.string().max(140),
   })
   .partial();
 

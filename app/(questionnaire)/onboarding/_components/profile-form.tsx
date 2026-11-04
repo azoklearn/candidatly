@@ -33,7 +33,8 @@ const LEVELS: Choice[] = [
 const CONTRACTS: Choice[] = [
   { value: "alternance", label: "Une alternance" },
   { value: "stage", label: "Un stage", hint: "Offres bientôt disponibles" },
-  { value: "both", label: "Les deux" },
+  { value: "job_etudiant", label: "Un job étudiant", hint: "Offres bientôt disponibles" },
+  { value: "both", label: "Peu importe" },
 ];
 
 /**
@@ -96,7 +97,7 @@ export function ProfileForm({ profile }: { profile: ProfileValues }) {
         options={CONTRACTS}
         defaultValue={profile.target_contract}
         error={errors.target_contract}
-        gridClassName="sm:grid-cols-3"
+        gridClassName="sm:grid-cols-2"
       />
       {text("availability_date", "Disponible à partir du", { type: "date", hint: "Facultatif." })}
       {text("phone", "Téléphone (facultatif)", {

@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -1116,7 +1116,7 @@ export type Database = {
       offers_apply_channel: "api_alternance" | "email" | "external_url"
       offers_source: "api_alternance" | "adzuna" | "france_travail"
       profiles_diploma_level: "bac" | "bac+2" | "bac+3" | "bac+4" | "bac+5"
-      profiles_target_contract: "alternance" | "stage" | "both"
+      profiles_target_contract: "alternance" | "stage" | "both" | "job_etudiant"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1272,7 +1272,7 @@ export const Constants = {
       offers_apply_channel: ["api_alternance", "email", "external_url"],
       offers_source: ["api_alternance", "adzuna", "france_travail"],
       profiles_diploma_level: ["bac", "bac+2", "bac+3", "bac+4", "bac+5"],
-      profiles_target_contract: ["alternance", "stage", "both"],
+      profiles_target_contract: ["alternance", "stage", "both", "job_etudiant"],
     },
   },
 } as const

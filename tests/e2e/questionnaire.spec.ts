@@ -27,7 +27,7 @@ const DRAFT = {
 
 test("a visitor answers the questions with clicks, without an account", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Décrocher mon alternance" }).click();
+  await page.getByRole("link", { name: /Je n’ai pas mon CV ici/ }).click();
   await expect(page).toHaveURL(/\/onboarding\/1$/);
 
   // 1. Contract, 2. domain, 3. jobs, 4. level, 5. city: one click each.
@@ -46,7 +46,7 @@ test("a visitor answers the questions with clicks, without an account", async ({
 
   // The answers travel in one http-only cookie.
   const cookie = (await page.context().cookies()).find(
-    (item) => item.name === "candidatly_questionnaire",
+    (item) => item.name === "jobgpt_questionnaire",
   );
   expect(cookie?.httpOnly).toBe(true);
   expect(JSON.parse(decodeURIComponent(cookie?.value ?? "{}"))).toMatchObject({
@@ -62,7 +62,7 @@ test("the answers of a visitor land on the profile created at the end", async ({
   const password = `E2e-${randomUUID()}`;
   await page.context().addCookies([
     {
-      name: "candidatly_questionnaire",
+      name: "jobgpt_questionnaire",
       // The server writes the cookie url-encoded, like the browser reads it back.
       value: encodeURIComponent(JSON.stringify(DRAFT)),
       url: "http://localhost:3100",
@@ -102,8 +102,7 @@ test("the answers of a visitor land on the profile created at the end", async ({
     });
     // The cookie is dropped once the answers are on the profile.
     expect(
-      (await page.context().cookies()).find((item) => item.name === "candidatly_questionnaire")
-        ?.value,
+      (await page.context().cookies()).find((item) => item.name === "jobgpt_questionnaire")?.value,
     ).toBeFalsy();
   } finally {
     const { data } = await db.auth.admin.listUsers({ perPage: 1000 });
@@ -111,4 +110,20 @@ test("the answers of a visitor land on the profile created at the end", async ({
       await db.auth.admin.deleteUser(user.id);
     }
   }
+});
+
+test("a CV dropped on the landing page fills the questionnaire", async ({ page }) => {
+  await page.goto("/");
+  // The scan reads the file on the server and keeps only the answers it suggests (C95).
+  await page.setInputFiles('input[type="file"]', "tests/fixtures/documents/cv.pdf");
+  await page.waitForURL(/\/onboarding\/(\d|analyse)/, { timeout: 30_000 });
+  const cookie = (await page.context().cookies()).find(
+    (item) => item.name === "jobgpt_questionnaire",
+  );
+  const draft = JSON.parse(decodeURIComponent(cookie?.value ?? "{}"));
+  // Whatever the CV says, nothing of its text is kept, only questionnaire answers.
+  expect(
+    Object.keys(draft).every((key) => !key.includes("text") || key === "domain_free_text"),
+  ).toBe(true);
+  expect(draft.scan_summary ?? "").not.toContain("@");
 });

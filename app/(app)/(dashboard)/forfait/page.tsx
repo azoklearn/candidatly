@@ -76,7 +76,7 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
         </p>
         {offerCount > 0 ? (
           <ShareResult
-            text={`J’ai trouvé ${offerCount} ${offerCount > 1 ? "offres d’alternance" : "offre d’alternance"} près de chez moi en 2 minutes avec Candidatly.`}
+            text={`J’ai trouvé ${offerCount} ${offerCount > 1 ? "offres d’alternance" : "offre d’alternance"} près de chez moi en 2 minutes avec JobGPT.`}
           />
         ) : null}
       </header>

@@ -19,11 +19,11 @@ function rounded(value: number, step: number): { text: string; exact: boolean } 
 export function socialProofMessage(stats: LandingStats | null): string {
   if (stats && stats.placedStudents >= PLACED_THRESHOLD) {
     const count = rounded(stats.placedStudents, 100);
-    return `${count.exact ? "" : "Plus de "}${count.text} étudiants ont trouvé leur stage ou leur alternance grâce à Candidatly.`;
+    return `${count.exact ? "" : "Plus de "}${count.text} étudiants ont trouvé leur stage ou leur alternance grâce à JobGPT.`;
   }
   if (stats && stats.students >= SIGNED_UP_THRESHOLD) {
     const count = rounded(stats.students, 50);
-    return `${count.exact ? "Déjà" : "Déjà plus de"} ${count.text} étudiants utilisent Candidatly.`;
+    return `${count.exact ? "Déjà" : "Déjà plus de"} ${count.text} étudiants utilisent JobGPT.`;
   }
   return "Les offres d’alternance officielles, triées pour ton profil.";
 }

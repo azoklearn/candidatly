@@ -7,7 +7,7 @@ import { featuredBadge } from "@/lib/pricing";
 export const metadata: Metadata = {
   title: "Tarifs",
   description:
-    "Les forfaits Candidatly : offres d’alternance près de chez vous, lettre adaptée à chaque entreprise, recherches illimitées.",
+    "Les forfaits JobGPT : offres d’alternance près de chez vous, lettre adaptée à chaque entreprise, recherches illimitées.",
 };
 
 export default async function PricingPage() {

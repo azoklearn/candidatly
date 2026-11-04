@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { CvDropzone } from "@/components/cv-dropzone";
 import { RotatingWord } from "@/components/rotating-word";
 import { TrackedLink } from "@/components/tracked-link";
 import { EVENTS } from "@/lib/analytics";
@@ -8,9 +9,9 @@ import { socialProofMessage, type LandingStats } from "@/lib/social-proof";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
-  title: { absolute: "Candidatly · Trouve ton alternance en quelques clics" },
+  title: { absolute: "JobGPT · Dépose ton CV, on te trouve ton alternance" },
   description:
-    "Candidatly traque les offres d’alternance qui collent à ton profil, te dit lesquelles valent le coup et prépare ta lettre pour chacune.",
+    "JobGPT traque les offres d’alternance qui collent à ton profil, te dit lesquelles valent le coup et prépare ta lettre pour chacune.",
 };
 
 /** Real numbers for the proof pill; none when the database is unreachable. */
@@ -48,9 +49,9 @@ export default async function HomePage({
       <div className="grain" aria-hidden="true" />
 
       <header className="site-header lp-container">
-        <a className="brand" href="#top" aria-label="Candidatly, accueil">
-          <span className="brand-mark">C</span>
-          <span>Candidatly</span>
+        <a className="brand" href="#top" aria-label="JobGPT, accueil">
+          <span className="brand-mark">J</span>
+          <span>JobGPT</span>
         </a>
         <nav aria-label="Navigation principale">
           <a href="#comment-ca-marche">Comment ça marche</a>
@@ -88,29 +89,17 @@ export default async function HomePage({
               <span>{proof}</span>
             </div>
             <h1>
-              Trouve ton <RotatingWord words={["alternance", "stage"]} />
+              Dépose ton CV,
               <br />
-              en quelques <em>clics.</em>
+              on te trouve ton <RotatingWord words={["alternance", "stage"]} />.
             </h1>
             <p className="hero-copy">
-              Des offres d’alternance sortent tous les jours et disparaissent aussi vite. Candidatly
-              garde celles qui collent à ton profil, te dit pourquoi, et prépare ta lettre pendant
-              que les autres recopient la leur.
+              JobGPT lit ton CV, en tire ton métier, ton niveau et ta ville, puis garde les offres
+              qui collent. Aujourd’hui on sert les offres d’alternance publiées ; le stage et le job
+              étudiant arrivent.
             </p>
             <div className="hero-actions">
-              <TrackedLink
-                className="shiny-cta"
-                href="/onboarding/1"
-                event={EVENTS.signupClicked}
-                properties={{ emplacement: "hero" }}
-              >
-                <span>
-                  Décrocher mon alternance <b>→</b>
-                </span>
-              </TrackedLink>
-              <a className="text-link" href="#comment-ca-marche">
-                Voir comment ça marche <span>↓</span>
-              </a>
+              <CvDropzone />
             </div>
           </div>
         </section>
@@ -136,10 +125,10 @@ export default async function HomePage({
                 <i />
                 <i />
               </div>
-              <h3>Tu dis ce que tu vises.</h3>
+              <h3>Tu déposes ton CV.</h3>
               <p>
-                Ta formation, ton niveau, les métiers, ta ville. Un profil qui va plus loin que
-                trois mots-clés jetés dans une barre de recherche.
+                On y lit ton niveau d’études, ton domaine et ta ville. Pas de CV sous la main ? Cinq
+                questions à cliquer font le même travail.
               </p>
               <span className="step-arrow">↘</span>
             </article>
@@ -150,10 +139,10 @@ export default async function HomePage({
                 <i />
                 <i />
               </div>
-              <h3>On surveille pendant que tu bosses.</h3>
+              <h3>Tu corriges en deux clics.</h3>
               <p>
-                Les offres publiées sur La bonne alternance et ses partenaires, suivies pour toi
-                plusieurs fois par jour. Zéro onglet à garder ouvert.
+                Ce qu’on a lu s’affiche : métiers, niveau, ville. Tu ajustes si besoin, et la
+                recherche part. Ensuite on la relance pour toi plusieurs fois par jour.
               </p>
               <span className="step-arrow">↘</span>
             </article>
@@ -293,8 +282,8 @@ export default async function HomePage({
             <article className="quote quote-main reveal">
               <span className="quote-mark">“</span>
               <blockquote>
-                Ta lettre reste la tienne. Candidatly l’adapte à chaque entreprise sans rien
-                inventer, et te montre chaque mot changé.
+                Ta lettre reste la tienne. JobGPT l’adapte à chaque entreprise sans rien inventer,
+                et te montre chaque mot changé.
               </blockquote>
               <footer>
                 <span className="person-avatar coral">✦</span>
@@ -302,14 +291,14 @@ export default async function HomePage({
                   <strong>Notre engagement</strong>
                   <small>Rien d’inventé, jamais</small>
                 </span>
-                <b>C</b>
+                <b>J</b>
               </footer>
             </article>
             <div className="quote-column">
               <article className="quote quote-small reveal reveal-delay">
                 <blockquote>
-                  Tu candidates sur le site de l’offre, puis Candidatly suit tes réponses et te
-                  sonne quand il faut relancer.
+                  Tu candidates sur le site de l’offre, puis JobGPT suit tes réponses et te sonne
+                  quand il faut relancer.
                 </blockquote>
                 <footer>
                   <span className="person-avatar violet">✓</span>
@@ -361,10 +350,10 @@ export default async function HomePage({
 
       <footer className="site-footer lp-container">
         <a className="brand" href="#top">
-          <span className="brand-mark">C</span>
-          <span>Candidatly</span>
+          <span className="brand-mark">J</span>
+          <span>JobGPT</span>
         </a>
-        <p>© 2026 Candidatly. Cherche moins. Décroche plus.</p>
+        <p>© 2026 JobGPT. Cherche moins. Décroche plus.</p>
         <div>
           <Link href="/mentions-legales">Mentions légales</Link>
           <Link href="/confidentialite">Confidentialité</Link>

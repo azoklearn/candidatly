@@ -80,9 +80,7 @@ describe("parseRobots", () => {
   });
 
   it("prefers a group naming our user agent", () => {
-    const allowed = parseRobots(
-      "User-agent: Candidatly/1.0\nDisallow: /\n\nUser-agent: *\nAllow: /",
-    );
+    const allowed = parseRobots("User-agent: JobGPT/1.0\nDisallow: /\n\nUser-agent: *\nAllow: /");
     expect(allowed("/")).toBe(false);
     expect(parseRobots("User-agent: *\nDisallow:")("/anything")).toBe(true);
   });

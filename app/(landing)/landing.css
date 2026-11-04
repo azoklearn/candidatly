@@ -1094,7 +1094,7 @@ html:has(.lp) {
   }
 }
 
-/* Direction Candidatly — inspiration : surfaces aérées, halos bleus et interface flottante. */
+/* Direction JobGPT — inspiration : surfaces aérées, halos bleus et interface flottante. */
 .lp {
   background:
     radial-gradient(circle at 54% 7%, rgba(140, 198, 255, 0.36), transparent 18%),
@@ -1534,5 +1534,44 @@ html:has(.lp) {
   .lp .typed-caret {
     animation: none;
     opacity: 0;
+  }
+}
+
+/* CV dropped on the landing page (docs/QUESTIONS.md C95). */
+.lp .cv-drop {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  max-width: 460px;
+  padding: 22px;
+  border: 1.5px dashed var(--line);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.55);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+.lp .cv-drop[data-dragging="true"] {
+  border-color: var(--coral);
+  background: rgba(255, 255, 255, 0.85);
+}
+.lp .cv-drop .shiny-cta {
+  width: 100%;
+}
+.lp .cv-drop-hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.lp .cv-drop-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 14px;
+}
+@media (max-width: 720px) {
+  .lp .cv-drop {
+    max-width: none;
+    padding: 18px;
   }
 }

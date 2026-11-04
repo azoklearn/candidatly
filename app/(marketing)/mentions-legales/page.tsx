@@ -9,8 +9,8 @@ export default function LegalNoticePage() {
     <LegalPage title="Mentions légales" updated="11 septembre 2026">
       <h2>Éditeur</h2>
       <p>
-        Candidatly est édité par [Nom ou raison sociale de l’éditeur], [forme juridique, capital,
-        RCS ou SIRET], dont le siège est situé [adresse postale].
+        JobGPT est édité par [Nom ou raison sociale de l’éditeur], [forme juridique, capital, RCS ou
+        SIRET], dont le siège est situé [adresse postale].
       </p>
       <p>Contact : [adresse email de contact].</p>
       <p>Directeur de la publication : [nom du directeur de la publication].</p>
@@ -42,8 +42,8 @@ export default function LegalNoticePage() {
       </ul>
       <h2>Propriété intellectuelle</h2>
       <p>
-        Les textes, l’interface et le code de Candidatly sont protégés. Les données publiques
-        listées ci-dessus restent soumises à leurs licences respectives.
+        Les textes, l’interface et le code de JobGPT sont protégés. Les données publiques listées
+        ci-dessus restent soumises à leurs licences respectives.
       </p>
     </LegalPage>
   );

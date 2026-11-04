@@ -5,10 +5,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          2.36041,
-          48.8555
-        ]
+        "coordinates": [2.36041, 48.8555]
       },
       "properties": {
         "label": "10 Rue de Rivoli 75004 Paris",

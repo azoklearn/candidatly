@@ -16,7 +16,7 @@ export const MAX_WEBSITE_TEXT = 6_000;
 const MAX_BODY_BYTES = 1_500_000;
 const MAX_ROBOTS_BYTES = 200_000;
 const MAX_REDIRECTS = 3;
-const ROBOTS_TOKEN = "candidatly";
+const ROBOTS_TOKEN = "jobgpt";
 const ABOUT_PATTERN = /(about|a-propos|apropos|qui-sommes-nous|quisommesnous|notre-histoire)/;
 const LOCAL_HOST = /(^localhost$|\.localhost$|\.local$|\.internal$|\.lan$|\.home$)/;
 

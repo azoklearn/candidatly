@@ -9,7 +9,9 @@ test("the landing page and the legal pages are public", async ({ page }) => {
   const typed = headline.locator("[aria-hidden='true']");
   await expect(typed).toHaveText("stage", { timeout: 15_000 });
   await expect(typed).toHaveText("alternance", { timeout: 15_000 });
-  await expect(page.getByRole("link", { name: "Décrocher mon alternance" })).toBeVisible();
+  // The CV is the way in; the questionnaire stays one click away (C95).
+  await expect(page.getByRole("button", { name: "Analyser mon CV" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Je n’ai pas mon CV ici/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Trouver mon stage\/alternance/ })).toBeVisible();
   // No beta or price wording on the landing page (C81).
   await expect(page.getByText(/bêta|0 €|gratuit/i)).toHaveCount(0);

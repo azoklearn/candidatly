@@ -90,7 +90,7 @@ const required = (max: number) =>
     .min(1, { error: "Ce champ est obligatoire." })
     .max(max, { error: `${max} caractères maximum.` });
 
-const ContractSchema = z.enum(["alternance", "stage", "both"]);
+const ContractSchema = z.enum(["alternance", "stage", "job_etudiant", "both"]);
 
 /** Step 1: one click on the kind of contract (docs/QUESTIONS.md C92). */
 export async function saveContract(formData: FormData): Promise<void> {
@@ -181,7 +181,7 @@ const ProfileSchema = z.object({
   diploma_level: z.enum(["bac", "bac+2", "bac+3", "bac+4", "bac+5"], {
     error: "Choisissez le niveau du diplôme préparé.",
   }),
-  target_contract: z.enum(["alternance", "stage", "both"], {
+  target_contract: z.enum(["alternance", "stage", "job_etudiant", "both"], {
     error: "Choisissez un type de contrat.",
   }),
   availability_date: z

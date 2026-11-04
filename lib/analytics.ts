@@ -25,6 +25,7 @@ export const EVENTS = {
   recruiterCalled: "Recruteur appelé",
   signupClicked: "Clic inscription",
   resultShared: "Résultat partagé",
+  cvScanned: "CV analysé",
 } as const;
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];
 export type EventProperties = Record<string, string | number | boolean | null>;

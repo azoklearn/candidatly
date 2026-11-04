@@ -78,4 +78,4 @@ export function createLogger(
   };
 }
 
-export const logger = createLogger({ app: "candidatly" });
+export const logger = createLogger({ app: "jobgpt" });

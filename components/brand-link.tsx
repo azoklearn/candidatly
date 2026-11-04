@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { APP_NAME } from "@/lib/brand";
 
-/** Logo of the landing page: tilted "C" mark and word mark. */
+/** Logo of the landing page: tilted "J" mark and word mark. */
 export function BrandLink({ href = "/" }: { href?: string }) {
   return (
     <Link
@@ -11,7 +11,7 @@ export function BrandLink({ href = "/" }: { href?: string }) {
       className="inline-flex items-center gap-2 text-[19px] font-bold tracking-[-0.055em]"
     >
       <span className="brand-mark" aria-hidden>
-        C
+        J
       </span>
       <span>{APP_NAME}</span>
     </Link>

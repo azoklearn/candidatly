@@ -5,10 +5,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          2.062821,
-          49.031624
-        ]
+        "coordinates": [2.062821, 49.031624]
       },
       "properties": {
         "label": "8 Boulevard du Port 95000 Cergy",
@@ -34,10 +31,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          2.290084,
-          49.897442
-        ]
+        "coordinates": [2.290084, 49.897442]
       },
       "properties": {
         "label": "8 Boulevard du Port 80000 Amiens",
@@ -63,10 +57,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          3.605884,
-          43.425225
-        ]
+        "coordinates": [3.605884, 43.425225]
       },
       "properties": {
         "label": "8 Boulevard du Port 34140 Mèze",

@@ -9,8 +9,8 @@ export default function TermsPage() {
     <LegalPage title="Conditions d’utilisation" updated="11 septembre 2026">
       <h2>Objet</h2>
       <p>
-        Candidatly aide les étudiants à trouver des offres d’alternance publiées, à préparer une
-        lettre de motivation adaptée à chaque offre et à suivre leurs candidatures. Ces conditions
+        JobGPT aide les étudiants à trouver des offres d’alternance publiées, à préparer une lettre
+        de motivation adaptée à chaque offre et à suivre leurs candidatures. Ces conditions
         s’appliquent à toute personne qui crée un compte.
       </p>
       <h2>Accès et prix</h2>
@@ -21,7 +21,7 @@ export default function TermsPage() {
       <h2>Fonctionnement</h2>
       <ul>
         <li>
-          Les offres sont publiées par des tiers. Candidatly ne garantit ni leur exactitude, ni leur
+          Les offres sont publiées par des tiers. JobGPT ne garantit ni leur exactitude, ni leur
           disponibilité, ni la réponse des recruteurs.
         </li>
         <li>
@@ -41,9 +41,9 @@ export default function TermsPage() {
       </ul>
       <h2>Responsabilité</h2>
       <p>
-        Candidatly s’efforce d’assurer un service disponible et fiable, sans pouvoir le garantir en
-        continu. Candidatly ne peut être tenu responsable des décisions des recruteurs ni du contenu
-        des sites tiers.
+        JobGPT s’efforce d’assurer un service disponible et fiable, sans pouvoir le garantir en
+        continu. JobGPT ne peut être tenu responsable des décisions des recruteurs ni du contenu des
+        sites tiers.
       </p>
       <h2>Suppression du compte</h2>
       <p>
