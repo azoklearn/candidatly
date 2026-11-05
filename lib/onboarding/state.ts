@@ -28,6 +28,20 @@ export const ACCOUNT_STEP_PATH = "/onboarding/compte";
  * student sees what the search found before being asked to sign up.
  */
 export const ANALYSIS_PATH = "/onboarding/analyse";
+/**
+ * A CV read on the landing page replaces the five questions by one screen (C100): what we
+ * understood, corrected in place. Visitors who drop no CV keep the questions one by one.
+ */
+export const RECAP_PATH = "/onboarding/profil";
+
+/**
+ * Where a student goes once their CV has been read: the confirmation screen as soon as a
+ * field was recognised, and otherwise the question they stopped at, as any other visitor.
+ */
+export function nextAfterScan({ hasDomain, step }: { hasDomain: boolean; step: number }): string {
+  if (hasDomain) return RECAP_PATH;
+  return step > VISITOR_LAST_STEP ? ANALYSIS_PATH : `/onboarding/${step}`;
+}
 
 export type OnboardingProfile = Pick<
   Tables<"profiles">,

@@ -338,64 +338,75 @@ function readRadius(formData: FormData): number {
 }
 
 /**
- * Step 5, in three shapes (docs/QUESTIONS.md C92): a city of the list, which calls nothing,
+ * A city, in three shapes (docs/QUESTIONS.md C92): one of the list, which calls nothing,
  * the position of the browser, read back through the geocoder, or a typed address.
  */
-export async function saveLocation(_previous: FormState, formData: FormData): Promise<FormState> {
+async function readPlaceValues(
+  formData: FormData,
+  userId: string | null,
+): Promise<{ values: PlaceValues } | { error: string }> {
   const radius = readRadius(formData);
-  const { supabase, userId } = await onboardingContext(formData);
   const preset = findPresetCity(read(formData, "city"));
-  let values: PlaceValues | null = preset
-    ? {
+  if (preset) {
+    return {
+      values: {
         location_label: preset.label,
         location_lat: preset.lat,
         location_lng: preset.lng,
         insee_code: preset.insee,
         search_radius_km: radius,
-      }
-    : null;
+      },
+    };
+  }
 
-  if (!values) {
-    if (!userId && !(await allowAnonymousAction("save_location", await headers()))) {
-      return { error: RATE_LIMITED_MESSAGE };
-    }
-    const lat = Number(read(formData, "lat"));
-    const lng = Number(read(formData, "lng"));
-    const fromPosition =
-      read(formData, "lat") !== "" && Number.isFinite(lat) && Number.isFinite(lng);
-    const address = fromPosition
-      ? null
-      : AddressSchema.safeParse({
-          label: read(formData, "label"),
-          citycode: read(formData, "citycode"),
-        });
-    if (address && !address.success) {
-      return { error: "Choisis une ville de la liste ou une adresse proposée." };
-    }
-    let place;
-    try {
-      place = fromPosition ? await reversePlace(lat, lng) : await resolvePlace(address!.data!);
-    } catch (error) {
-      log.warn("geocoding_unavailable", {
-        status: error instanceof ExternalApiError ? error.status : null,
+  if (!userId && !(await allowAnonymousAction("save_location", await headers()))) {
+    return { error: RATE_LIMITED_MESSAGE };
+  }
+  const lat = Number(read(formData, "lat"));
+  const lng = Number(read(formData, "lng"));
+  const fromPosition = read(formData, "lat") !== "" && Number.isFinite(lat) && Number.isFinite(lng);
+  const address = fromPosition
+    ? null
+    : AddressSchema.safeParse({
+        label: read(formData, "label"),
+        citycode: read(formData, "citycode"),
       });
-      return { error: "Le service d’adresses ne répond pas. Réessaie dans un instant." };
-    }
-    if (!place) {
-      return {
-        error: fromPosition
-          ? "On n’a pas reconnu ta position. Choisis une ville."
-          : "Adresse introuvable. Choisis une proposition de la liste.",
-      };
-    }
-    values = {
+  if (address && !address.success) {
+    return { error: "Choisis une ville de la liste ou une adresse proposée." };
+  }
+  let place;
+  try {
+    place = fromPosition ? await reversePlace(lat, lng) : await resolvePlace(address!.data!);
+  } catch (error) {
+    log.warn("geocoding_unavailable", {
+      status: error instanceof ExternalApiError ? error.status : null,
+    });
+    return { error: "Le service d’adresses ne répond pas. Réessaie dans un instant." };
+  }
+  if (!place) {
+    return {
+      error: fromPosition
+        ? "On n’a pas reconnu ta position. Choisis une ville."
+        : "Adresse introuvable. Choisis une proposition de la liste.",
+    };
+  }
+  return {
+    values: {
       location_label: place.label,
       location_lat: place.lat,
       location_lng: place.lng,
       insee_code: place.citycode,
       search_radius_km: radius,
-    };
-  }
+    },
+  };
+}
+
+/** Step 5 of the questionnaire, and the city field of the account page. */
+export async function saveLocation(_previous: FormState, formData: FormData): Promise<FormState> {
+  const { supabase, userId } = await onboardingContext(formData);
+  const outcome = await readPlaceValues(formData, userId);
+  if ("error" in outcome) return { error: outcome.error };
+  const values = outcome.values;
 
   if (!userId) {
     await saveDraft(values);
@@ -412,6 +423,73 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
     revalidatePath("/account");
     return { saved: true };
   }
+  redirect(ANALYSIS_PATH);
+}
+
+/**
+ * The one screen that follows a CV dropped on the landing page (docs/QUESTIONS.md C100):
+ * contract, field, jobs, level and city are confirmed together, then the search starts.
+ * Everything the scan did not find is asked here, so there is a single screen either way.
+ */
+export async function saveScanProfile(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const contract = ContractSchema.safeParse(read(formData, "target_contract"));
+  const level = LevelSchema.safeParse(read(formData, "diploma_level"));
+  const domain = findDomain(read(formData, "domain"));
+  const codes = [...new Set(formData.getAll("rome_codes").map(String))];
+  const fieldErrors: Record<string, string> = {};
+  if (!contract.success) fieldErrors.target_contract = "Choisis ce que tu cherches.";
+  if (!domain) fieldErrors.domain = "Choisis ton domaine.";
+  if (!level.success) fieldErrors.diploma_level = "Choisis ton niveau d’études.";
+  if (codes.length === 0) fieldErrors.rome_codes = "Choisis au moins un métier.";
+  if (codes.length > 5) fieldErrors.rome_codes = "5 métiers au maximum.";
+  if (domain && codes.some((code) => !domain.codes.includes(code))) {
+    fieldErrors.rome_codes = "Choisis des métiers de ce domaine.";
+  }
+  if (Object.keys(fieldErrors).length > 0) return { fieldErrors };
+  if (!contract.success || !level.success || !domain) return { error: GENERIC_ERROR };
+
+  const { supabase, userId, reference } = await onboardingContext(formData);
+  const known = await reference
+    .from("rome_codes")
+    .select("code, rome_version")
+    .in("code", codes)
+    .eq("is_active", true);
+  if (known.error || known.data.length !== codes.length) {
+    return { fieldErrors: { rome_codes: "Un des métiers n’existe pas dans la nomenclature." } };
+  }
+
+  // The city is kept as it was read on the CV unless the student opened the picker.
+  let place: Partial<PlaceValues> = { search_radius_km: readRadius(formData) };
+  if (read(formData, "city_mode") !== "keep") {
+    const outcome = await readPlaceValues(formData, userId);
+    if ("error" in outcome) return { fieldErrors: { city: outcome.error } };
+    place = outcome.values;
+  } else if (read(formData, "has_city") !== "1") {
+    return { fieldErrors: { city: "Choisis ta ville." } };
+  }
+
+  const values = {
+    target_contract: contract.data,
+    contract_chosen_at: new Date().toISOString(),
+    diploma_level: level.data,
+    domain_free_text: domain.label,
+    rome_codes: codes,
+    rome_version: Math.max(...known.data.map((row) => row.rome_version)),
+    ...place,
+  };
+  if (userId) {
+    const { error } = await supabase.from("profiles").update(values).eq("user_id", userId);
+    if (error) {
+      log.error("scan_profile_update_failed", { code: error.code });
+      return { error: GENERIC_ERROR };
+    }
+  } else {
+    await saveDraft(values);
+  }
+  log.info("scan_profile_saved", { domain: domain.id, jobs: codes.length });
   redirect(ANALYSIS_PATH);
 }
 

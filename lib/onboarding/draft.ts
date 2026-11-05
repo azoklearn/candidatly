@@ -39,6 +39,8 @@ export const DraftSchema = z
     scan_summary: z.string().max(140),
     /** Address read on the CV, only to fill the sign-up form (C97). */
     scan_email: z.email().max(160),
+    /** When a CV was read: the questionnaire then asks for a confirmation only (C100). */
+    scanned_at: z.string().max(40),
   })
   .partial();
 

@@ -14,7 +14,7 @@ import { logger } from "@/lib/logger";
 import { saveDraft, readDraft } from "@/lib/onboarding/draft-cookie";
 import { draftSnapshot } from "@/lib/onboarding/draft";
 import { bestDomainForCandidates } from "@/lib/onboarding/domains";
-import { ANALYSIS_PATH, firstIncompleteStep, VISITOR_LAST_STEP } from "@/lib/onboarding/state";
+import { firstIncompleteStep, nextAfterScan } from "@/lib/onboarding/state";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -125,6 +125,7 @@ export async function POST(request: NextRequest) {
 
   const draft = await saveDraft({
     ...answers,
+    scanned_at: new Date().toISOString(),
     ...(summary ? { scan_summary: summary } : {}),
     ...(scan.email ? { scan_email: scan.email } : {}),
   });
@@ -141,7 +142,8 @@ export async function POST(request: NextRequest) {
     jobs: domain?.codes.length ?? 0,
   });
 
+  // A field was recognised: one screen to confirm it, instead of the five questions (C100).
   const step = firstIncompleteStep(draftSnapshot(userId ? await readDraft() : draft));
-  const next = step > VISITOR_LAST_STEP ? ANALYSIS_PATH : `/onboarding/${step}`;
+  const next = nextAfterScan({ hasDomain: domain !== null, step });
   return NextResponse.json({ ok: true, next, summary });
 }

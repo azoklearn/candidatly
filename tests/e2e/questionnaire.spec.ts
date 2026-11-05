@@ -149,6 +149,15 @@ test("a CV dropped on the landing page fills the questionnaire", async ({ page }
   expect(stored).not.toContain("Atelier");
   expect(stored).not.toContain("06 12 34 56 78");
 
+  // A CV replaces the five questions by one screen to confirm (C100).
+  await expect(page).toHaveURL(/\/onboarding\/profil$/);
+  await expect(page.getByRole("heading", { name: "On a lu ton CV." })).toBeVisible();
+  await expect(page.getByLabel("Ton domaine")).toHaveValue("informatique");
+  await expect(page.getByRole("radio", { name: "Bac+3" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Alternance" })).toBeChecked();
+  await expect(page.getByText("Lyon", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Voir mes offres" })).toBeVisible();
+
   // The account screen opens with what the CV gave.
   await page.goto("/onboarding/compte");
   await expect(page.getByLabel("Prénom")).toHaveValue("Camille");

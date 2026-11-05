@@ -8,28 +8,11 @@ import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
-
-import {
-  finishOnboarding,
-  registerDocument,
-  saveLetterText,
-  skipDocuments,
-  type FormState,
-} from "../actions";
+import { finishOnboarding, saveLetterText, skipDocuments, type FormState } from "../actions";
 import type { DocumentSummary } from "../data";
+import { CvHandoff } from "./cv-handoff";
 import { FieldError, FieldHint, textareaClassName } from "./fields";
-
-const PDF = "application/pdf";
-const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-const MAX_BYTES = 5 * 1024 * 1024;
-
-function mimeTypeOf(file: File): string {
-  if (file.type) return file.type;
-  if (/\.pdf$/i.test(file.name)) return PDF;
-  if (/\.docx$/i.test(file.name)) return DOCX;
-  return "";
-}
+import { DOCX, mimeTypeOf, PDF, uploadDocument } from "./upload-document";
 
 type UploadStatus =
   | { state: "idle" }
@@ -63,27 +46,8 @@ function FileUpload({
       });
       return;
     }
-    if (file.size > MAX_BYTES) {
-      setStatus({ state: "error", message: "Le fichier dépasse 5 Mo." });
-      return;
-    }
     setStatus({ state: "working" });
-    const extension = mimeType === PDF ? "pdf" : "docx";
-    const path = `${userId}/${kind === "cv" ? "cv" : "letter"}/${crypto.randomUUID()}.${extension}`;
-    const uploaded = await createClient()
-      .storage.from("documents")
-      .upload(path, file, { contentType: mimeType });
-    if (uploaded.error) {
-      setStatus({ state: "error", message: "L’envoi du fichier a échoué. Réessaie." });
-      return;
-    }
-    const result = await registerDocument({
-      kind,
-      path,
-      originalName: file.name,
-      mimeType: mimeType as typeof PDF,
-      size: file.size,
-    });
+    const result = await uploadDocument(userId, kind, file);
     setStatus(result.ok ? { state: "done" } : { state: "error", message: result.error });
   }
 
@@ -180,6 +144,7 @@ export function DocumentsStep({
           Au format PDF, 5 Mo au maximum. Il est stocké de façon privée et chiffrée.
         </FieldHint>
         <CurrentDocument document={cv} />
+        {cv ? null : <CvHandoff userId={userId} />}
         <FileUpload
           userId={userId}
           kind="cv"

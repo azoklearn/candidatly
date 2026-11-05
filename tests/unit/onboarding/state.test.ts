@@ -2,11 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import {
   ACCOUNT_STEP,
+  ANALYSIS_PATH,
   completedSteps,
   firstIncompleteStep,
   isStepAccessible,
   LAST_STEP,
+  nextAfterScan,
   parseStep,
+  RECAP_PATH,
+  VISITOR_LAST_STEP,
   type OnboardingSnapshot,
 } from "@/lib/onboarding/state";
 
@@ -108,6 +112,15 @@ describe("onboarding progress", () => {
     expect(isStepAccessible(ACCOUNT_STEP, answered)).toBe(true);
     expect(isStepAccessible(ACCOUNT_STEP + 1, answered)).toBe(false);
     expect(isStepAccessible(0, answered)).toBe(false);
+  });
+
+  it("sends a read CV to the confirmation screen, and the others to their question", () => {
+    // A field was recognised: one screen instead of five questions (C100).
+    expect(nextAfterScan({ hasDomain: true, step: 1 })).toBe(RECAP_PATH);
+    expect(nextAfterScan({ hasDomain: true, step: VISITOR_LAST_STEP + 1 })).toBe(RECAP_PATH);
+    // Nothing recognised: the questionnaire runs as usual.
+    expect(nextAfterScan({ hasDomain: false, step: 2 })).toBe("/onboarding/2");
+    expect(nextAfterScan({ hasDomain: false, step: VISITOR_LAST_STEP + 1 })).toBe(ANALYSIS_PATH);
   });
 
   it("parses step numbers from the URL", () => {

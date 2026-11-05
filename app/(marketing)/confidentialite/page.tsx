@@ -118,7 +118,10 @@ export default function PrivacyPage() {
         pendant 7 jours, ainsi que le prénom, le nom et l’adresse email lus sur votre CV pour
         préremplir la création du compte : il est déposé sur votre navigateur, effacé dès que vos
         réponses rejoignent votre profil, et vous pouvez le supprimer à tout moment. Le fichier du
-        CV lui-même n’est jamais conservé tant que vous n’avez pas de compte. La mesure d’audience
+        CV lui-même n’est jamais envoyé à nos serveurs pour y rester : il est lu, puis oublié. Il
+        est en revanche gardé dans votre propre navigateur (stockage local, 24 heures au maximum),
+        afin d’être joint à votre compte si vous le créez, sans avoir à le redéposer ; il n’en sort
+        pas avant, et vous pouvez l’effacer en vidant les données du site. La mesure d’audience
         (Vercel Web Analytics) ne dépose aucun cookie : les visites sont comptées de façon agrégée,
         et nous retirons des adresses de pages les identifiants et les paramètres avant tout envoi.
         Aucun traceur publicitaire n’est utilisé.

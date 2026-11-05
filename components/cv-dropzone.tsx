@@ -13,6 +13,7 @@ import {
 } from "react";
 
 import { EVENTS } from "@/lib/analytics";
+import { canStashCv, clearStashedCv, stashCv } from "@/lib/cv/handoff";
 
 /**
  * The CV lands on the landing page (docs/QUESTIONS.md C95 and C96): the whole window is a
@@ -57,6 +58,9 @@ export function CvDropzone() {
       }
       setState({ status: "reading", name: file.name });
       track(EVENTS.cvScanned);
+      // The file waits in this browser so the account does not ask for it again (C100).
+      if (canStashCv(file)) await stashCv(file);
+      else await clearStashedCv();
       try {
         const body = new FormData();
         body.append("cv", file);
@@ -184,7 +188,7 @@ export function CvDropzone() {
               <span className="cv-drop-drag">Glisse ton CV ici</span>
               <span className="cv-drop-tap">Choisis ton CV</span>
             </strong>
-            <span className="cv-drop-hint">PDF ou Word, 4 Mo maximum. Il n’est pas conservé.</span>
+            <span className="cv-drop-hint">PDF ou Word, 4 Mo maximum. Il n’est pas stocké chez nous.</span>
             <button
               type="button"
               className="shiny-cta"
