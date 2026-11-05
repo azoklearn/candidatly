@@ -1137,29 +1137,6 @@ html:has(.lp) {
   margin: 0 auto;
   text-align: center;
 }
-.lp .hero-intro .social-proof-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
-  margin-bottom: 25px;
-  background: rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(188, 211, 237, 0.9);
-  border-radius: 999px;
-  box-shadow: 0 6px 20px rgba(25, 67, 121, 0.08);
-  color: #355270;
-  font-size: 10px;
-  font-weight: 600;
-}
-.lp .hero-stars {
-  color: #1764d8;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-}
-.lp .social-proof-pill strong {
-  color: #0a2a52;
-  font-size: 10px;
-}
 .lp .hero-intro h1 {
   max-width: 830px;
   margin: 0 auto 23px;
@@ -1360,9 +1337,6 @@ html:has(.lp) {
   }
   .lp .hero-intro {
     text-align: left;
-  }
-  .lp .hero-intro .social-proof-pill {
-    margin-bottom: 20px;
   }
   .lp .hero-intro h1 {
     font-size: clamp(48px, 14vw, 67px);
@@ -1794,14 +1768,18 @@ html:has(.lp) {
 /* Le héros : le texte au-dessus, la zone de dépôt au milieu de sa scène. */
 .lp .hero {
   min-height: 0;
-  padding: 72px 0 42px;
+  padding: 38px 0 40px;
+}
+/* Le point reste collé au mot qui se tape : jamais seul sur sa ligne. */
+.lp .hero-word {
+  white-space: nowrap;
 }
 .lp .hero-stage {
   position: relative;
   display: grid;
   place-items: center;
   min-height: 486px;
-  margin-top: 34px;
+  margin-top: 26px;
 }
 .lp .hero-drop {
   position: relative;
@@ -2086,9 +2064,12 @@ html:has(.lp) {
   .lp .drop-cue {
     display: none;
   }
+  .lp .hero {
+    padding: 24px 0 34px;
+  }
   .lp .hero-stage {
     min-height: 505px;
-    margin-top: 24px;
+    margin-top: 20px;
   }
   .lp .hero-prop {
     filter: drop-shadow(0 10px 16px rgba(40, 70, 110, 0.08));

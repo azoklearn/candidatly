@@ -6,8 +6,6 @@ import { DropCue, HeroProps } from "@/components/hero-props";
 import { RotatingWord } from "@/components/rotating-word";
 import { TrackedLink } from "@/components/tracked-link";
 import { EVENTS } from "@/lib/analytics";
-import { socialProofMessage, type LandingStats } from "@/lib/social-proof";
-import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
   title: { absolute: "JobGPT · Dépose ton CV, on te trouve ton alternance" },
@@ -15,35 +13,13 @@ export const metadata: Metadata = {
     "JobGPT traque les offres d’alternance qui collent à ton profil, te dit lesquelles valent le coup et prépare ta lettre pour chacune.",
 };
 
-/** Real numbers for the proof pill; none when the database is unreachable. */
-async function loadStats(): Promise<LandingStats | null> {
-  try {
-    const admin = createAdminClient();
-    const [placed, students] = await Promise.all([
-      admin.from("applications").select("user_id").eq("status", "replied_positive").limit(10_000),
-      admin
-        .from("profiles")
-        .select("user_id", { count: "exact", head: true })
-        .eq("onboarding_completed", true),
-    ]);
-    if (placed.error || students.error) return null;
-    return {
-      placedStudents: new Set(placed.data.map((row) => row.user_id)).size,
-      students: students.count ?? 0,
-    };
-  } catch {
-    return null;
-  }
-}
-
 export default async function HomePage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [params, stats] = await Promise.all([searchParams, loadStats()]);
+  const params = await searchParams;
   const deleted = params.compte === "supprime";
-  const proof = socialProofMessage(stats);
 
   return (
     <>
@@ -83,16 +59,13 @@ export default async function HomePage({
                 Votre compte et vos données ont été supprimés.
               </p>
             ) : null}
-            <div className="social-proof-pill">
-              <span className="hero-stars" aria-hidden="true">
-                ✦
-              </span>
-              <span>{proof}</span>
-            </div>
             <h1>
               Dépose ton CV,
               <br />
-              on te trouve ton <RotatingWord words={["alternance", "stage"]} />.
+              on te trouve ton{" "}
+              <span className="hero-word">
+                <RotatingWord words={["alternance", "stage"]} />.
+              </span>
             </h1>
             <p className="hero-copy">
               JobGPT lit ton CV, en tire ton métier, ton niveau et ta ville, puis garde les offres
