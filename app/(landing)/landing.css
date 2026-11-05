@@ -209,11 +209,6 @@ html:has(.lp) {
   max-width: 500px;
   margin-bottom: 29px;
 }
-.lp .hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
 .lp .button {
   display: inline-flex;
   justify-content: center;
@@ -871,11 +866,6 @@ html:has(.lp) {
   .lp .hero-copy {
     font-size: 15px;
   }
-  .lp .hero-actions {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 19px;
-  }
   .lp .how,
   .lp .testimonials {
     padding: 78px 0;
@@ -1191,9 +1181,6 @@ html:has(.lp) {
   line-height: 1.55;
   color: #54708d;
 }
-.lp .hero-actions {
-  justify-content: center;
-}
 .lp .button {
   border-radius: 999px;
   padding: 15px 18px 15px 23px;
@@ -1382,9 +1369,6 @@ html:has(.lp) {
   }
   .lp .hero-copy {
     margin-left: 0;
-  }
-  .lp .hero-actions {
-    justify-content: flex-start;
   }
   .lp .steps {
     grid-template-columns: 1fr;
@@ -1781,5 +1765,397 @@ html:has(.lp) {
   }
   .lp .cv-drop-bar::after {
     width: 100%;
+  }
+}
+
+/* ===========================================================================
+   Direction ivoire et pastel (docs/QUESTIONS.md C98).
+   Fond ivoire, lavis pastel très légers sur toute la page, et une scène d'objets
+   qui flottent autour de la zone de dépôt du CV, au centre du héros.
+   =========================================================================== */
+.lp {
+  --paper: #fcf8f0;
+  --pastel-sky: #dfecff;
+  --pastel-mint: #ddf2e7;
+  --pastel-peach: #ffe8d8;
+  --pastel-lilac: #eae3fc;
+  --pastel-sun: #fdf1d2;
+  --pastel-rose: #fde4ee;
+  --pastel-line: #e9e0d2;
+  background:
+    radial-gradient(780px 540px at 14% 3%, rgba(210, 231, 255, 0.5), transparent 72%),
+    radial-gradient(700px 500px at 88% 9%, rgba(255, 224, 205, 0.45), transparent 72%),
+    radial-gradient(760px 540px at 82% 34%, rgba(230, 221, 252, 0.52), transparent 72%),
+    radial-gradient(680px 480px at 6% 48%, rgba(214, 241, 228, 0.5), transparent 72%),
+    radial-gradient(720px 520px at 92% 72%, rgba(253, 226, 238, 0.45), transparent 72%),
+    radial-gradient(700px 520px at 10% 88%, rgba(253, 241, 210, 0.5), transparent 72%), var(--paper);
+}
+
+/* Le héros : le texte au-dessus, la zone de dépôt au milieu de sa scène. */
+.lp .hero {
+  min-height: 0;
+  padding: 72px 0 42px;
+}
+.lp .hero-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 486px;
+  margin-top: 34px;
+}
+.lp .hero-drop {
+  position: relative;
+  z-index: 3;
+  width: min(470px, 100%);
+}
+.lp .hero-props {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.lp .hero-prop {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  width: var(--w);
+  height: var(--w);
+  filter: drop-shadow(0 16px 24px rgba(40, 70, 110, 0.09));
+  animation: lp-prop-float var(--dur, 7s) var(--d, 0s) ease-in-out infinite alternate;
+  will-change: transform;
+}
+.lp .hero-prop svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+@keyframes lp-prop-float {
+  from {
+    transform: translate3d(0, -7px, 0) rotate(calc(var(--r, 0deg) - 1.6deg));
+  }
+  to {
+    transform: translate3d(0, 7px, 0) rotate(calc(var(--r, 0deg) + 1.6deg));
+  }
+}
+.lp .hero-prop[data-prop="plane"] {
+  --l: 5%;
+  --t: -2%;
+  --w: 104px;
+  --r: -7deg;
+  --dur: 6.4s;
+  --d: -0.4s;
+}
+.lp .hero-prop[data-prop="clock"] {
+  --l: 0.5%;
+  --t: 29%;
+  --w: 84px;
+  --r: 5deg;
+  --dur: 7.6s;
+  --d: -1.9s;
+}
+.lp .hero-prop[data-prop="pencil"] {
+  --l: 19.5%;
+  --t: 13%;
+  --w: 74px;
+  --r: -4deg;
+  --dur: 5.8s;
+  --d: -3.1s;
+}
+.lp .hero-prop[data-prop="notebook"] {
+  --l: 12%;
+  --t: 50%;
+  --w: 98px;
+  --r: 3deg;
+  --dur: 8.1s;
+  --d: -0.9s;
+}
+.lp .hero-prop[data-prop="desk"] {
+  --l: 0;
+  --t: 69%;
+  --w: 132px;
+  --r: 0deg;
+  --dur: 9s;
+  --d: -2.4s;
+}
+.lp .hero-prop[data-prop="sticky"] {
+  --l: 20%;
+  --t: 80%;
+  --w: 76px;
+  --r: -6deg;
+  --dur: 6.9s;
+  --d: -1.2s;
+}
+.lp .hero-prop[data-prop="cap"] {
+  --l: 86%;
+  --t: 33%;
+  --w: 100px;
+  --r: 6deg;
+  --dur: 7.2s;
+  --d: -2.8s;
+}
+.lp .hero-prop[data-prop="coffee"] {
+  --l: 92%;
+  --t: 1%;
+  --w: 78px;
+  --r: -5deg;
+  --dur: 6.1s;
+  --d: -0.6s;
+}
+.lp .hero-prop[data-prop="laptop"] {
+  --l: 72.5%;
+  --t: 42%;
+  --w: 118px;
+  --r: -3deg;
+  --dur: 8.4s;
+  --d: -3.6s;
+}
+.lp .hero-prop[data-prop="envelope"] {
+  --l: 87%;
+  --t: 59%;
+  --w: 94px;
+  --r: 7deg;
+  --dur: 7s;
+  --d: -1.5s;
+}
+.lp .hero-prop[data-prop="folder"] {
+  --l: 71%;
+  --t: 76%;
+  --w: 112px;
+  --r: -4deg;
+  --dur: 8.8s;
+  --d: -2.1s;
+}
+.lp .hero-prop[data-prop="plant"] {
+  --l: 89%;
+  --t: 80%;
+  --w: 82px;
+  --r: 4deg;
+  --dur: 6.6s;
+  --d: -4.2s;
+}
+
+/* Le trait pointillé qui boucle et pointe sur la zone de dépôt. */
+.lp .drop-cue {
+  position: absolute;
+  left: calc(100% - 100px);
+  bottom: calc(100% - 20px);
+  width: 210px;
+  pointer-events: none;
+}
+.lp .drop-cue-arrow {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.lp .drop-cue-line,
+.lp .drop-cue-head {
+  stroke: #a9bfd9;
+}
+.lp .drop-cue-line {
+  stroke-dasharray: 7 9;
+  animation: lp-cue-flow 2.6s linear infinite;
+}
+@keyframes lp-cue-flow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+.lp .drop-cue-label {
+  position: absolute;
+  right: -14px;
+  bottom: calc(100% - 18px);
+  width: 170px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 30px;
+  line-height: 1.05;
+  color: #35598a;
+  text-align: right;
+  transform: rotate(-5deg);
+}
+
+/* Pastels sur le reste de la page. */
+.lp .step-card {
+  border-color: var(--pastel-line);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 14px 30px rgba(74, 64, 48, 0.05);
+}
+.lp .step-card:hover {
+  box-shadow: 0 20px 38px rgba(74, 64, 48, 0.1);
+}
+.lp .yellow-card {
+  background: var(--pastel-sky);
+  border-color: #cfe1f8;
+}
+.lp .dark-card {
+  color: var(--ink);
+  background: linear-gradient(150deg, var(--pastel-lilac), #dcd1f8);
+  border-color: #d7cdf4;
+}
+.lp .dark-card p {
+  color: #55507a;
+}
+.lp .dark-card .step-arrow,
+.lp .dark-card .step-index {
+  color: var(--ink);
+}
+.lp .spark-icon {
+  color: #8a78d6;
+}
+.lp .opportunity-section {
+  background: linear-gradient(140deg, #e9f2ff, #fdf4ea 56%, #f2ecfd);
+}
+.lp .opportunity-section::before {
+  border-color: rgba(53, 89, 138, 0.12);
+}
+.lp .feed-demo {
+  border-color: #e6ddcf;
+  box-shadow: 0 28px 54px rgba(74, 64, 48, 0.12);
+}
+.lp .quote {
+  border-color: var(--pastel-line);
+}
+.lp .quote-main {
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--pastel-sky), var(--pastel-lilac));
+  border-color: #d8d1f1;
+  box-shadow: 0 18px 38px rgba(74, 64, 48, 0.08);
+}
+.lp .quote-main footer small {
+  color: var(--ink-soft);
+}
+.lp .quote-mark {
+  color: #9db6e2;
+}
+.lp .quote-stat {
+  background: var(--pastel-mint);
+}
+.lp .quote-stat strong {
+  color: #2f6a4f;
+}
+.lp .final-cta {
+  color: var(--ink);
+  background: linear-gradient(160deg, #e8f1ff, #fdf2e6 54%, #efe7fd);
+}
+.lp .final-cta h2 em {
+  color: var(--coral);
+}
+.lp .final-cta p,
+.lp .final-login {
+  color: var(--ink-soft);
+}
+.lp .final-login:hover {
+  color: var(--ink);
+}
+.lp .eyebrow.light {
+  color: #5d7792;
+}
+.lp .eyebrow.light .pulse {
+  background: var(--coral);
+}
+.lp .final-dots {
+  background-image: radial-gradient(circle, rgba(53, 89, 138, 0.22) 1px, transparent 1px);
+}
+.lp .site-footer {
+  border-color: var(--pastel-line);
+}
+
+/* La zone de dépôt, au centre de la scène. */
+.lp .cv-drop {
+  padding: 34px 28px 26px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 22px 48px rgba(74, 64, 48, 0.1);
+}
+.lp .cv-dashes rect {
+  stroke: #d6c9b4;
+}
+.lp .cv-sheet {
+  border-color: #dfd3bf;
+}
+.lp .cv-drop-hint {
+  color: #6c7f94;
+}
+.lp .cv-overlay {
+  background: rgba(252, 248, 240, 0.88);
+}
+
+@media (max-width: 900px) {
+  .lp .drop-cue {
+    display: none;
+  }
+  .lp .hero-stage {
+    min-height: 505px;
+    margin-top: 24px;
+  }
+  .lp .hero-prop {
+    filter: drop-shadow(0 10px 16px rgba(40, 70, 110, 0.08));
+  }
+  /* Six objets seulement, en haut et en bas, pour laisser la carte respirer. */
+  .lp .hero-prop[data-prop="clock"],
+  .lp .hero-prop[data-prop="pencil"],
+  .lp .hero-prop[data-prop="desk"],
+  .lp .hero-prop[data-prop="envelope"],
+  .lp .hero-prop[data-prop="folder"],
+  .lp .hero-prop[data-prop="plant"] {
+    display: none;
+  }
+  .lp .hero-prop[data-prop="plane"],
+  .lp .hero-prop[data-prop="coffee"],
+  .lp .hero-prop[data-prop="cap"] {
+    --t: 4px;
+  }
+  .lp .hero-prop[data-prop="notebook"],
+  .lp .hero-prop[data-prop="laptop"],
+  .lp .hero-prop[data-prop="sticky"] {
+    --t: auto;
+    top: auto;
+    bottom: 4px;
+  }
+  .lp .hero-prop[data-prop="plane"] {
+    --l: 1%;
+    --w: 72px;
+  }
+  .lp .hero-prop[data-prop="coffee"] {
+    --l: 46%;
+    --w: 56px;
+  }
+  .lp .hero-prop[data-prop="cap"] {
+    --l: 77%;
+    --w: 74px;
+  }
+  .lp .hero-prop[data-prop="notebook"] {
+    --l: 3%;
+    --w: 64px;
+  }
+  .lp .hero-prop[data-prop="laptop"] {
+    --l: 44%;
+    --w: 72px;
+  }
+  .lp .hero-prop[data-prop="sticky"] {
+    --l: 80%;
+    --w: 60px;
+  }
+}
+
+@media (max-width: 420px) {
+  .lp .hero-stage {
+    min-height: 490px;
+  }
+  .lp .hero-prop[data-prop="coffee"],
+  .lp .hero-prop[data-prop="laptop"] {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp .hero-prop,
+  .lp .drop-cue-line {
+    animation: none;
+  }
+  .lp .hero-prop {
+    transform: rotate(var(--r, 0deg));
   }
 }

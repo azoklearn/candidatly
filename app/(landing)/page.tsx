@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CvDropzone } from "@/components/cv-dropzone";
+import { DropCue, HeroProps } from "@/components/hero-props";
 import { RotatingWord } from "@/components/rotating-word";
 import { TrackedLink } from "@/components/tracked-link";
 import { EVENTS } from "@/lib/analytics";
@@ -98,7 +99,11 @@ export default async function HomePage({
               qui collent. Aujourd’hui on sert les offres d’alternance publiées ; le stage et le job
               étudiant arrivent.
             </p>
-            <div className="hero-actions">
+          </div>
+          <div className="hero-stage reveal reveal-delay">
+            <HeroProps />
+            <div className="hero-drop">
+              <DropCue />
               <CvDropzone />
             </div>
           </div>
