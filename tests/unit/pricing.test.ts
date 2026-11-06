@@ -4,6 +4,7 @@ import { searchSummary } from "@/lib/offers/search-summary";
 import {
   PLANS,
   annualCents,
+  annualSavingsCents,
   featuredBadge,
   formatEuros,
   priceView,
@@ -31,6 +32,16 @@ describe("prices", () => {
       billedLabel: null,
     });
     expect(priceView(plan("basic"), "monthly").perDayCents).toBe(33);
+  });
+
+  it("says in euros what the annual formula keeps, for each plan", () => {
+    expect(PLANS.map(annualSavingsCents)).toEqual([1998, 2998, 3998]);
+    PLANS.forEach((p) => expect(annualCents(p) + annualSavingsCents(p)).toBe(p.monthlyCents * 12));
+  });
+
+  it('speaks to the student with "tu", like the rest of the funnel', () => {
+    const copy = PLANS.flatMap((p) => [p.tagline, ...p.features.map((f) => f.label)]).join(" ");
+    expect(copy).not.toMatch(/\bvotre\b|\bvos\b|\bvous\b/i);
   });
 
   it("strikes the real monthly price next to the annual price per month", () => {

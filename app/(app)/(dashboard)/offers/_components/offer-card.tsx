@@ -1,7 +1,8 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 
+import { SubmitButton } from "@/components/submit-button";
 import { Tag } from "@/components/tag";
-import { Button } from "@/components/ui/button";
 import { cityFromAddress, contractLabel, formatDistance, formatRelativeDays } from "@/lib/format";
 
 import { setMatchStatus } from "../actions";
@@ -23,7 +24,8 @@ export type OfferCardData = {
   hasCompanyCard: boolean;
 };
 
-export function OfferCard({ data }: { data: OfferCardData }) {
+/** `index` only drives the entrance: the cards arrive one after the other, not all at once. */
+export function OfferCard({ data, index = 0 }: { data: OfferCardData; index?: number }) {
   const { offer } = data;
   const saved = data.status === "saved";
   const details = [
@@ -34,7 +36,10 @@ export function OfferCard({ data }: { data: OfferCardData }) {
   ].filter(Boolean);
 
   return (
-    <li className="card-lift grid gap-3 rounded-2xl border bg-card p-4 sm:p-5">
+    <li
+      style={{ "--i": index } as CSSProperties}
+      className="card-lift rise grid gap-3 rounded-2xl border bg-card p-4 sm:p-5"
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="grid min-w-0 gap-1">
           <Link
@@ -67,14 +72,14 @@ export function OfferCard({ data }: { data: OfferCardData }) {
           action={setMatchStatus.bind(null, data.matchId, saved ? "new" : "saved")}
           className="ml-auto"
         >
-          <Button type="submit" variant="outline" size="sm">
+          <SubmitButton variant="outline" size="sm" pendingLabel="Un instant…">
             {saved ? "Retirer des favoris" : "Enregistrer"}
-          </Button>
+          </SubmitButton>
         </form>
         <form action={setMatchStatus.bind(null, data.matchId, "dismissed")}>
-          <Button type="submit" variant="ghost" size="sm">
+          <SubmitButton variant="ghost" size="sm" pendingLabel="On retire…">
             Ignorer
-          </Button>
+          </SubmitButton>
         </form>
       </div>
     </li>

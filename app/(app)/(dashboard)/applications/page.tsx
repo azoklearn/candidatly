@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 
 import { requireUserId } from "@/lib/auth/session";
 import { requirePaidAccess } from "@/lib/billing/access";
@@ -76,10 +77,11 @@ export default async function ApplicationsPage() {
                 {group.title} ({items.length})
               </h2>
               <ul className="grid gap-3">
-                {items.map((application) => (
+                {items.map((application, index) => (
                   <li
                     key={application.id}
-                    className="card-lift flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-4 sm:p-5"
+                    style={{ "--i": index } as CSSProperties}
+                    className="card-lift rise flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-4 sm:p-5"
                   >
                     <div className="grid gap-1">
                       <Link

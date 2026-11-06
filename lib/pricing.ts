@@ -2,6 +2,7 @@
  * Plans shown on /tarifs and after the questionnaire (docs/QUESTIONS.md C82). Prices in
  * euro cents; annual billing charges 10 months (two months free). Features that are not
  * built yet are flagged `soon` and shown as such: nothing is sold before it exists.
+ * The wording says "tu": the plans belong to the entry funnel (C93).
  */
 
 export const PLAN_IDS = ["basic", "plus", "premium"] as const;
@@ -29,35 +30,35 @@ export const PLANS: readonly Plan[] = [
     tagline: "Pour trouver les bonnes offres",
     monthlyCents: 999,
     features: [
-      { label: "Les offres d’alternance de votre zone et de votre domaine" },
+      { label: "Les offres d’alternance de ta zone et de ton domaine" },
       { label: "Un score de correspondance pour chaque offre" },
-      { label: "Les entreprises qui recrutent près de chez vous" },
+      { label: "Les entreprises qui recrutent près de chez toi" },
       { label: "3 recherches par jour" },
     ],
   },
   {
     id: "plus",
     name: "Plus",
-    tagline: "Pour candidater sans y passer vos soirées",
+    tagline: "Pour candidater sans y passer tes soirées",
     monthlyCents: 1499,
     features: [
       { label: "Tout le forfait Basic" },
-      { label: "Votre lettre de motivation adaptée à chaque entreprise" },
-      { label: "Votre candidature prête avec votre CV, et le suivi des réponses" },
-      { label: "Votre CV adapté à chaque entreprise", soon: true },
-      { label: "L’envoi direct de vos candidatures", soon: true },
+      { label: "Ta lettre de motivation adaptée à chaque entreprise" },
+      { label: "Ta candidature prête avec ton CV, et le suivi des réponses" },
+      { label: "Ton CV adapté à chaque entreprise", soon: true },
+      { label: "L’envoi direct de tes candidatures", soon: true },
       { label: "10 recherches par jour" },
     ],
   },
   {
     id: "premium",
     name: "Premium",
-    tagline: "Pour mettre toutes les chances de votre côté",
+    tagline: "Pour mettre toutes les chances de ton côté",
     monthlyCents: 1999,
     features: [
       { label: "Tout le forfait Plus" },
       { label: "Recherches illimitées" },
-      { label: "L’optimisation de votre CV", soon: true },
+      { label: "L’optimisation de ton CV", soon: true },
     ],
   },
 ];
@@ -70,6 +71,11 @@ export function formatEuros(cents: number): string {
 
 export function annualCents(plan: Plan): number {
   return plan.monthlyCents * ANNUAL_MONTHS_CHARGED;
+}
+
+/** What the annual formula keeps in the student's pocket: the months that are not charged. */
+export function annualSavingsCents(plan: Plan): number {
+  return plan.monthlyCents * (12 - ANNUAL_MONTHS_CHARGED);
 }
 
 export type PriceView = {

@@ -1,3 +1,5 @@
+import type { ProfileDiplomaLevel } from "@/lib/providers/types";
+
 /** French display helpers for the offer screens. */
 
 const DATE_FORMAT = new Intl.DateTimeFormat("fr-FR", {
@@ -46,6 +48,16 @@ export function cityFromAddress(address: string | null | undefined): string | nu
   return titleCase((match?.[1] ?? address).trim());
 }
 
+/** Level of study stored on a profile (profiles.diploma_level), as the student picked it. */
+export const STUDY_LEVEL_LABELS: Record<ProfileDiplomaLevel, string> = {
+  bac: "Bac",
+  "bac+2": "Bac+2",
+  "bac+3": "Bac+3",
+  "bac+4": "Bac+4",
+  "bac+5": "Bac+5",
+};
+
+/** Level required by an offer, as the API Alternance numbers it. */
 export const DIPLOMA_LABELS: Record<number, string> = {
   3: "CAP, BEP",
   4: "Bac",

@@ -188,7 +188,9 @@ export function CvDropzone() {
               <span className="cv-drop-drag">Glisse ton CV ici</span>
               <span className="cv-drop-tap">Choisis ton CV</span>
             </strong>
-            <span className="cv-drop-hint">PDF ou Word, 4 Mo maximum. Il n’est pas stocké chez nous.</span>
+            <span className="cv-drop-hint">
+              PDF ou Word, 4 Mo maximum. Il n’est pas stocké chez nous.
+            </span>
             <button
               type="button"
               className="shiny-cta"

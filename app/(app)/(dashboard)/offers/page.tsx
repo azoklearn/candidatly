@@ -136,8 +136,8 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
       ) : null}
       {cards.length > 0 ? (
         <ul className="grid gap-3">
-          {cards.map((card) => (
-            <OfferCard key={card.matchId} data={card} />
+          {cards.map((card, index) => (
+            <OfferCard key={card.matchId} data={card} index={index} />
           ))}
         </ul>
       ) : null}
@@ -172,8 +172,8 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
             </p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2">
-            {hiringCompanies.map((company) => (
-              <HiringCompanyCard key={company.id} company={company} />
+            {hiringCompanies.map((company, index) => (
+              <HiringCompanyCard key={company.id} company={company} index={index} />
             ))}
           </ul>
         </section>

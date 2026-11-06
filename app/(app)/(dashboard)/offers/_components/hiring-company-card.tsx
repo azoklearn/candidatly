@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { Tag } from "@/components/tag";
 import { TrackedLink } from "@/components/tracked-link";
 import { buttonVariants } from "@/components/ui/button";
@@ -6,14 +8,23 @@ import { formatDistance } from "@/lib/format";
 import type { HiringCompanyCardData } from "@/lib/offers/hiring-companies";
 
 /** A company likely to hire apprentices, reached by an unsolicited application. */
-export function HiringCompanyCard({ company }: { company: HiringCompanyCardData }) {
+export function HiringCompanyCard({
+  company,
+  index = 0,
+}: {
+  company: HiringCompanyCardData;
+  index?: number;
+}) {
   const place = [
     company.city,
     company.distanceKm === null ? null : formatDistance(company.distanceKm),
   ].filter(Boolean);
 
   return (
-    <li className="card-lift grid content-start gap-3 rounded-2xl border bg-card p-4 sm:p-5">
+    <li
+      style={{ "--i": index } as CSSProperties}
+      className="card-lift rise grid content-start gap-3 rounded-2xl border bg-card p-4 sm:p-5"
+    >
       <div className="flex items-start gap-3">
         <span
           aria-hidden

@@ -1,3 +1,8 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useTransition, type ChangeEvent, type FormEvent } from "react";
+
 import { Button } from "@/components/ui/button";
 
 export type OfferFilterValues = { maxKm: string; days: string; company: string; view: string };
@@ -5,13 +10,48 @@ export type OfferFilterValues = { maxKm: string; days: string; company: string; 
 const control =
   "h-9 rounded-full border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
-/** Plain GET form: filters live in the URL and work without JavaScript. */
+/**
+ * Filters live in the URL, so the form stays a plain GET and keeps working without
+ * JavaScript. With JavaScript, picking a value applies it straight away and the bar says
+ * that something is loading: the page used to change under the student with no warning.
+ */
 export function OfferFilters({ values }: { values: OfferFilterValues }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+
+  const apply = (form: HTMLFormElement) => {
+    const query = new URLSearchParams();
+    for (const [name, value] of new FormData(form)) {
+      if (typeof value === "string" && value.trim() !== "") query.set(name, value.trim());
+    }
+    const search = query.toString();
+    startTransition(() => router.push(search ? `/offers?${search}` : "/offers", { scroll: false }));
+  };
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    apply(event.currentTarget);
+  };
+
+  // A chosen value applies itself; free text waits for the button, to avoid a query per key.
+  const onChange = (event: ChangeEvent<HTMLFormElement>) => {
+    if (event.target instanceof HTMLSelectElement) apply(event.currentTarget);
+  };
+
   return (
     <form
       method="get"
-      className="flex flex-wrap items-end gap-3 rounded-2xl border bg-card p-3 text-sm sm:p-4"
+      onSubmit={onSubmit}
+      onChange={onChange}
+      aria-busy={pending}
+      className="relative flex flex-wrap items-end gap-3 overflow-hidden rounded-2xl border bg-card p-3 text-sm sm:p-4"
     >
+      {pending ? (
+        <span
+          aria-hidden
+          className="loader-bar absolute inset-x-0 top-0 h-[3px] w-full rounded-none bg-transparent"
+        />
+      ) : null}
       <label className="grid gap-1">
         <span className="text-muted-foreground">Distance</span>
         <select name="km" defaultValue={values.maxKm} className={control}>
@@ -41,8 +81,8 @@ export function OfferFilters({ values }: { values: OfferFilterValues }) {
           <option value="saved">Offres enregistrées</option>
         </select>
       </label>
-      <Button type="submit" variant="outline" size="sm">
-        Filtrer
+      <Button type="submit" variant="outline" size="sm" disabled={pending}>
+        {pending ? "Filtrage…" : "Filtrer"}
       </Button>
     </form>
   );

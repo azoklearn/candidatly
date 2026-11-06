@@ -19,7 +19,7 @@ export function PendingOverlay({
   const { pending } = useFormStatus();
   if (!pending) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50 grid place-items-center bg-background/90 px-4 backdrop-blur-sm">
+    <div className="swap fixed inset-0 z-50 grid place-items-center bg-background/90 px-4 backdrop-blur-sm">
       <LoadingScreen title={title} messages={messages} />
     </div>,
     document.body,

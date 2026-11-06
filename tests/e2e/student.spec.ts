@@ -61,6 +61,15 @@ test("a student prepares, sends and tracks an application, then exports their da
   // The preview shows the city but never the job title, not even in the HTML (C88).
   await expect(page.getByText("Tes offres attendent derrière le flou")).toBeVisible();
   expect(await page.content()).not.toContain(OFFER_TITLE);
+  // What convinces before paying must be measured, never invented: the freshness comes
+  // from the student's own matches and the recap from their own profile.
+  await expect(page.getByText(/de ta sélection publiée ces 7 derniers jours/)).toBeVisible();
+  const recap = page.getByRole("region", { name: "Ce qu’on a retenu de ta recherche" });
+  await expect(recap.getByText("Paris", { exact: true })).toBeVisible();
+  await expect(recap.getByText("jusqu’à 30 km")).toBeVisible();
+  await expect(recap.getByText("Bac+3")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Ce qu’on tient, noir sur blanc/ })).toBeVisible();
+  await expect(page.getByText("Je peux arrêter quand je veux ?")).toBeVisible();
   await page.getByRole("button", { name: "Choisir Plus" }).click();
   await expect(page).toHaveURL(/\/offers$/);
 

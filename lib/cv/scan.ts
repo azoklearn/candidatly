@@ -1,3 +1,4 @@
+import { STUDY_LEVEL_LABELS } from "@/lib/format";
 import { PRESET_CITIES, type PresetCity } from "@/lib/onboarding/cities";
 import { extractKeywords } from "@/lib/matching/score";
 import type { ProfileDiplomaLevel } from "@/lib/providers/types";
@@ -118,14 +119,6 @@ export function scanCvText(text: string): CvScan {
   };
 }
 
-export const DIPLOMA_LABELS: Record<ProfileDiplomaLevel, string> = {
-  bac: "Bac",
-  "bac+2": "Bac+2",
-  "bac+3": "Bac+3",
-  "bac+4": "Bac+4",
-  "bac+5": "Bac+5",
-};
-
 export const CONTRACT_LABELS: Record<ContractGuess, string> = {
   alternance: "Alternance",
   stage: "Stage",
@@ -139,7 +132,7 @@ export function scanSummary(input: {
   city: string | null;
 }): string | null {
   const parts = [
-    input.diplomaLevel ? DIPLOMA_LABELS[input.diplomaLevel] : null,
+    input.diplomaLevel ? STUDY_LEVEL_LABELS[input.diplomaLevel] : null,
     input.domainLabel,
     input.city,
   ].filter((part): part is string => Boolean(part));

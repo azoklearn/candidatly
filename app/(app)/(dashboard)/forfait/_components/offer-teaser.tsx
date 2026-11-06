@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { Tag } from "@/components/tag";
 import type { TeaserCard } from "@/lib/offers/teaser";
 
@@ -6,7 +8,8 @@ import type { TeaserCard } from "@/lib/offers/teaser";
  * and the employers never reach the browser, so removing the blur in the developer tools
  * reveals nothing.
  */
-export function OfferTeaser({ cards }: { cards: TeaserCard[] }) {
+export function OfferTeaser({ cards, total = 0 }: { cards: TeaserCard[]; total?: number }) {
+  const hidden = Math.max(0, total - cards.length);
   if (cards.length === 0) return null;
   return (
     <section aria-labelledby="apercu" className="fade-up grid gap-4">
@@ -20,9 +23,13 @@ export function OfferTeaser({ cards }: { cards: TeaserCard[] }) {
           s’affichent avec ton forfait.
         </p>
       </div>
-      <ul className="grid gap-3 sm:grid-cols-2">
+      <ul className={`grid gap-3 ${cards.length > 1 ? "sm:grid-cols-2" : "mx-auto max-w-md"}`}>
         {cards.map((card, index) => (
-          <li key={index} className="grid gap-3 rounded-2xl border bg-card p-4">
+          <li
+            key={index}
+            style={{ "--i": index } as CSSProperties}
+            className="rise grid gap-3 rounded-2xl border bg-card p-4"
+          >
             <div className="grid gap-2">
               <span className="teaser-bar w-4/5" aria-hidden />
               <span className="teaser-bar teaser-bar-small w-1/2" aria-hidden />
@@ -36,6 +43,11 @@ export function OfferTeaser({ cards }: { cards: TeaserCard[] }) {
           </li>
         ))}
       </ul>
+      {hidden > 0 ? (
+        <p className="text-center text-sm font-medium">
+          + {hidden} autre{hidden > 1 ? "s" : ""} offre{hidden > 1 ? "s" : ""} dans ta sélection.
+        </p>
+      ) : null}
     </section>
   );
 }
