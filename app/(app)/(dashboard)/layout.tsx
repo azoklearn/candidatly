@@ -26,7 +26,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <div className="min-h-svh">
       <AppHeader firstName={profile.first_name} />
-      <main className="mx-auto w-full max-w-5xl px-4 py-8">{children}</main>
+      <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14">{children}</main>
     </div>
   );
 }

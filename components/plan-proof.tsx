@@ -77,7 +77,7 @@ export function PlanProof({ preview }: { preview: ReactNode }) {
             <li
               key={commitment.title}
               style={{ "--i": index } as CSSProperties}
-              className="rise grid content-start gap-2 rounded-2xl border bg-card p-4"
+              className="panel rise grid content-start gap-2 rounded-2xl border bg-card p-4"
             >
               <span
                 aria-hidden
@@ -99,7 +99,7 @@ export function PlanProof({ preview }: { preview: ReactNode }) {
         <ul className="grid gap-2">
           {questions(preview).map((item) => (
             <li key={item.question}>
-              <details className="faq rounded-2xl border bg-card px-4">
+              <details className="faq panel rounded-2xl border bg-card px-4">
                 <summary className="flex items-center gap-3 py-3.5 text-sm font-medium">
                   {item.question}
                 </summary>

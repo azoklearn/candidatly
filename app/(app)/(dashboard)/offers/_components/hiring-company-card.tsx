@@ -23,7 +23,7 @@ export function HiringCompanyCard({
   return (
     <li
       style={{ "--i": index } as CSSProperties}
-      className="card-lift rise grid content-start gap-3 rounded-2xl border bg-card p-4 sm:p-5"
+      className="card-lift panel rise grid content-start gap-3 rounded-2xl border bg-card p-4 sm:p-5"
     >
       <div className="flex items-start gap-3">
         <span

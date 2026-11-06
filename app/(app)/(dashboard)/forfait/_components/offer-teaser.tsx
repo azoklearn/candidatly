@@ -28,7 +28,7 @@ export function OfferTeaser({ cards, total = 0 }: { cards: TeaserCard[]; total?:
           <li
             key={index}
             style={{ "--i": index } as CSSProperties}
-            className="rise grid gap-3 rounded-2xl border bg-card p-4"
+            className="panel rise grid gap-3 rounded-2xl border bg-card p-4"
           >
             <div className="grid gap-2">
               <span className="teaser-bar w-4/5" aria-hidden />

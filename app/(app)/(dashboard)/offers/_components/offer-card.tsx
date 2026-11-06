@@ -38,7 +38,7 @@ export function OfferCard({ data, index = 0 }: { data: OfferCardData; index?: nu
   return (
     <li
       style={{ "--i": index } as CSSProperties}
-      className="card-lift rise grid gap-3 rounded-2xl border bg-card p-4 sm:p-5"
+      className="card-lift panel rise grid gap-3 rounded-2xl border bg-card p-4 sm:p-5"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="grid min-w-0 gap-1">

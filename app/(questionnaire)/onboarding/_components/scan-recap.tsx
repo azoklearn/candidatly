@@ -214,7 +214,7 @@ export function ScanRecap({
 
   return (
     <ActionForm action={action} className="grid gap-6">
-      <div className="grid gap-4 rounded-2xl border bg-card p-4 sm:p-5">
+      <div className="panel grid gap-4 rounded-2xl border bg-card p-4 sm:p-5">
         <Row title="Tu cherches">
           <Pills name="target_contract" options={CONTRACTS} defaultValue={contract} />
           <FieldError id="contract-error" message={state.fieldErrors?.target_contract} />

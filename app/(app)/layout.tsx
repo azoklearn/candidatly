@@ -12,6 +12,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   if (!data?.claims) redirect("/login");
   return (
     <>
+      <div className="app-washes" aria-hidden />
       <div className="app-grain" aria-hidden />
       {children}
     </>

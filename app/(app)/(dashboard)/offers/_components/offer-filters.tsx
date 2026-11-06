@@ -44,7 +44,7 @@ export function OfferFilters({ values }: { values: OfferFilterValues }) {
       onSubmit={onSubmit}
       onChange={onChange}
       aria-busy={pending}
-      className="relative flex flex-wrap items-end gap-3 overflow-hidden rounded-2xl border bg-card p-3 text-sm sm:p-4"
+      className="panel relative flex flex-wrap items-end gap-3 overflow-hidden rounded-2xl border bg-card p-3 text-sm sm:p-4"
     >
       {pending ? (
         <span

@@ -13,6 +13,7 @@ export default async function OnboardingLayout({ children }: { children: ReactNo
     : false;
   return (
     <div className="min-h-svh">
+      <div className="app-washes" aria-hidden />
       <div className="app-grain" aria-hidden />
       <header className="mx-auto flex w-full max-w-2xl items-center justify-between px-4 pt-4 sm:pt-6">
         <BrandLink />

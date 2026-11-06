@@ -26,7 +26,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="grid gap-1 rounded-2xl border bg-card p-4">
+    <div className="panel grid gap-1 rounded-2xl border bg-card p-4">
       <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{label}</p>
       <p className="text-3xl font-bold tracking-[-0.04em]">{value}</p>
       {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
@@ -48,7 +48,7 @@ function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
     return <p className="text-sm text-muted-foreground">Rien pour l’instant.</p>;
   }
   return (
-    <div className="overflow-x-auto rounded-2xl border bg-card">
+    <div className="panel overflow-x-auto rounded-2xl border bg-card">
       <table className="w-full min-w-[42rem] text-left text-sm">
         <thead className="border-b text-xs tracking-wide text-muted-foreground uppercase">
           <tr>

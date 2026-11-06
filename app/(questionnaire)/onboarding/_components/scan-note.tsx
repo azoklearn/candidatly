@@ -2,7 +2,7 @@
 export function ScanNote({ summary }: { summary: string | null }) {
   if (!summary) return null;
   return (
-    <p className="q-in mb-6 grid gap-0.5 rounded-2xl border bg-card px-4 py-3 text-sm">
+    <p className="q-in panel-warm mb-6 grid gap-0.5 rounded-2xl border px-4 py-3 text-sm">
       <span>
         <span className="font-medium">D’après ton CV :</span>{" "}
         <span className="text-muted-foreground">{summary}</span>

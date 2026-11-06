@@ -143,7 +143,7 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
       ) : null}
 
       {total === 0 && hiringCompanies.length === 0 ? (
-        <div className="fade-up grid justify-items-start gap-3 rounded-2xl border bg-card p-6">
+        <div className="panel-tint fade-up grid justify-items-start gap-3 rounded-2xl border p-6">
           <p className="section-title">
             Votre sélection <em>se prépare</em>
           </p>
@@ -171,7 +171,7 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
               métiers. Proposez-leur votre profil avec une candidature spontanée.
             </p>
           </div>
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid gap-3 sm:grid-cols-2 sm:items-start">
             {hiringCompanies.map((company, index) => (
               <HiringCompanyCard key={company.id} company={company} index={index} />
             ))}

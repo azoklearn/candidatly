@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
-/** Small rounded label for offer and company facts. */
+/** The small square label of the landing page feed: sky background, soft ink, no border. */
 export function Tag({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded-full border border-foreground/10 bg-secondary px-2.5 py-0.5 text-xs text-secondary-foreground">
+    <span className="rounded-md bg-[var(--pastel-sky)] px-2 py-1 text-[0.7rem] font-medium text-muted-foreground">
       {children}
     </span>
   );

@@ -28,7 +28,7 @@ function ChoiceCard({
       disabled={pending}
       style={{ "--i": index } as CSSProperties}
       className={cn(
-        "q-card q-in group flex min-h-16 items-center justify-between gap-4 rounded-2xl border bg-card p-4 text-left",
+        "q-card q-in panel group flex min-h-16 items-center justify-between gap-4 rounded-2xl border bg-card p-4 text-left",
         "hover:border-foreground hover:bg-muted/40 disabled:opacity-60",
         selected && "border-foreground bg-primary/5",
         chosen && "border-brand bg-primary/5",

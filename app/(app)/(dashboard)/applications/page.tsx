@@ -55,7 +55,7 @@ export default async function ApplicationsPage() {
         </p>
       </div>
       {data.length === 0 ? (
-        <div className="grid gap-2 rounded-2xl border bg-card p-6 text-sm">
+        <div className="panel-tint grid gap-2 rounded-2xl border p-6 text-sm">
           <p className="section-title">
             Votre première candidature <em>vous attend</em>
           </p>
@@ -81,7 +81,7 @@ export default async function ApplicationsPage() {
                   <li
                     key={application.id}
                     style={{ "--i": index } as CSSProperties}
-                    className="card-lift rise flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-4 sm:p-5"
+                    className="card-lift panel rise flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-4 sm:p-5"
                   >
                     <div className="grid gap-1">
                       <Link

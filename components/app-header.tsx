@@ -1,20 +1,20 @@
 import { signOut } from "@/app/(auth)/actions";
 import { BrandLink } from "@/components/brand-link";
 import { NavLinks } from "@/components/nav-links";
-import { Button } from "@/components/ui/button";
 
+/** Header of the landing page, for the signed-in area: brand, swept links, the student. */
 export function AppHeader({ firstName }: { firstName: string | null }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-foreground/10 bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
+    <header className="sticky top-0 z-40 border-b border-[var(--pastel-line)] bg-[color-mix(in_srgb,var(--paper)_82%,transparent)] backdrop-blur-md">
+      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-4">
         <BrandLink href="/offers" />
         <NavLinks />
-        <div className="ml-auto flex items-center gap-2 text-sm">
+        <div className="ml-auto flex items-center gap-3 text-[0.8125rem]">
           {firstName ? (
             <span className="hidden items-center gap-2 text-muted-foreground sm:inline-flex">
               <span
                 aria-hidden
-                className="grid size-7 place-items-center rounded-full bg-brand-soft text-xs font-semibold text-foreground"
+                className="grid size-7 place-items-center rounded-[9px_9px_9px_2px] bg-brand-soft font-serif text-sm text-foreground"
               >
                 {firstName.slice(0, 1).toUpperCase()}
               </span>
@@ -22,9 +22,9 @@ export function AppHeader({ firstName }: { firstName: string | null }) {
             </span>
           ) : null}
           <form action={signOut}>
-            <Button type="submit" variant="ghost" size="sm">
+            <button type="submit" className="nav-sweep text-muted-foreground hover:text-foreground">
               Se déconnecter
-            </Button>
+            </button>
           </form>
         </div>
       </div>

@@ -51,29 +51,41 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Palette of the landing page (app/(landing)/landing.css): off-white paper, ink, blue. */
+/*
+ * Palette of the landing page (app/(landing)/landing.css): ivory paper, ink, blue, and
+ * the six pastel washes of the C98 direction. The application uses the same values so
+ * both halves of the product look like one product (C102).
+ */
 :root {
-  --paper: #f6f2ea;
+  --paper: #fcf8f0;
   --ink: #0a2a52;
+  --ink-soft: #41627d;
   --brand: #1764d8;
   --brand-soft: #8cc6ff;
+  --pastel-sky: #dfecff;
+  --pastel-mint: #ddf2e7;
+  --pastel-peach: #ffe8d8;
+  --pastel-lilac: #eae3fc;
+  --pastel-sun: #fdf1d2;
+  --pastel-rose: #fde4ee;
+  --pastel-line: #e9e0d2;
   --background: var(--paper);
   --foreground: var(--ink);
-  --card: #fffefa;
+  --card: #fffdf8;
   --card-foreground: var(--ink);
-  --popover: #fffefa;
+  --popover: #fffdf8;
   --popover-foreground: var(--ink);
   --primary: var(--ink);
   --primary-foreground: var(--paper);
-  --secondary: #e7eef6;
+  --secondary: #e8f0fb;
   --secondary-foreground: var(--ink);
-  --muted: #eee8dc;
-  --muted-foreground: #48657f;
+  --muted: #f2ecdf;
+  --muted-foreground: var(--ink-soft);
   --accent: #e3eefb;
   --accent-foreground: var(--ink);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #d9e3ec;
-  --input: #c8d9e8;
+  --border: var(--pastel-line);
+  --input: #ded2be;
   --ring: var(--brand);
   --chart-1: #8cc6ff;
   --chart-2: #1764d8;
@@ -81,13 +93,13 @@
   --chart-4: #41627d;
   --chart-5: #c8d9e8;
   --radius: 0.75rem;
-  --sidebar: #fffefa;
+  --sidebar: #fffdf8;
   --sidebar-foreground: var(--ink);
   --sidebar-primary: var(--ink);
   --sidebar-primary-foreground: var(--paper);
   --sidebar-accent: #e3eefb;
   --sidebar-accent-foreground: var(--ink);
-  --sidebar-border: #d9e3ec;
+  --sidebar-border: var(--pastel-line);
   --sidebar-ring: var(--brand);
 }
 
@@ -143,19 +155,19 @@
 
 /* Pieces of the landing design, reused by the application. */
 @layer components {
-  /* Page titles: tight sans with an italic serif accent in <em>. */
+  /* Page titles: the editorial scale of the landing page, italic serif accent in <em>. */
   .page-title {
-    font-size: clamp(1.875rem, 1.35rem + 2vw, 2.75rem);
-    font-weight: 700;
-    letter-spacing: -0.055em;
-    line-height: 1.02;
+    font-size: clamp(2.125rem, 1.4rem + 2.6vw, 3.25rem);
+    font-weight: 600;
+    letter-spacing: -0.068em;
+    line-height: 0.94;
     text-wrap: balance;
   }
   .section-title {
-    font-size: 1.375rem;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.15;
+    font-size: clamp(1.4rem, 1.2rem + 0.7vw, 1.75rem);
+    font-weight: 600;
+    letter-spacing: -0.055em;
+    line-height: 1.04;
     text-wrap: balance;
   }
   .page-title em,
@@ -169,11 +181,51 @@
 
   .eyebrow {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
     font-weight: 500;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.085em;
     text-transform: uppercase;
     color: var(--muted-foreground);
+  }
+
+  /*
+   * Raised surface of the landing page: a warm hairline and a long, very soft shadow.
+   * Sits next to `border bg-card`, which carry the colours.
+   */
+  .panel {
+    box-shadow: 0 18px 38px rgba(74, 64, 48, 0.07);
+  }
+  /* The pastel block of the landing page, for an opening or an empty screen. */
+  .panel-tint {
+    background: linear-gradient(135deg, var(--pastel-sky), var(--pastel-lilac));
+    border-color: #dbd4ef;
+    box-shadow: 0 18px 38px rgba(74, 64, 48, 0.08);
+  }
+  .panel-warm {
+    background: linear-gradient(140deg, var(--pastel-sun), var(--pastel-peach));
+    border-color: #efdcc6;
+    box-shadow: 0 18px 38px rgba(74, 64, 48, 0.08);
+  }
+
+  /* Navigation of the landing page: a rule that grows under the link. */
+  .nav-sweep {
+    position: relative;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+  .nav-sweep::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    height: 1px;
+    width: 0;
+    background: currentColor;
+    transition: width 0.25s var(--ease-out-strong);
+  }
+  .nav-sweep:hover::after,
+  .nav-sweep[aria-current="page"]::after {
+    width: 100%;
   }
 
   .brand-mark {
@@ -246,6 +298,24 @@
   .teaser-bar-small {
     height: 0.7rem;
     opacity: 0.75;
+  }
+
+  /*
+   * The pastel washes of the landing page, on a layer of their own behind the content:
+   * a `fixed` background image would be repainted at every scrolled frame.
+   */
+  .app-washes {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(760px 520px at 12% 2%, rgba(210, 231, 255, 0.5), transparent 72%),
+      radial-gradient(680px 480px at 90% 8%, rgba(255, 224, 205, 0.42), transparent 72%),
+      radial-gradient(720px 520px at 84% 46%, rgba(230, 221, 252, 0.46), transparent 72%),
+      radial-gradient(660px 460px at 6% 54%, rgba(214, 241, 228, 0.46), transparent 72%),
+      radial-gradient(700px 500px at 94% 88%, rgba(253, 226, 238, 0.4), transparent 72%),
+      radial-gradient(680px 500px at 8% 94%, rgba(253, 241, 210, 0.46), transparent 72%);
   }
 
   .app-grain {

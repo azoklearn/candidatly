@@ -10,10 +10,14 @@ const NAVIGATION = [
   { href: "/account", label: "Compte" },
 ] as const;
 
+/** Navigation of the landing page: a rule grows under the link, and stays on the page you are on. */
 export function NavLinks() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Navigation principale" className="flex gap-1 text-sm">
+    <nav
+      aria-label="Navigation principale"
+      className="flex gap-5 text-[0.8125rem] sm:gap-7 sm:pl-6"
+    >
       {NAVIGATION.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
@@ -22,10 +26,8 @@ export function NavLinks() {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "rounded-full px-3 py-1.5 font-medium transition-colors",
-              active
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
+              "nav-sweep",
+              active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >
             {item.label}

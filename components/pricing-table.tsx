@@ -75,7 +75,7 @@ export function PricingTable({
               key={plan.id}
               style={{ "--i": index } as CSSProperties}
               className={cn(
-                "rise relative grid content-start gap-5 rounded-3xl border bg-card p-6",
+                "panel rise relative grid content-start gap-5 rounded-3xl border bg-card p-6",
                 featured && "border-foreground shadow-[6px_6px_0_var(--ink)] lg:-mt-3",
               )}
             >

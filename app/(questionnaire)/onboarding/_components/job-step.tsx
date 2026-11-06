@@ -52,7 +52,7 @@ export function JobStep({
             <li key={job.code} className="q-in" style={{ "--i": index } as CSSProperties}>
               <label
                 className={cn(
-                  "q-card flex h-full min-h-16 cursor-pointer items-start gap-3 rounded-2xl border bg-card p-4 text-sm hover:bg-muted/40",
+                  "q-card panel flex h-full min-h-16 cursor-pointer items-start gap-3 rounded-2xl border bg-card p-4 text-sm hover:bg-muted/40",
                   isChecked && "border-foreground bg-primary/5",
                   full && "cursor-not-allowed opacity-50",
                 )}

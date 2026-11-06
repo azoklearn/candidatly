@@ -33,7 +33,7 @@ export default async function PricingPage() {
         marquées « Bientôt » ne sont pas encore disponibles.
       </p>
       <PlanProof preview="Dépose ton CV sur l’accueil : la recherche part pour de vrai, et l’écran suivant te dit ce qu’elle a trouvé pour toi avant que tu paies quoi que ce soit. Le nombre dépend de ton métier et de ton rayon, donc on ne t’annonce pas un chiffre à l’avance." />
-      <section className="fade-up grid justify-items-center gap-4 rounded-3xl border bg-card p-8 text-center">
+      <section className="panel-tint fade-up grid justify-items-center gap-4 rounded-3xl border p-8 text-center">
         <h2 className="section-title">
           Vois ta sélection, <em>puis décide</em>
         </h2>
