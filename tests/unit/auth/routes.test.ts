@@ -49,16 +49,16 @@ describe("route guards", () => {
 
 describe("authRedirectBase", () => {
   it("sends visitors back to the site they are on", () => {
-    expect(authRedirectBase("https://candidatly.vercel.app", "http://localhost:3000")).toBe(
-      "https://candidatly.vercel.app",
+    expect(authRedirectBase("https://jobgpt.vercel.app", "http://localhost:3000")).toBe(
+      "https://jobgpt.vercel.app",
     );
   });
 
   it("falls back on the configured site URL when the origin is missing or odd", () => {
-    expect(authRedirectBase(null, "https://candidatly.fr/")).toBe("https://candidatly.fr");
-    expect(authRedirectBase("null", "https://candidatly.fr")).toBe("https://candidatly.fr");
-    expect(authRedirectBase("https://evil.example/path", "https://candidatly.fr")).toBe(
-      "https://candidatly.fr",
+    expect(authRedirectBase(null, "https://gptjob.io/")).toBe("https://gptjob.io");
+    expect(authRedirectBase("null", "https://gptjob.io")).toBe("https://gptjob.io");
+    expect(authRedirectBase("https://evil.example/path", "https://gptjob.io")).toBe(
+      "https://gptjob.io",
     );
   });
 });

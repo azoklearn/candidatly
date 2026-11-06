@@ -22,7 +22,7 @@ Ne jamais coller un jeton dans un ticket, un commit, un log ou une conversation 
 
 Supabase Cron lance toutes les 15 minutes la fonction `public.invoke_offer_sync()`, qui appelle `POST <site>/api/cron/sync-offers` avec le secret partagé. Chaque appel met à jour au plus 25 recherches vieilles de plus de 6 heures, recalcule les correspondances des étudiants concernés et retire les offres périmées. Tant que les deux secrets ci-dessous manquent dans Vault, la tâche tourne sans rien appeler : c'est le cas du projet de développement, qui n'a pas de site déployé.
 
-État : en service depuis le 11 septembre 2026 sur le projet `ylupsjydkbmryctfrfte`, avec `candidatly_site_url` = `https://www.candidatly.app` (premier appel accepté à 16 h 34 UTC). Un 401 dans `net._http_response` signifie que le secret de Vault diffère de `CRON_SECRET` sur Vercel.
+État : en service depuis le 11 septembre 2026 sur le projet `ylupsjydkbmryctfrfte` (premier appel accepté à 16 h 34 UTC). `candidatly_site_url` doit valoir `https://gptjob.io` depuis le changement de domaine du 6 novembre 2026 : tant qu'il garde l'ancienne adresse, la tâche appelle un site qui ne répond plus. Un 401 dans `net._http_response` signifie que le secret de Vault diffère de `CRON_SECRET` sur Vercel.
 
 Mise en service, une fois le site déployé :
 
@@ -60,7 +60,7 @@ Mise en service :
 3. **Plans** : l'owner a créé les produits et les plans dans le tableau de bord Whop (11 septembre 2026). Chacun doit être un abonnement en euros au prix de `lib/pricing.ts` : 9,99 €, 14,99 €, 19,99 € tous les 30 jours ; 99,90 €, 149,90 €, 199,90 € tous les 365 jours. Après tout changement de prix, corriger les plans dans Whop puis relancer `npm run whop:setup` : tant que le prix relié diffère du prix affiché, le paiement refuse de démarrer (`billing_plan_price_mismatch` dans les logs) plutôt que de débiter un autre montant.
 
 Changer le prix d'un plan par l'API (12 septembre 2026) : `PATCH https://api.whop.com/api/v1/plans/<plan_id>` avec `{"renewal_price": 9.99}` et l'en-tête `Authorization: Bearer $WHOP_API_KEY`. Les autres routes échouent : `POST /api/v2/plans/<id>` répond 201 sans rien changer, `PATCH`/`PUT` v2 répondent 401. Un plan qui a déjà vendu un abonnement est gelé (« You cannot change the renewal price of a plan that has sold memberships ») : créer un plan de remplacement (`POST /api/v1/plans` avec `company_id`, `product_id`, `plan_type`, `billing_period`, `initial_price`, `renewal_price`, `currency`), masquer l'ancien (`PATCH … {"visibility": "hidden"}`), puis relier explicitement avec `npm run whop:setup -- --map=basic:annual=plan_...`. L'abonnement déjà vendu garde son ancien prix jusqu'à sa résiliation.
-4. **Liaison et webhook** : `npm run whop:setup -- --dry-run` liste les plans Whop et montre à quel forfait chacun est relié, sans rien écrire. Puis `npm run whop:setup` enregistre les six liaisons dans `billing_plans`, crée le webhook `https://www.candidatly.app/api/whop/webhook` (événements `membership.activated`, `membership.deactivated`, `membership.cancel_at_period_end_changed`, `payment.succeeded`, `payment.failed`) et écrit `WHOP_WEBHOOK_SECRET` dans `.env.local`. Un plan à un autre prix ou à une autre période n'est pas relié : corriger le plan dans Whop, ou nommer les plans avec `--map=basic:monthly=plan_...,plus:annual=plan_...`. Relançable sans doublon.
+4. **Liaison et webhook** : `npm run whop:setup -- --dry-run` liste les plans Whop et montre à quel forfait chacun est relié, sans rien écrire. Puis `npm run whop:setup` enregistre les six liaisons dans `billing_plans`, crée le webhook `https://gptjob.io/api/whop/webhook` (événements `membership.activated`, `membership.deactivated`, `membership.cancel_at_period_end_changed`, `payment.succeeded`, `payment.failed`) et écrit `WHOP_WEBHOOK_SECRET` dans `.env.local`. Un plan à un autre prix ou à une autre période n'est pas relié : corriger le plan dans Whop, ou nommer les plans avec `--map=basic:monthly=plan_...,plus:annual=plan_...`. Relançable sans doublon.
 5. **Vercel** : ajouter `WHOP_API_KEY` et `WHOP_WEBHOOK_SECRET`, redéployer. Le mur de paiement s'active.
 6. **Vérifier** : choisir un forfait avec un compte de test, payer, revenir sur `/forfait/merci` : la page ouvre les offres dès que le webhook a enregistré l'abonnement. Contrôle en base : `select plan, status, current_period_end from subscriptions order by updated_at desc limit 5;`.
 
@@ -85,7 +85,20 @@ adresse qui n'est pas la vôtre.
 
 ## Mettre le MVP en ligne
 
-Adresse publique depuis le 11 septembre 2026 : https://candidatly.app (DNS chez Vercel), qui redirige vers https://www.candidatly.app. Utilisez l'adresse `www` partout où une adresse est demandée : `NEXT_PUBLIC_SITE_URL`, Site URL de Supabase, secret Vault `candidatly_site_url`. Les Redirect URLs de Supabase doivent lister `/auth/callback` et `/auth/confirm` pour `https://www.candidatly.app` et pour `https://candidatly.vercel.app`, qui reste active.
+Adresse publique : **https://gptjob.io** (choisie par l'owner le 6 novembre 2026). Elle remplace candidatly.app, qui était en service du 11 septembre au 6 novembre 2026. L'adresse sans `www` est la bonne partout où une adresse est demandée : `NEXT_PUBLIC_SITE_URL`, Site URL de Supabase, secret Vault `candidatly_site_url` (le nom de la clé garde l'ancien nom du projet), adresse du webhook Whop. `www.gptjob.io` doit rediriger vers elle. Les Redirect URLs de Supabase doivent lister `/auth/callback` et `/auth/confirm` pour `https://gptjob.io` et pour l'adresse Vercel du projet, qui reste active.
+
+### Changement de domaine, dans l'ordre
+
+Tant que ces six points ne sont pas faits, la connexion, le paiement ou la synchronisation cassent : ils dépendent tous de l'adresse enregistrée ailleurs.
+
+1. **Vercel** : ajouter `gptjob.io` et `www.gptjob.io` au projet, suivre les enregistrements DNS proposés, et faire de `gptjob.io` le domaine principal (`www` en redirection).
+2. **Vercel, variables** : `NEXT_PUBLIC_SITE_URL=https://gptjob.io`, puis redéployer (la variable est lue à la construction).
+3. **Supabase, Authentication > URL Configuration** : Site URL `https://gptjob.io` ; ajouter `https://gptjob.io/auth/callback` et `https://gptjob.io/auth/confirm` aux Redirect URLs. Ne pas retirer les anciennes avant que le nouveau domaine réponde.
+4. **Supabase, Vault** : `select vault.update_secret((select id from vault.secrets where name = 'candidatly_site_url'), 'https://gptjob.io');` — sans cela, la synchronisation toutes les 15 minutes continue d'appeler l'ancienne adresse.
+5. **Whop** : `npm run whop:setup` recrée le webhook sur `https://gptjob.io/api/whop/webhook` et réécrit `WHOP_WEBHOOK_SECRET` dans `.env.local` ; reporter ce secret dans Vercel. Supprimer l'ancien webhook dans le tableau de bord Whop.
+6. **Google OAuth** (quand il sera activé) : ajouter `https://<ref>.supabase.co/auth/v1/callback` reste inchangé, mais l'écran de consentement doit afficher le nouveau domaine.
+
+Vérifier ensuite : une inscription complète, un paiement de test, et `cron.job_run_details` au quart d'heure suivant.
 
 1. **Vercel.** Créer le projet depuis le dépôt, Node 24. Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL` (adresse publique du site), `SUPABASE_SECRET_KEY`, `API_ALTERNANCE_KEY`, `CRON_SECRET`. Facultatives : `LOG_LEVEL`, `GEOCODING_API_BASE_URL`, `RECHERCHE_ENTREPRISES_BASE_URL`.
 2. **Supabase, authentification.** Dans Authentication > URL Configuration : Site URL égale à l'adresse publique ; ajouter `<site>/auth/callback` et `<site>/auth/confirm` aux Redirect URLs. Recopier le modèle d'email de `supabase/templates/confirmation.html`. Activer Google seulement avec un client OAuth configuré.

@@ -30,7 +30,7 @@ describe("Whop client", () => {
     const checkout = await client.createCheckout({
       planId: "plan_plus_year",
       metadata: { user_id: "u1", plan: "plus", billing: "annual" },
-      redirectUrl: "https://www.candidatly.app/forfait/merci",
+      redirectUrl: "https://gptjob.io/forfait/merci",
     });
     expect(checkout).toEqual({ id: "ch_123", url: "https://whop.com/checkout/ch_123/" });
     const [call] = calls;
@@ -41,7 +41,7 @@ describe("Whop client", () => {
       mode: "payment",
       plan_id: "plan_plus_year",
       metadata: { user_id: "u1", plan: "plus", billing: "annual" },
-      redirect_url: "https://www.candidatly.app/forfait/merci",
+      redirect_url: "https://gptjob.io/forfait/merci",
     });
   });
 
