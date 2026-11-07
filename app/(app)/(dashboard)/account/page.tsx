@@ -94,7 +94,7 @@ export default async function AccountPage() {
           ) : access.exempt ? (
             <p className="text-sm text-muted-foreground">Accès complet offert à ce compte.</p>
           ) : (
-            <Link href="/forfait" className={buttonVariants() + " w-fit"}>
+            <Link href="/forfait/choisir" className={buttonVariants() + " w-fit"}>
               Choisir un forfait
             </Link>
           )}

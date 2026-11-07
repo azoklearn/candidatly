@@ -19,7 +19,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 const ChoiceSchema = z.object({ plan: z.enum(PLAN_IDS), billing: z.enum(BILLINGS) });
-const UNAVAILABLE = "/forfait?paiement=indisponible";
+const UNAVAILABLE = "/forfait/choisir?paiement=indisponible";
 
 /**
  * Plan chosen after the questionnaire (docs/QUESTIONS.md C82, C83): recorded, then paid on
@@ -30,7 +30,7 @@ export async function choosePlan(formData: FormData): Promise<void> {
     plan: formData.get("plan"),
     billing: formData.get("billing"),
   });
-  if (!parsed.success) redirect("/forfait");
+  if (!parsed.success) redirect("/forfait/choisir");
   const { plan, billing } = parsed.data;
   const supabase = await createClient();
   const userId = await requireUserId(supabase);

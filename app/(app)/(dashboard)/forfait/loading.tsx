@@ -1,17 +1,17 @@
 import { LoadingScreen } from "@/components/loading-screen";
 
-export default function ChoosePlanLoading() {
+export default function SearchResultLoading() {
   return (
     <LoadingScreen
       title={
         <>
-          On fait le compte de <em>vos offres</em>
+          On rassemble <em>tes offres</em>
         </>
       }
       messages={[
         "On rassemble les offres trouvées…",
-        "On regarde qui recrute près de chez vous…",
-        "On prépare vos forfaits…",
+        "On regarde qui recrute près de chez toi…",
+        "On vérifie la fraîcheur de ta sélection…",
       ]}
     />
   );

@@ -54,22 +54,24 @@ test("a student prepares, sends and tracks an application, then exports their da
   await page.goto("/offers");
   await expect(page.getByText("Candidature envoyée")).toBeVisible();
 
-  // The page shown after the questionnaire: what the search found, then the plans (C82).
+  // The page shown after the questionnaire: the result in words, then one button (C105).
   await page.goto("/forfait");
-  // No figure before the plan is active (C104), and one button straight to the plans.
+  // No figure before the plan is active (C104).
   await expect(page.getByRole("heading", { level: 1 })).toContainText("une offre");
   await expect(page.getByRole("heading", { level: 1 })).not.toContainText(/\d/);
-  await expect(page.getByRole("link", { name: /Découvrir les offres/ })).toHaveAttribute(
-    "href",
-    "#forfaits",
-  );
+  // The freshness comes from the student's own matches, never invented.
+  await expect(page.getByText(/de ta sélection a été publiée ces 7 derniers jours/)).toBeVisible();
+  // Nothing else on this page: the plans live behind the button.
+  await expect(page.getByText("Recommandé")).toHaveCount(0);
+  await page.getByRole("link", { name: "Découvrir les offres" }).click();
+  await expect(page).toHaveURL(/\/forfait\/choisir$/);
+
+  await expect(page.getByRole("heading", { level: 1, name: "Choisis ton forfait" })).toBeVisible();
   await expect(page.getByText("Recommandé")).toBeVisible();
   // The preview shows the city but never the job title, not even in the HTML (C88).
   await expect(page.getByText("Tes offres attendent derrière le flou")).toBeVisible();
   expect(await page.content()).not.toContain(OFFER_TITLE);
-  // What convinces before paying must be measured, never invented: the freshness comes
-  // from the student's own matches and the recap from their own profile.
-  await expect(page.getByText(/de ta sélection a été publiée ces 7 derniers jours/)).toBeVisible();
+  // The recap comes from the student's own profile.
   const recap = page.getByRole("region", { name: "Ce qu’on a retenu de ta recherche" });
   await expect(recap.getByText("Paris", { exact: true })).toBeVisible();
   await expect(recap.getByText("jusqu’à 30 km")).toBeVisible();

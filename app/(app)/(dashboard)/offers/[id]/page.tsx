@@ -181,7 +181,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                       Passer au forfait Plus
                     </a>
                   ) : (
-                    <Link href="/forfait" className={buttonVariants({ variant: "shiny" })}>
+                    <Link href="/forfait/choisir" className={buttonVariants({ variant: "shiny" })}>
                       Voir les forfaits
                     </Link>
                   )}

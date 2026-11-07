@@ -24,7 +24,6 @@ export const EVENTS = {
   offerSiteOpened: "Site de l’offre ouvert",
   recruiterCalled: "Recruteur appelé",
   signupClicked: "Clic inscription",
-  resultShared: "Résultat partagé",
   cvScanned: "CV analysé",
 } as const;
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];
