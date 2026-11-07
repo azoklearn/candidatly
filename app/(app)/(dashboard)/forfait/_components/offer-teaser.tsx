@@ -44,9 +44,7 @@ export function OfferTeaser({ cards, total = 0 }: { cards: TeaserCard[]; total?:
         ))}
       </ul>
       {hidden > 0 ? (
-        <p className="text-center text-sm font-medium">
-          + {hidden} autre{hidden > 1 ? "s" : ""} offre{hidden > 1 ? "s" : ""} dans ta sélection.
-        </p>
+        <p className="text-center text-sm font-medium">Et d’autres offres dans ta sélection.</p>
       ) : null}
     </section>
   );

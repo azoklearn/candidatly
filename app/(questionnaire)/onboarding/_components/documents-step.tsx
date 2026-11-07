@@ -126,20 +126,28 @@ export function DocumentsStep({
   cv,
   letter,
   showContinue = true,
+  showLetter = true,
   failed = false,
 }: {
   userId: string;
   cv: DocumentSummary | null;
   letter: DocumentSummary | null;
   showContinue?: boolean;
+  /**
+   * The questionnaire no longer asks for the cover letter: it is one thing too many
+   * between the account and the offers. It is added later, from the account page, when
+   * the student wants a letter tailored to an offer.
+   */
+  showLetter?: boolean;
   /** The last attempt to open the results did not go through. */
   failed?: boolean;
 }) {
-  const ready = cv !== null && letter !== null;
+  const ready = cv !== null && (letter !== null || !showLetter);
   return (
     <div className="grid gap-10">
       <section className="grid gap-3">
-        <h2 className="font-medium">Ton CV</h2>
+        {/* The step header already says "Ton CV" when the letter is not on this screen. */}
+        {showLetter ? <h2 className="font-medium">Ton CV</h2> : null}
         <FieldHint>
           Au format PDF, 5 Mo au maximum. Il est stocké de façon privée et chiffrée.
         </FieldHint>
@@ -153,23 +161,25 @@ export function DocumentsStep({
           label={cv ? "Remplacer le CV" : "Choisir ton CV"}
         />
       </section>
-      <section className="grid gap-3">
-        <h2 className="font-medium">Ta lettre de motivation de base</h2>
-        <FieldHint>
-          C’est elle qu’on adapte à chaque offre, en gardant ton style. PDF, Word ou texte collé.
-          Astuce : écris [entreprise] et [poste] là où ils doivent apparaître, on les remplit pour
-          chaque offre.
-        </FieldHint>
-        <CurrentDocument document={letter} />
-        <FileUpload
-          userId={userId}
-          kind="cover_letter_base"
-          accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          allowed={[PDF, DOCX]}
-          label={letter ? "Remplacer la lettre par un fichier" : "Choisir un fichier"}
-        />
-        <LetterText />
-      </section>
+      {showLetter ? (
+        <section className="grid gap-3">
+          <h2 className="font-medium">Ta lettre de motivation de base</h2>
+          <FieldHint>
+            C’est elle qu’on adapte à chaque offre, en gardant ton style. PDF, Word ou texte collé.
+            Astuce : écris [entreprise] et [poste] là où ils doivent apparaître, on les remplit pour
+            chaque offre.
+          </FieldHint>
+          <CurrentDocument document={letter} />
+          <FileUpload
+            userId={userId}
+            kind="cover_letter_base"
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            allowed={[PDF, DOCX]}
+            label={letter ? "Remplacer la lettre par un fichier" : "Choisir un fichier"}
+          />
+          <LetterText />
+        </section>
+      ) : null}
       {failed && showContinue ? (
         <Alert variant="destructive">
           <AlertDescription>Ça n’a pas abouti. Réessaie dans un instant.</AlertDescription>
@@ -183,18 +193,14 @@ export function DocumentsStep({
         </form>
       ) : (
         <div className="grid gap-3">
-          <FieldHint>
-            Avec ton CV, les correspondances sont plus précises. Avec ta lettre, on l’adapte à
-            chaque entreprise.
-          </FieldHint>
+          <FieldHint>Avec ton CV, les correspondances sont plus précises.</FieldHint>
           <form action={skipDocuments}>
             <SubmitButton variant="outline" size="lg" pendingLabel="On ouvre tes offres…">
               Passer cette étape
             </SubmitButton>
           </form>
           <FieldHint>
-            Tu pourras les ajouter plus tard depuis ton compte. Sans lettre de base, la lettre
-            adaptée à chaque offre n’est pas disponible.
+            Tu pourras l’ajouter plus tard depuis ton compte, avec ta lettre de motivation.
           </FieldHint>
         </div>
       )}

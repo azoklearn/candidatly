@@ -114,10 +114,16 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
             ? `Ton forfait ${currentName} est actif.`
             : "Choisis ton forfait pour les découvrir et candidater."}
         </p>
+        {current ? null : (
+          <a
+            href="#forfaits"
+            className={`${buttonVariants({ variant: "shiny", size: "lg" })} mt-1`}
+          >
+            Découvrir les offres <span aria-hidden>↓</span>
+          </a>
+        )}
         {offerCount > 0 ? (
-          <ShareResult
-            text={`J’ai trouvé ${offerCount} ${offerCount > 1 ? "offres d’alternance" : "offre d’alternance"} près de chez moi en 2 minutes avec JobGPT.`}
-          />
+          <ShareResult text="J’ai trouvé des offres d’alternance près de chez moi en 2 minutes avec JobGPT." />
         ) : null}
       </header>
 

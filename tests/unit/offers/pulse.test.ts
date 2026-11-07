@@ -42,16 +42,17 @@ describe("searchPulse", () => {
 });
 
 describe("pulseSentence", () => {
-  it("says only what was measured", () => {
+  it("says only what was measured, and never how many offers there are (C104)", () => {
     expect(pulseSentence({ lastWeek: 4, newestLabel: "il y a 2 heures" })).toBe(
-      "4 offres de ta sélection publiées ces 7 derniers jours · la plus récente il y a 2 heures",
+      "Des offres de ta sélection ont été publiées ces 7 derniers jours · la plus récente il y a 2 heures",
     );
     expect(pulseSentence({ lastWeek: 1, newestLabel: null })).toBe(
-      "1 offre de ta sélection publiée ces 7 derniers jours",
+      "Une offre de ta sélection a été publiée ces 7 derniers jours",
     );
     expect(pulseSentence({ lastWeek: 0, newestLabel: "il y a 20 jours" })).toBe(
       "la plus récente il y a 20 jours",
     );
+    expect(pulseSentence({ lastWeek: 42, newestLabel: null })).not.toMatch(/42/);
   });
 
   it("stays silent when there is nothing to say", () => {

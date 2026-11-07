@@ -73,17 +73,18 @@ describe("onboarding progress", () => {
     expect(firstIncompleteStep(located)).toBe(ACCOUNT_STEP);
   });
 
-  it("asks the name once, then the documents", () => {
+  it("asks the name once, then the CV, and never the letter (C104)", () => {
     const named = {
       ...answered,
       profile: { ...answered.profile, first_name: "Camille", last_name: "Martin" },
     };
     expect(firstIncompleteStep(named)).toBe(ACCOUNT_STEP + 1);
-    expect(firstIncompleteStep({ ...named, hasCv: true })).toBe(ACCOUNT_STEP + 1);
+    // The CV alone finishes the questionnaire: the letter is added later, from the account.
+    expect(firstIncompleteStep({ ...named, hasCv: true })).toBe(LAST_STEP);
     expect(firstIncompleteStep({ ...named, hasCv: true, hasLetter: true })).toBe(LAST_STEP);
   });
 
-  it("lets students skip the CV and the letter (C89)", () => {
+  it("lets students skip the CV (C89)", () => {
     const named = {
       ...answered,
       profile: {

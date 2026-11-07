@@ -150,6 +150,7 @@ export default async function OnboardingStepPage({
           userId={userId}
           cv={data.cv}
           letter={data.letter}
+          showLetter={false}
           failed={Boolean((await searchParams).error)}
         />
       ) : null}

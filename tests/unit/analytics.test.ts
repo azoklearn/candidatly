@@ -16,9 +16,7 @@ describe("anonymizeUrl", () => {
     expect(
       anonymizeUrl("https://www.gptjob.io/applications/3f2b8c1e-9d4a-4b7e-8c21-5a6f7e8d9c0b"),
     ).toBe("https://www.gptjob.io/applications/[id]");
-    expect(anonymizeUrl("https://www.gptjob.io/tarifs")).toBe(
-      "https://www.gptjob.io/tarifs",
-    );
+    expect(anonymizeUrl("https://www.gptjob.io/tarifs")).toBe("https://www.gptjob.io/tarifs");
   });
 
   it("keeps the path of a relative address", () => {

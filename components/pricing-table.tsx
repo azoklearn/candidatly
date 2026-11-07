@@ -34,7 +34,7 @@ export function PricingTable({
   const [billing, setBilling] = useState<Billing>("annual");
 
   return (
-    <div className="grid gap-8" id="forfaits">
+    <div className="grid gap-8 scroll-mt-24" id="forfaits">
       <div className="relative mx-auto w-fit">
         <span className="pointer-events-none absolute -top-3 right-2 z-10 rounded-full bg-brand px-2 py-0.5 text-[0.7rem] font-semibold text-white shadow-sm">
           2 mois offerts

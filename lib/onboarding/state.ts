@@ -14,7 +14,7 @@ export const ONBOARDING_STEPS = [
   { step: 4, title: "T’en es où dans tes études ?" },
   { step: 5, title: "Tu veux bosser où ?" },
   { step: 6, title: "Ton compte" },
-  { step: 7, title: "Ton CV et ta lettre" },
+  { step: 7, title: "Ton CV" },
 ] as const;
 
 export const LAST_STEP = ONBOARDING_STEPS.length;
@@ -57,11 +57,16 @@ export type OnboardingProfile = Pick<
   | "documents_skipped_at"
 >;
 
-export type OnboardingSnapshot = { profile: OnboardingProfile; hasCv: boolean; hasLetter: boolean };
+export type OnboardingSnapshot = {
+  profile: OnboardingProfile;
+  hasCv: boolean;
+  /** Kept for the account page; the questionnaire no longer waits for it (C104). */
+  hasLetter: boolean;
+};
 
 const filled = (value: string | null) => (value ?? "").trim().length > 0;
 
-export function completedSteps({ profile, hasCv, hasLetter }: OnboardingSnapshot): Set<number> {
+export function completedSteps({ profile, hasCv }: OnboardingSnapshot): Set<number> {
   const done = new Set<number>();
   if (profile.contract_chosen_at !== null) done.add(1);
   if (filled(profile.domain_free_text)) done.add(2);
@@ -69,8 +74,9 @@ export function completedSteps({ profile, hasCv, hasLetter }: OnboardingSnapshot
   if (profile.diploma_level !== null) done.add(4);
   if (profile.location_lat !== null && profile.location_lng !== null) done.add(5);
   if (filled(profile.first_name) && filled(profile.last_name)) done.add(ACCOUNT_STEP);
-  // The documents are optional: the step is done once both are there or the student skipped it (C89).
-  if ((hasCv && hasLetter) || profile.documents_skipped_at !== null) done.add(DOCUMENTS_STEP);
+  // The last step only asks for the CV, and even that is optional (C89, C104): the cover
+  // letter is added later from the account, when a tailored letter is wanted.
+  if (hasCv || profile.documents_skipped_at !== null) done.add(DOCUMENTS_STEP);
   return done;
 }
 

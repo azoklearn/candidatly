@@ -56,14 +56,20 @@ test("a student prepares, sends and tracks an application, then exports their da
 
   // The page shown after the questionnaire: what the search found, then the plans (C82).
   await page.goto("/forfait");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("1 offre");
+  // No figure before the plan is active (C104), and one button straight to the plans.
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("une offre");
+  await expect(page.getByRole("heading", { level: 1 })).not.toContainText(/\d/);
+  await expect(page.getByRole("link", { name: /Découvrir les offres/ })).toHaveAttribute(
+    "href",
+    "#forfaits",
+  );
   await expect(page.getByText("Recommandé")).toBeVisible();
   // The preview shows the city but never the job title, not even in the HTML (C88).
   await expect(page.getByText("Tes offres attendent derrière le flou")).toBeVisible();
   expect(await page.content()).not.toContain(OFFER_TITLE);
   // What convinces before paying must be measured, never invented: the freshness comes
   // from the student's own matches and the recap from their own profile.
-  await expect(page.getByText(/de ta sélection publiée ces 7 derniers jours/)).toBeVisible();
+  await expect(page.getByText(/de ta sélection a été publiée ces 7 derniers jours/)).toBeVisible();
   const recap = page.getByRole("region", { name: "Ce qu’on a retenu de ta recherche" });
   await expect(recap.getByText("Paris", { exact: true })).toBeVisible();
   await expect(recap.getByText("jusqu’à 30 km")).toBeVisible();

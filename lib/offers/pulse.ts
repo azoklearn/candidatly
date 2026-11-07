@@ -45,14 +45,18 @@ export function searchPulse(rows: PulseRow[], now: Date = new Date()): SearchPul
   return { lastWeek, newestLabel: newest === null ? null : freshness(newest) };
 }
 
-/** The sentence shown next to the live dot, or null when there is nothing true to say. */
+/**
+ * The sentence shown next to the live dot, or null when there is nothing true to say. It
+ * says that the selection is alive without saying how big it is: no count before the plan
+ * is active (C104).
+ */
 export function pulseSentence(pulse: SearchPulse): string | null {
   const parts: string[] = [];
   if (pulse.lastWeek > 0) {
     parts.push(
-      `${pulse.lastWeek} offre${pulse.lastWeek > 1 ? "s" : ""} de ta sélection publiée${
-        pulse.lastWeek > 1 ? "s" : ""
-      } ces ${PULSE_WINDOW_DAYS} derniers jours`,
+      pulse.lastWeek > 1
+        ? `Des offres de ta sélection ont été publiées ces ${PULSE_WINDOW_DAYS} derniers jours`
+        : `Une offre de ta sélection a été publiée ces ${PULSE_WINDOW_DAYS} derniers jours`,
     );
   }
   if (pulse.newestLabel) parts.push(`la plus récente ${pulse.newestLabel}`);

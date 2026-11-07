@@ -74,18 +74,35 @@ describe("featuredBadge", () => {
 });
 
 describe("searchSummary", () => {
-  it("counts the offers first, then the companies", () => {
+  it("says the offers come first, without ever saying how many (C104)", () => {
     expect(searchSummary(37, 150)).toEqual({
       before: "On a trouvé ",
-      highlight: "37 offres",
+      highlight: "plusieurs offres",
       after: " qui collent à ton profil",
-      extra: "Et 150 entreprises qui recrutent des alternants près de chez toi.",
+      extra: "Et des entreprises qui recrutent des alternants près de chez toi.",
     });
-    expect(searchSummary(1, 0).after).toBe(" qui colle à ton profil");
+    expect(searchSummary(1, 0)).toMatchObject({
+      highlight: "une offre",
+      after: " qui colle à ton profil",
+    });
     expect(searchSummary(0, 1)).toMatchObject({
-      highlight: "1 entreprise",
+      highlight: "une entreprise",
       after: " qui recrute des alternants près de chez toi",
     });
+    expect(searchSummary(0, 12).highlight).toBe("des entreprises");
+  });
+
+  it("never prints a figure before the plan is active", () => {
+    for (const [offers, companies] of [
+      [37, 150],
+      [1, 0],
+      [0, 12],
+      [0, 0],
+    ] as const) {
+      const summary = searchSummary(offers, companies);
+      const sentence = `${summary.before}${summary.highlight}${summary.after} ${summary.extra ?? ""}`;
+      expect(sentence).not.toMatch(/\d/);
+    }
   });
 
   it("never says that nothing was found", () => {
