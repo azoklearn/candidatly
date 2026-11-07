@@ -252,9 +252,6 @@ export default async function HomePage({
               <br />
               <em>Que du concret.</em>
             </h2>
-            <div className="rating">
-              <span>✦</span> Offres : La bonne alternance · Entreprises : Annuaire des Entreprises
-            </div>
           </div>
           <div className="quote-layout">
             <article className="quote quote-main reveal">

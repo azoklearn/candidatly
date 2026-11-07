@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  directoryUrl,
   formatHeadcount,
   rankHiringCompanies,
   sectorLabel,
@@ -68,5 +69,16 @@ describe("rankHiringCompanies", () => {
   it("keeps at most the requested number of companies", () => {
     const rows = Array.from({ length: 20 }, (_, i) => row({ id: String(i), name: `E${i}` }));
     expect(rankHiringCompanies(rows, PARIS, 5)).toHaveLength(5);
+  });
+});
+
+describe("directoryUrl", () => {
+  it("links a 14-digit SIRET to its public page, and nothing else", () => {
+    expect(directoryUrl("123 456 789 00012")).toBe(
+      "https://annuaire-entreprises.data.gouv.fr/etablissement/12345678900012",
+    );
+    expect(directoryUrl("123456789")).toBeNull();
+    expect(directoryUrl("../../evil")).toBeNull();
+    expect(directoryUrl(null)).toBeNull();
   });
 });

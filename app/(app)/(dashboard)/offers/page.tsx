@@ -8,7 +8,12 @@ import { requirePaidAccess } from "@/lib/billing/access";
 import { DatabaseError } from "@/lib/errors";
 import { readScoreReasons } from "@/lib/matching/reasons";
 import { applyOfferFilters, parseOfferFilters } from "@/lib/offers/filters";
-import { FEW_OFFERS, loadHiringCompanies } from "@/lib/offers/hiring-companies";
+import { companiesOnly } from "@/lib/offers/contract-mode";
+import {
+  FEW_OFFERS,
+  MAX_SHOWN_COMPANIES_ONLY,
+  loadHiringCompanies,
+} from "@/lib/offers/hiring-companies";
 import { createClient } from "@/lib/supabase/server";
 
 import { refreshMyOffers } from "./actions";
@@ -47,7 +52,9 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
       .limit(300),
     supabase
       .from("profiles")
-      .select("rome_codes, location_lat, location_lng, search_radius_km, diploma_level")
+      .select(
+        "rome_codes, location_lat, location_lng, search_radius_km, diploma_level, target_contract",
+      )
       .eq("user_id", userId)
       .maybeSingle(),
   ]);
@@ -82,6 +89,51 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
       view: filters.view,
     }),
   );
+  // An internship or a student job: the companies of the student's trades are the page (C106).
+  if (profile.data && companiesOnly(profile.data.target_contract)) {
+    const contract = profile.data.target_contract === "job_etudiant" ? "job étudiant" : "stage";
+    const domainCompanies = await loadHiringCompanies(
+      supabase,
+      profile.data,
+      MAX_SHOWN_COMPANIES_ONLY,
+    );
+    return (
+      <div className="grid gap-8">
+        <div className="fade-up grid gap-2">
+          <p className="eyebrow">Votre sélection</p>
+          <h1 className="page-title">
+            Vos <em>entreprises</em>
+          </h1>
+          <p className="max-w-prose text-sm text-muted-foreground">
+            Les entreprises de vos métiers près de chez vous, les plus proches d’abord.
+            Proposez-leur votre profil pour un {contract}.
+          </p>
+        </div>
+        {domainCompanies.length > 0 ? (
+          <ul className="grid gap-3 sm:grid-cols-2 sm:items-start">
+            {domainCompanies.map((company, index) => (
+              <HiringCompanyCard key={company.id} company={company} index={index} domainOnly />
+            ))}
+          </ul>
+        ) : (
+          <div className="panel-tint fade-up grid justify-items-start gap-3 rounded-2xl border p-6">
+            <p className="section-title">
+              Votre sélection <em>se prépare</em>
+            </p>
+            <p className="max-w-prose text-sm text-muted-foreground">
+              Pour voir plus d’entreprises, élargissez votre rayon ou ajoutez des métiers depuis
+              votre{" "}
+              <Link href="/account" className="font-medium text-brand underline underline-offset-4">
+                compte
+              </Link>
+              .
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   const total = matches.data.length;
   // While published offers are scarce, companies that hire apprentices in the student's
   // trades complete the page (docs/QUESTIONS.md C80).
@@ -167,8 +219,8 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
               Entreprises à fort potentiel d’embauche <em>près de chez vous</em>
             </h2>
             <p className="max-w-prose text-sm text-muted-foreground">
-              Repérées par La bonne alternance d’après leurs recrutements d’alternants dans vos
-              métiers. Proposez-leur votre profil avec une candidature spontanée.
+              Elles recrutent des alternants dans vos métiers. Proposez-leur votre profil avec une
+              candidature spontanée.
             </p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2 sm:items-start">
@@ -178,11 +230,6 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
           </ul>
         </section>
       ) : null}
-
-      <p className="text-xs text-muted-foreground">
-        Offres et entreprises issues de La bonne alternance et de ses partenaires, via l’API
-        Alternance.
-      </p>
     </div>
   );
 }

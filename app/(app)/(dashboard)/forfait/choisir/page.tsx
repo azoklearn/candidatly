@@ -9,6 +9,7 @@ import { requireUserId } from "@/lib/auth/session";
 import { loadAccess } from "@/lib/billing/access";
 import { DatabaseError } from "@/lib/errors";
 import { STUDY_LEVEL_LABELS, cityFromAddress, formatDistance } from "@/lib/format";
+import { companiesOnly } from "@/lib/offers/contract-mode";
 import { toTeaserCards } from "@/lib/offers/teaser";
 import { loadPlanCounts } from "@/lib/plan-choice";
 import { featuredBadge } from "@/lib/pricing";
@@ -44,7 +45,7 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
       .limit(4),
     supabase
       .from("profiles")
-      .select("rome_codes, location_label, search_radius_km, diploma_level")
+      .select("rome_codes, location_label, search_radius_km, diploma_level, target_contract")
       .eq("user_id", userId)
       .maybeSingle(),
     loadPlanCounts(),
@@ -59,6 +60,9 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
     profile.data && profile.data.rome_codes.length > 0
       ? await supabase.from("rome_codes").select("code, label").in("code", profile.data.rome_codes)
       : null;
+
+  // An internship or a student job: companies of the student's trades, no offers (C106).
+  const domainOnly = companiesOnly(profile.data?.target_contract);
 
   // What we understood of their search, so they can see it is really theirs before paying.
   const jobLabels = (jobs?.data ?? []).map((row) => row.label);
@@ -80,7 +84,11 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
         <h1 className="page-title max-w-3xl">
           Choisis ton <em>forfait</em>
         </h1>
-        <p className="max-w-xl text-muted-foreground">Pour découvrir tes offres et candidater.</p>
+        <p className="max-w-xl text-muted-foreground">
+          {domainOnly
+            ? "Pour découvrir les entreprises de ton domaine et les contacter."
+            : "Pour découvrir tes offres et candidater."}
+        </p>
       </header>
 
       {params.paiement === "indisponible" ? (
@@ -120,8 +128,16 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
         </section>
       ) : null}
 
-      <OfferTeaser cards={toTeaserCards(preview.data)} total={offers.count ?? 0} />
-      <PlanProof preview="Toute ta sélection du jour, calculée sur tes métiers, ton niveau et ton rayon. Elle bouge chaque jour : les offres sont retirées dès qu’elles expirent et la recherche tourne plusieurs fois par jour. On ne t’annonce pas de chiffre avant que tu les voies." />
+      {domainOnly ? null : (
+        <OfferTeaser cards={toTeaserCards(preview.data)} total={offers.count ?? 0} />
+      )}
+      <PlanProof
+        preview={
+          domainOnly
+            ? "Toutes les entreprises de ton domaine dans ton rayon, les plus proches d’abord. On ne t’annonce pas de chiffre avant que tu les voies."
+            : "Toute ta sélection du jour, calculée sur tes métiers, ton niveau et ton rayon. Elle bouge chaque jour : les offres sont retirées dès qu’elles expirent et la recherche tourne plusieurs fois par jour. On ne t’annonce pas de chiffre avant que tu les voies."
+        }
+      />
     </div>
   );
 }

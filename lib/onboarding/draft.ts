@@ -139,5 +139,6 @@ export function draftProfileValuesForAnalysis(draft: OnboardingDraft) {
     location_lng: draft.location_lng ?? null,
     search_radius_km: draft.search_radius_km ?? 30,
     diploma_level: draft.diploma_level ?? null,
+    target_contract: draft.target_contract ?? "alternance",
   };
 }

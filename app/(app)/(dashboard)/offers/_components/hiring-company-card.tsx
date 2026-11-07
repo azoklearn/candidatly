@@ -7,13 +7,19 @@ import { EVENTS } from "@/lib/analytics";
 import { formatDistance } from "@/lib/format";
 import type { HiringCompanyCardData } from "@/lib/offers/hiring-companies";
 
-/** A company likely to hire apprentices, reached by an unsolicited application. */
+/**
+ * A company likely to hire apprentices, reached by an unsolicited application. For an
+ * internship or a student job (`domainOnly`, C106) the card claims nothing about hiring: it
+ * is a company of the student's trades nearby, with its official page and its phone.
+ */
 export function HiringCompanyCard({
   company,
   index = 0,
+  domainOnly = false,
 }: {
   company: HiringCompanyCardData;
   index?: number;
+  domainOnly?: boolean;
 }) {
   const place = [
     company.city,
@@ -40,12 +46,24 @@ export function HiringCompanyCard({
         </div>
       </div>
       <div className="flex flex-wrap gap-2">
-        <span className="match-pill">✦ Fort potentiel d’embauche</span>
+        <span className="match-pill">
+          {domainOnly ? "✦ Dans vos métiers" : "✦ Fort potentiel d’embauche"}
+        </span>
         {company.sector ? <Tag>{company.sector}</Tag> : null}
         {company.headcount ? <Tag>{company.headcount}</Tag> : null}
       </div>
       <div className="flex flex-wrap gap-2">
-        {company.applyUrl ? (
+        {domainOnly && company.directoryUrl ? (
+          <a
+            href={company.directoryUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            Voir l’entreprise <span aria-hidden>↗</span>
+          </a>
+        ) : null}
+        {!domainOnly && company.applyUrl ? (
           <TrackedLink
             href={company.applyUrl}
             event={EVENTS.spontaneousApplication}

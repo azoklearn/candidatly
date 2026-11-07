@@ -15,7 +15,28 @@ export type SearchSummary = {
   extra: string | null;
 };
 
-export function searchSummary(offers: number, companies: number): SearchSummary {
+export function searchSummary(
+  offers: number,
+  companies: number,
+  options: { companiesOnly?: boolean } = {},
+): SearchSummary {
+  // Internships and student jobs: the companies of the student's trades nearby (C106).
+  if (options.companiesOnly) {
+    if (companies > 0) {
+      return {
+        before: "On a trouvé ",
+        highlight: companies > 1 ? "plusieurs entreprises" : "une entreprise",
+        after: " de ton domaine près de chez toi",
+        extra: "À contacter directement avec ton CV.",
+      };
+    }
+    return {
+      before: "Ta recherche est ",
+      highlight: "lancée",
+      after: "",
+      extra: "Élargis ton rayon depuis ton compte pour voir plus d’entreprises.",
+    };
+  }
   if (offers > 0) {
     return {
       before: "On a trouvé ",

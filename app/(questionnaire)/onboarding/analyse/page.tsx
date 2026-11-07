@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { currentUserId } from "@/lib/auth/session";
+import { companiesOnly } from "@/lib/offers/contract-mode";
 import { draftSnapshot } from "@/lib/onboarding/draft";
 import { readDraft } from "@/lib/onboarding/draft-cookie";
 import {
@@ -39,6 +40,8 @@ export default async function AnalysisPage() {
   } else {
     const pending = firstIncompleteStep(draftSnapshot(draft));
     if (pending <= VISITOR_LAST_STEP) redirect(`/onboarding/${pending}`);
+    // An internship or a student job leads to companies, not offers (C106).
+    if (companiesOnly(draft.target_contract)) cta = "Voir les entreprises";
   }
 
   return (

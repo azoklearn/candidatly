@@ -11,12 +11,15 @@ import type { Db } from "./sync";
 /**
  * Companies likely to hire apprentices in the student's trades, returned by the student's
  * own search (docs/QUESTIONS.md C80). Shown while published offers are scarce, with an
- * unsolicited application as the next step.
+ * unsolicited application as the next step; for an internship or a student job they are the
+ * whole selection, as the companies of the student's trades nearby (C106).
  */
 
 /** Below this many offers, the offers page also shows hiring companies. */
 export const FEW_OFFERS = 10;
 const MAX_SHOWN = 12;
+/** Internships and student jobs: the companies are the whole page (C106). */
+export const MAX_SHOWN_COMPANIES_ONLY = 60;
 
 export type HiringCompanyCardData = {
   id: string;
@@ -28,6 +31,8 @@ export type HiringCompanyCardData = {
   applyUrl: string | null;
   phone: string | null;
   telHref: string | null;
+  /** Public page of the establishment on the official directory, when the SIRET is known. */
+  directoryUrl: string | null;
 };
 
 export type HiringCompanyRow = {
@@ -41,7 +46,16 @@ export type HiringCompanyRow = {
   lng: number | null;
   apply_url: string | null;
   phone?: string | null;
+  siret?: string | null;
 };
+
+/** annuaire-entreprises.data.gouv.fr page of an establishment; null for anything but 14 digits. */
+export function directoryUrl(siret: string | null | undefined): string | null {
+  const digits = siret?.replace(/\s/g, "") ?? "";
+  return /^\d{14}$/.test(digits)
+    ? `https://annuaire-entreprises.data.gouv.fr/etablissement/${digits}`
+    : null;
+}
 
 /** "10-19" becomes "10 à 19 salariés"; ranges without employees give null. */
 export function formatHeadcount(range: string | null): string | null {
@@ -84,6 +98,7 @@ export function rankHiringCompanies(
       applyUrl: row.apply_url,
       phone: formatPhone(row.phone),
       telHref: telHref(row.phone),
+      directoryUrl: directoryUrl(row.siret),
     }))
     .sort(
       (a, b) =>
@@ -105,6 +120,7 @@ export type ProfileForHiringCompanies = {
 export async function loadHiringCompanies(
   db: Db,
   profile: ProfileForHiringCompanies,
+  limit = MAX_SHOWN,
 ): Promise<HiringCompanyCardData[]> {
   const { location_lat: lat, location_lng: lng } = profile;
   if (lat === null || lng === null || profile.rome_codes.length === 0) return [];
@@ -117,12 +133,12 @@ export async function loadHiringCompanies(
   });
   const { data, error } = await db
     .from("hiring_companies")
-    .select("id, name, naf_code, naf_label, headcount, address, lat, lng, apply_url, phone")
+    .select("id, name, naf_code, naf_label, headcount, address, lat, lng, apply_url, phone, siret")
     .eq("query_key", key)
     .limit(200);
   if (error) {
     logger.warn("hiring_companies_load_failed", { code: error.code });
     return [];
   }
-  return rankHiringCompanies(data, { lat, lng });
+  return rankHiringCompanies(data, { lat, lng }, limit);
 }

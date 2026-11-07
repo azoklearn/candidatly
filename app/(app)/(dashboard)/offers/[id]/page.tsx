@@ -300,8 +300,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
             <CompanyCardLoader offer={offer} />
           </Suspense>
           <p className="text-xs text-muted-foreground">
-            Source : La bonne alternance, via l’API Alternance. Données mises à jour le{" "}
-            {formatDate(offer.last_seen_at)}.
+            Données mises à jour le {formatDate(offer.last_seen_at)}.
           </p>
         </aside>
       </div>

@@ -32,8 +32,12 @@ const LEVELS: Choice[] = [
 
 const CONTRACTS: Choice[] = [
   { value: "alternance", label: "Une alternance" },
-  { value: "stage", label: "Un stage", hint: "Offres bientôt disponibles" },
-  { value: "job_etudiant", label: "Un job étudiant", hint: "Offres bientôt disponibles" },
+  { value: "stage", label: "Un stage", hint: "Les entreprises de ton domaine près de chez toi" },
+  {
+    value: "job_etudiant",
+    label: "Un job étudiant",
+    hint: "Les entreprises de ton domaine près de chez toi",
+  },
   { value: "both", label: "Peu importe" },
 ];
 

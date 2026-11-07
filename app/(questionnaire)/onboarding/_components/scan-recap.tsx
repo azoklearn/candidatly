@@ -28,8 +28,8 @@ const MAX_CODES = 5;
 
 const CONTRACTS = [
   { value: "alternance", label: "Alternance" },
-  { value: "stage", label: "Stage", hint: "bientôt" },
-  { value: "job_etudiant", label: "Job étudiant", hint: "bientôt" },
+  { value: "stage", label: "Stage" },
+  { value: "job_etudiant", label: "Job étudiant" },
   { value: "both", label: "Peu importe" },
 ] as const;
 

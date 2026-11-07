@@ -153,16 +153,14 @@ export function CompanyCard({
               </a>
             ))}
           <p>
-            Source :{" "}
             <a
               href={`https://annuaire-entreprises.data.gouv.fr/entreprise/${company.siren}`}
               target="_blank"
               rel="noopener noreferrer"
               className="underline underline-offset-4"
             >
-              Annuaire des Entreprises
-            </a>{" "}
-            (INSEE, INPI), Licence Ouverte 2.0.
+              Fiche complète de l’entreprise <span aria-hidden>↗</span>
+            </a>
           </p>
         </div>
       </CardContent>

@@ -74,6 +74,20 @@ describe("featuredBadge", () => {
 });
 
 describe("searchSummary", () => {
+  it("gives an internship or a student job the companies of the domain, no offers (C106)", () => {
+    expect(searchSummary(37, 150, { companiesOnly: true })).toMatchObject({
+      before: "On a trouvé ",
+      highlight: "plusieurs entreprises",
+      after: " de ton domaine près de chez toi",
+    });
+    expect(searchSummary(5, 1, { companiesOnly: true }).highlight).toBe("une entreprise");
+    const empty = searchSummary(12, 0, { companiesOnly: true });
+    expect(empty.highlight).toBe("lancée");
+    for (const summary of [searchSummary(37, 150, { companiesOnly: true }), empty]) {
+      expect(Object.values(summary).join(" ")).not.toMatch(/\d|offre/);
+    }
+  });
+
   it("says the offers come first, without ever saying how many (C104)", () => {
     expect(searchSummary(37, 150)).toEqual({
       before: "On a trouvé ",

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { loadState, OFFER_TITLE } from "./support";
+import { adminClient, loadState, OFFER_TITLE } from "./support";
 
 test("a student prepares, sends and tracks an application, then exports their data", async ({
   page,
@@ -90,4 +90,49 @@ test("a student prepares, sends and tracks an application, then exports their da
   expect(data.profile.chosen_billing).toBe("annual");
   expect(data.applications).toHaveLength(1);
   expect(data.applications[0].status).toBe("replied_positive");
+});
+
+test("a student looking for an internship gets the companies of their domain (C106)", async ({
+  page,
+}) => {
+  const { users } = loadState();
+  const db = adminClient();
+  const set = (target_contract: "stage" | "alternance") =>
+    db.from("profiles").update({ target_contract }).eq("user_id", users.student.id);
+  expect((await set("stage")).error).toBeNull();
+  try {
+    // The seeded link was spent by the test above: a fresh one for this session.
+    const link = await db.auth.admin.generateLink({
+      type: "magiclink",
+      email: users.student.email,
+    });
+    expect(link.error).toBeNull();
+    await page.goto(
+      `/auth/confirm?type=email&next=/offers&token_hash=${link.data.properties?.hashed_token}`,
+    );
+    await expect(page.getByRole("heading", { level: 1, name: "Vos entreprises" })).toBeVisible();
+    // No work-study offer and no claim about hiring apprentices: companies of the domain.
+    await expect(page.getByText(OFFER_TITLE)).toHaveCount(0);
+    const seeded = page.getByRole("listitem").filter({ hasText: "Atelier numérique 1 (test E2E)" });
+    await expect(seeded.getByText("Dans vos métiers")).toBeVisible();
+    await expect(seeded.getByRole("link", { name: /Voir l’entreprise/ })).toHaveAttribute(
+      "href",
+      "https://annuaire-entreprises.data.gouv.fr/etablissement/12345678900012",
+    );
+    await expect(seeded.getByRole("link", { name: /candidature spontanée/ })).toHaveCount(0);
+    // Nothing on the page says where the data comes from.
+    expect(await page.content()).not.toMatch(/La bonne alternance|API Alternance/);
+
+    await page.goto("/forfait");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "de ton domaine près de chez toi",
+    );
+    await expect(page.getByRole("heading", { level: 1 })).not.toContainText(/\d|offre/);
+    await expect(page.getByText(/7 derniers jours/)).toHaveCount(0);
+    await page.getByRole("link", { name: "Découvrir les entreprises" }).click();
+    await expect(page).toHaveURL(/\/forfait\/choisir$/);
+    await expect(page.getByText("Tes offres attendent derrière le flou")).toHaveCount(0);
+  } finally {
+    await set("alternance");
+  }
 });

@@ -5,6 +5,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { requireUserId } from "@/lib/auth/session";
 import { loadAccess } from "@/lib/billing/access";
 import { DatabaseError } from "@/lib/errors";
+import { companiesOnly } from "@/lib/offers/contract-mode";
 import { pulseSentence, searchPulse } from "@/lib/offers/pulse";
 import { searchSummary } from "@/lib/offers/search-summary";
 import { countHiringCompanies } from "@/lib/plan-choice";
@@ -38,7 +39,9 @@ export default async function SearchResultPage() {
       .limit(300),
     supabase
       .from("profiles")
-      .select("rome_codes, location_lat, location_lng, search_radius_km, diploma_level")
+      .select(
+        "rome_codes, location_lat, location_lng, search_radius_km, diploma_level, target_contract",
+      )
       .eq("user_id", userId)
       .maybeSingle(),
     loadAccess(supabase, userId),
@@ -47,8 +50,10 @@ export default async function SearchResultPage() {
   if (dates.error) throw new DatabaseError("matches.dates", dates.error);
   if (profile.error) throw new DatabaseError("profiles.select", profile.error);
   const companies = profile.data ? await countHiringCompanies(supabase, profile.data) : 0;
-  const summary = searchSummary(offers.count ?? 0, companies);
-  const pulse = pulseSentence(searchPulse(dates.data.map((row) => row.offer)));
+  // An internship or a student job: companies of the student's trades, no offers (C106).
+  const domainOnly = companiesOnly(profile.data?.target_contract);
+  const summary = searchSummary(offers.count ?? 0, companies, { companiesOnly: domainOnly });
+  const pulse = domainOnly ? null : pulseSentence(searchPulse(dates.data.map((row) => row.offer)));
   const current = access.paywall ? access.subscription : null;
   const currentName = PLANS.find((plan) => plan.id === current?.plan)?.name;
 
@@ -90,7 +95,7 @@ export default async function SearchResultPage() {
           href="/forfait/choisir"
           className={`${buttonVariants({ variant: "shiny", size: "lg" })} mt-2`}
         >
-          Découvrir les offres
+          {domainOnly ? "Découvrir les entreprises" : "Découvrir les offres"}
         </Link>
       )}
     </header>

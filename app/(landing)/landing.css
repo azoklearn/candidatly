@@ -627,18 +627,6 @@ html:has(.lp) {
   grid-column: 1 / -1;
   margin-bottom: 20px;
 }
-.lp .rating {
-  align-self: end;
-  justify-self: end;
-  font-size: 11px;
-  color: var(--ink-soft);
-}
-.lp .rating span {
-  color: var(--coral);
-  letter-spacing: 2px;
-  font-size: 13px;
-  margin-right: 6px;
-}
 .lp .quote-layout {
   display: grid;
   grid-template-columns: 1.45fr 0.85fr;
@@ -913,9 +901,6 @@ html:has(.lp) {
   .lp .testimonial-header {
     grid-template-columns: 1fr;
     gap: 25px;
-  }
-  .lp .rating {
-    justify-self: start;
   }
   .lp .quote-layout {
     grid-template-columns: 1fr;
@@ -1275,14 +1260,6 @@ html:has(.lp) {
 .lp .testimonial-header h2 {
   grid-column: 1 / -1;
 }
-.lp .rating {
-  grid-column: 1 / -1;
-  justify-self: center;
-  margin-top: 17px;
-}
-.lp .rating span {
-  color: #1764d8;
-}
 .lp .quote {
   border: 1px solid #d7e5f1;
   border-radius: 20px;
@@ -1365,9 +1342,6 @@ html:has(.lp) {
   }
   .lp .testimonial-header h2 {
     margin-bottom: 16px;
-  }
-  .lp .rating {
-    margin-top: 0;
   }
   .lp .quote-main {
     border-radius: 19px;

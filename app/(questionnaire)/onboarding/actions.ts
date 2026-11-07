@@ -21,6 +21,7 @@ import {
 import { ExternalApiError, ValidationError } from "@/lib/errors";
 import { resolvePlace, reversePlace } from "@/lib/geocoding/geocode";
 import { analyseSearch, type AnalysisCounts } from "@/lib/offers/analysis";
+import { companiesOnly } from "@/lib/offers/contract-mode";
 import { requestOffersRefresh } from "@/lib/offers/request-refresh";
 import { createApiAlternanceProvider } from "@/lib/providers/api-alternance";
 import { logger } from "@/lib/logger";
@@ -605,7 +606,8 @@ export async function saveLetterText(_previous: FormState, formData: FormData): 
   return { saved: true };
 }
 
-export type AnalysisResult = { ok: true; counts: AnalysisCounts } | { ok: false; error: string };
+export type AnalysisResult =
+  { ok: true; counts: AnalysisCounts; companiesOnly: boolean } | { ok: false; error: string };
 
 /**
  * The work behind the analysis screen (docs/QUESTIONS.md C94), run before the account
@@ -645,7 +647,7 @@ export async function analyseQuestionnaire(): Promise<AnalysisResult> {
     if (!userId) {
       await saveDraft({ found_offers: counts.offers, found_companies: counts.companies });
     }
-    return { ok: true, counts };
+    return { ok: true, counts, companiesOnly: companiesOnly(profile.target_contract) };
   } catch (error) {
     log.error("analysis_failed", { error });
     return { ok: false, error: "L’analyse n’a pas abouti. Réessaie dans un instant." };

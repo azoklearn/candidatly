@@ -12,8 +12,8 @@ type Commitment = { title: string; body: string; icon: string };
 const COMMITMENTS: Commitment[] = [
   {
     icon: "◎",
-    title: "Des offres officielles",
-    body: "Elles viennent de La bonne alternance et de ses partenaires, par l’API Alternance de l’État. On n’aspire aucun site d’annonces.",
+    title: "Des offres réelles",
+    body: "Uniquement des offres réellement publiées par les entreprises, retirées de ta sélection dès qu’elles expirent.",
   },
   {
     icon: "✎",
@@ -51,12 +51,7 @@ function questions(preview: ReactNode): Question[] {
     {
       question: "Et pour un stage ou un job étudiant ?",
       answer:
-        "Pas encore : la source officielle qu’on interroge ne publie que de l’alternance. Tant que c’est le cas, c’est écrit « Bientôt » partout dans le produit plutôt que vendu.",
-    },
-    {
-      question: "D’où viennent les informations sur les entreprises ?",
-      answer:
-        "De l’Annuaire des Entreprises de l’État (SIREN, effectifs, activité, dirigeants) et du site de l’entreprise quand l’offre en donne un. Si on ne sait pas, on ne remplit pas.",
+        "On te montre les entreprises de ton domaine près de chez toi, les plus proches d’abord, avec leur fiche et leur téléphone quand on le connaît. À toi de leur proposer ton profil avec ton CV.",
     },
     {
       question: "Et si je trouve mon alternance ?",

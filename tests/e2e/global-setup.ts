@@ -169,6 +169,8 @@ export default async function globalSetup() {
       lng: STUDENT_SEARCH.lng,
       apply_url: `https://labonnealternance.apprentissage.beta.gouv.fr/emploi/recruteurs_lba/e2e-${n}`,
       phone: "01 23 45 67 89",
+      // A SIRET links the company to its public page for internships (C106).
+      siret: n === 1 ? "12345678900012" : null,
       last_seen_at: now,
     })),
   );

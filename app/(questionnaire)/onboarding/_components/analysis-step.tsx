@@ -99,15 +99,23 @@ export function AnalysisStep({ next, cta }: { next: string; cta: string }) {
     const { offers, companies } = result.counts;
     // No figure on this screen (owner, 29 September 2026): the wording only says what was
     // really found, and stays true when the search came back empty.
-    found = offers > 0 || companies > 0;
-    message =
-      offers > 0
-        ? "On a trouvé des offres qui pourraient t’intéresser !"
-        : companies > 0
-          ? "On a trouvé des entreprises qui recrutent près de chez toi !"
-          : "De nouvelles offres sont publiées chaque jour.";
-    extra =
-      offers > 0 && companies > 0 ? "Et des entreprises qui recrutent près de chez toi." : null;
+    if (result.companiesOnly) {
+      // Internships and student jobs: companies of the student's trades nearby (C106).
+      found = companies > 0;
+      message = found
+        ? "On a trouvé des entreprises de ton domaine près de chez toi !"
+        : "Élargis ton rayon pour voir plus d’entreprises.";
+    } else {
+      found = offers > 0 || companies > 0;
+      message =
+        offers > 0
+          ? "On a trouvé des offres qui pourraient t’intéresser !"
+          : companies > 0
+            ? "On a trouvé des entreprises qui recrutent près de chez toi !"
+            : "De nouvelles offres sont publiées chaque jour.";
+      extra =
+        offers > 0 && companies > 0 ? "Et des entreprises qui recrutent près de chez toi." : null;
+    }
   }
 
   return (
