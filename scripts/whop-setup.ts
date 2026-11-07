@@ -136,8 +136,30 @@ async function main() {
   if (saved.error) throw new Error(`billing_plans: ${saved.error.message}`);
   console.log("The six plans are recorded in Supabase.");
 
+  // A webhook already exists: creating a second one would deliver every event twice, and
+  // its secret is the one Vercel knows. Say where it points instead of making a new one.
   if (process.env.WHOP_WEBHOOK_SECRET) {
-    console.log("WHOP_WEBHOOK_SECRET is already set: webhook left as it is.");
+    const wanted = `${SITE}/api/whop/webhook`;
+    const hooks = await whop<{ data?: { id: string; url?: string; enabled?: boolean }[] }>(
+      `/webhooks?account_id=${accountId}`,
+    );
+    const existing = hooks.data ?? [];
+    if (existing.length === 0) {
+      console.log(
+        `WHOP_WEBHOOK_SECRET is set but no webhook exists on Whop. Remove the variable from .env.local and run again to create one on ${wanted}.`,
+      );
+      return;
+    }
+    for (const hook of existing) {
+      const state = hook.enabled === false ? " (disabled)" : "";
+      const verdict = hook.url === wanted ? "ok" : `should point to ${wanted}`;
+      console.log(`Webhook ${hook.id}${state}: ${hook.url ?? "?"} -- ${verdict}`);
+    }
+    if (!existing.some((hook) => hook.url === wanted)) {
+      console.log(
+        "Change the address of the existing webhook in the Whop dashboard (Developer > Webhooks): editing it keeps the same secret, so nothing changes on Vercel.",
+      );
+    }
     return;
   }
   const webhook = await whop<{ id: string; webhook_secret?: string }>("/webhooks", {

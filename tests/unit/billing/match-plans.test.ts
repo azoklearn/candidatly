@@ -38,6 +38,18 @@ const match = (listings: WhopPlanListing[], explicit?: Record<string, string>) =
   });
 
 describe("matchWhopPlans", () => {
+  it("ignores a retired plan that still carries its old memberships", () => {
+    // Real case of 12 September 2026: a plan that had sold a membership cannot change
+    // price, so it was hidden and replaced by an identical one. Both are still listed.
+    const result = match([...OWNER_PLANS, listing("plan_p_y_old", 149.9, 365, { visibility: "hidden" })]);
+    expect(result.ambiguous).toEqual([]);
+    expect(result.missing).toEqual([]);
+    expect(result.links.find((l) => l.plan === "plus" && l.billing === "annual")?.providerPlanId).toBe(
+      "plan_p_y",
+    );
+  });
+
+
   it("links the owner's six plans by period and price", () => {
     const result = match(OWNER_PLANS);
     expect(result.missing).toEqual([]);

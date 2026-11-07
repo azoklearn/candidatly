@@ -10,6 +10,8 @@ export type WhopPlanListing = {
   currency?: string | null;
   initial_price?: number | null;
   renewal_price?: number | null;
+  /** "hidden" once the owner retired the plan; Whop keeps it for its live memberships. */
+  visibility?: string | null;
 };
 
 export type PlanLink = {
@@ -37,6 +39,9 @@ function fits(listing: WhopPlanListing, billing: Billing, cents: number): boolea
   const period = listing.billing_period ?? -1;
   const currency = (listing.currency ?? "eur").toLowerCase();
   return (
+    // A hidden plan cannot be sold again: Whop only keeps it alive for the memberships
+    // already bought on it. Counting it would make a replacement plan look ambiguous.
+    (listing.visibility ?? "visible") !== "hidden" &&
     (listing.plan_type ?? "renewal") === "renewal" &&
     period >= min &&
     period <= max &&
