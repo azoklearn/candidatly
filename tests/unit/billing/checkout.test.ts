@@ -39,14 +39,14 @@ describe("startWhopCheckout", () => {
       userId: USER,
       plan: "plus",
       billing: "monthly",
-      returnUrl: "https://gptjob.io/forfait/merci",
+      returnUrl: "https://www.gptjob.io/forfait/merci",
       logger: silent,
     });
     expect(url).toBe("https://whop.com/checkout/ch_1/");
     expect(client.createCheckout).toHaveBeenCalledWith({
       planId: "plan_plus_month",
       metadata: { user_id: USER, plan: "plus", billing: "monthly" },
-      redirectUrl: "https://gptjob.io/forfait/merci",
+      redirectUrl: "https://www.gptjob.io/forfait/merci",
     });
   });
 
@@ -58,7 +58,7 @@ describe("startWhopCheckout", () => {
       userId: USER,
       plan: "plus",
       billing: "monthly",
-      returnUrl: "https://gptjob.io/forfait/merci",
+      returnUrl: "https://www.gptjob.io/forfait/merci",
       logger: silent,
     });
     expect(url).toBeNull();
@@ -74,7 +74,7 @@ describe("startWhopCheckout", () => {
         userId: USER,
         plan: "basic",
         billing: "annual",
-        returnUrl: "https://gptjob.io/forfait/merci",
+        returnUrl: "https://www.gptjob.io/forfait/merci",
         logger: silent,
       }),
     ).resolves.toBeNull();

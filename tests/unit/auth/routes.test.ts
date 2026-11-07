@@ -55,10 +55,10 @@ describe("authRedirectBase", () => {
   });
 
   it("falls back on the configured site URL when the origin is missing or odd", () => {
-    expect(authRedirectBase(null, "https://gptjob.io/")).toBe("https://gptjob.io");
-    expect(authRedirectBase("null", "https://gptjob.io")).toBe("https://gptjob.io");
-    expect(authRedirectBase("https://evil.example/path", "https://gptjob.io")).toBe(
-      "https://gptjob.io",
+    expect(authRedirectBase(null, "https://www.gptjob.io/")).toBe("https://www.gptjob.io");
+    expect(authRedirectBase("null", "https://www.gptjob.io")).toBe("https://www.gptjob.io");
+    expect(authRedirectBase("https://evil.example/path", "https://www.gptjob.io")).toBe(
+      "https://www.gptjob.io",
     );
   });
 });

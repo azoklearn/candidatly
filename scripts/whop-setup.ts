@@ -18,7 +18,7 @@ const option = (name: string) =>
   process.argv.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
 const DRY_RUN = process.argv.includes("--dry-run");
 const API = (process.env.WHOP_API_BASE_URL || "https://api.whop.com/api/v1").replace(/\/+$/, "");
-const SITE = (option("site") || "https://gptjob.io").replace(/\/+$/, "");
+const SITE = (option("site") || "https://www.gptjob.io").replace(/\/+$/, "");
 const WEBHOOK_EVENTS = [
   "membership.activated",
   "membership.deactivated",
