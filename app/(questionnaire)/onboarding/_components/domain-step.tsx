@@ -3,8 +3,24 @@ import { JOB_DOMAINS } from "@/lib/onboarding/domains";
 import { saveDomain } from "../actions";
 import { ChoiceCards } from "./choice-cards";
 
+const ICONS: Record<string, string> = {
+  informatique: "💻",
+  commerce: "🛍️",
+  marketing: "📣",
+  gestion: "🧮",
+  rh: "🤝",
+  banque: "🏦",
+  logistique: "📦",
+  industrie: "⚙️",
+  batiment: "🏗️",
+  sante: "🩺",
+  hotellerie: "🍽️",
+  droit: "⚖️",
+};
+
 const CHOICES = JOB_DOMAINS.map((domain) => ({
   value: domain.id,
+  icon: ICONS[domain.id] ?? "✦",
   label: domain.label,
   hint: domain.hint,
 }));

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { ResultStack } from "@/components/result-stack";
 import { buttonVariants } from "@/components/ui/button";
 import { requireUserId } from "@/lib/auth/session";
 import { loadAccess } from "@/lib/billing/access";
@@ -58,10 +59,11 @@ export default async function SearchResultPage() {
   const currentName = PLANS.find((plan) => plan.id === current?.plan)?.name;
 
   return (
-    <header className="fade-up grid min-h-[50svh] content-center justify-items-center gap-4 text-center">
-      <h1 className="page-title max-w-3xl">
+    <header className="grid min-h-[62svh] content-center justify-items-center gap-4 text-center">
+      <ResultStack />
+      <h1 className="page-title fade-up max-w-3xl">
         {summary.before}
-        <em>{summary.highlight}</em>
+        <em className="marker">{summary.highlight}</em>
         {summary.after}
       </h1>
       {summary.extra ? <p className="text-muted-foreground">{summary.extra}</p> : null}
@@ -93,9 +95,10 @@ export default async function SearchResultPage() {
       ) : (
         <Link
           href="/forfait/choisir"
-          className={`${buttonVariants({ variant: "shiny", size: "lg" })} mt-2`}
+          className={`${buttonVariants({ variant: "shiny", size: "lg" })} q-card mt-3 h-13 px-8 text-base`}
         >
-          {domainOnly ? "Découvrir les entreprises" : "Découvrir les offres"}
+          {domainOnly ? "Découvrir les entreprises" : "Découvrir les offres"}{" "}
+          <span aria-hidden>→</span>
         </Link>
       )}
     </header>

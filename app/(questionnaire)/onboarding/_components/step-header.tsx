@@ -24,11 +24,14 @@ export function StepHeader({ step }: { step: number }) {
           </Link>
         ) : null}
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-foreground/10" aria-hidden>
-        <div
-          className="h-full rounded-full bg-linear-to-r from-brand-soft to-brand transition-[width] duration-500"
-          style={{ width: `${(step / LAST_STEP) * 100}%` }}
-        />
+      {/* One segment per question, like the bars of a story; the current one fills up. */}
+      <div className="q-segments" aria-hidden>
+        {Array.from({ length: VISITOR_LAST_STEP }, (_, index) => (
+          <span
+            key={index}
+            data-state={index + 1 < step ? "done" : index + 1 === step ? "now" : "todo"}
+          />
+        ))}
       </div>
       <h1 className="page-title q-in">{stepTitle(step)}</h1>
     </header>

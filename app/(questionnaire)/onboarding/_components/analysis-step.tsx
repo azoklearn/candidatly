@@ -145,9 +145,18 @@ export function AnalysisStep({ next, cta }: { next: string; cta: string }) {
           aria-label="Analyse de ton profil"
         >
           {succeeded ? (
-            <span className="swap text-3xl font-bold text-brand" aria-hidden>
-              ✓
-            </span>
+            <>
+              <span className="swap text-4xl font-bold text-brand" aria-hidden>
+                ✓
+              </span>
+              {found ? (
+                <span className="confetti" aria-hidden>
+                  {Array.from({ length: 10 }, (_, index) => (
+                    <i key={index} style={{ "--n": index } as CSSProperties} />
+                  ))}
+                </span>
+              ) : null}
+            </>
           ) : (
             <span className="text-2xl font-bold tracking-[-0.04em] tabular-nums">{percent} %</span>
           )}
@@ -180,11 +189,11 @@ export function AnalysisStep({ next, cta }: { next: string; cta: string }) {
           </div>
         ) : (
           <>
-            <ul className="grid w-full gap-3 text-left">
+            <ul className="notebook panel grid w-full gap-0 rounded-2xl border bg-card px-4 py-2 text-left">
               {LINES.map((line, index) => (
                 <li
                   key={line}
-                  className="analysis-line text-sm"
+                  className="analysis-line py-2.5 text-sm"
                   data-state={index < lines ? "done" : index === lines ? "active" : "todo"}
                 >
                   <span className="analysis-check" aria-hidden>

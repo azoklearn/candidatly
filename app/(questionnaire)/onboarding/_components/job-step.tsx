@@ -52,8 +52,8 @@ export function JobStep({
             <li key={job.code} className="q-in" style={{ "--i": index } as CSSProperties}>
               <label
                 className={cn(
-                  "q-card panel flex h-full min-h-16 cursor-pointer items-start gap-3 rounded-2xl border bg-card p-4 text-sm hover:bg-muted/40",
-                  isChecked && "border-foreground bg-primary/5",
+                  "q-card panel relative flex h-full min-h-14 cursor-pointer items-center gap-3 rounded-[1.2rem] border bg-card px-4 py-3 text-[0.95rem] hover:border-foreground/60",
+                  isChecked && "border-brand bg-[var(--pastel-peach)]/45",
                   full && "cursor-not-allowed opacity-50",
                 )}
               >
@@ -64,9 +64,12 @@ export function JobStep({
                   checked={isChecked}
                   disabled={full}
                   onChange={() => toggle(job.code)}
-                  className="mt-0.5 size-4 accent-primary"
+                  className="peer absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
                 />
-                <span className="font-medium">{job.label}</span>
+                <span aria-hidden className="q-check">
+                  ✓
+                </span>
+                <span className="leading-snug font-medium">{job.label}</span>
               </label>
             </li>
           );
@@ -77,9 +80,21 @@ export function JobStep({
           <AlertDescription>{state.error}</AlertDescription>
         </Alert>
       ) : null}
-      <Button type="submit" size="lg" disabled={pending || checked.length === 0} className="w-fit">
-        {pending ? "Enregistrement…" : "Continuer"}
-      </Button>
+      {/* Always under the thumb: the list is long on a phone. */}
+      <div className="sticky bottom-3 z-20 flex items-center gap-3 rounded-full border bg-card/95 p-1.5 pl-4 shadow-[0_14px_30px_rgba(74,46,28,0.16)] backdrop-blur-md sm:static sm:w-fit sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none">
+        <span className="text-sm font-medium text-muted-foreground tabular-nums sm:hidden">
+          {checked.length} / {MAX_CODES}
+        </span>
+        <Button
+          type="submit"
+          size="lg"
+          variant="shiny"
+          disabled={pending || checked.length === 0}
+          className="h-11 flex-1 px-7 sm:flex-none"
+        >
+          {pending ? "Enregistrement…" : "Continuer"} <span aria-hidden>→</span>
+        </Button>
+      </div>
     </ActionForm>
   );
 }

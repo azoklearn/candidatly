@@ -485,6 +485,259 @@
       transform: translateY(-1px);
     }
   }
+  /* The pastel tile of an answer: a sticker, slightly tilted, that straightens when picked. */
+  .q-tile {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 0.95rem 0.95rem 0.95rem 0.35rem;
+    background: var(--tile, var(--pastel-peach));
+    border: 1px solid rgba(59, 37, 26, 0.08);
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    transform: rotate(-5deg);
+    transition: transform 220ms var(--ease-out-strong);
+  }
+  .q-card:nth-child(even) .q-tile {
+    transform: rotate(4deg);
+  }
+  .q-card:active .q-tile,
+  .q-card[data-picked="true"] .q-tile {
+    transform: rotate(0deg) scale(1.08);
+  }
+  .q-go {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 999px;
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-size: 0.9rem;
+    transition:
+      transform 180ms var(--ease-out-strong),
+      background-color 180ms ease,
+      color 180ms ease;
+  }
+  .q-card[data-picked="true"] .q-go {
+    background: var(--brand);
+    color: #fff;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .q-card:hover .q-go {
+      background: var(--foreground);
+      color: var(--background);
+      transform: translateX(2px);
+    }
+    .q-card:hover .q-tile {
+      transform: rotate(0deg) scale(1.06);
+    }
+  }
+  /* The round tick of a multiple-choice answer. */
+  .q-check {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1.5px solid var(--input);
+    border-radius: 50%;
+    background: var(--card);
+    color: transparent;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      transform 220ms var(--ease-out-strong);
+  }
+  .peer:checked ~ .q-check {
+    border-color: var(--brand);
+    background: var(--brand);
+    color: #fff;
+    transform: scale(1.1);
+  }
+  .peer:focus-visible ~ .q-check {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  /* Progress of the questionnaire: one bar per question, like a story. */
+  .q-segments {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 0.3rem;
+  }
+  .q-segments span {
+    position: relative;
+    height: 0.4rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(59, 37, 26, 0.1);
+  }
+  .q-segments span::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--brand-soft), var(--brand));
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .q-segments span[data-state="done"]::after {
+    transform: scaleX(1);
+  }
+  .q-segments span[data-state="now"]::after {
+    animation: q-segment 700ms 120ms both var(--ease-out-strong);
+  }
+  /* The checklist of the analysis, on ruled paper. */
+  .notebook > li + li {
+    border-top: 1px dashed var(--border);
+  }
+  /* A burst of pastel paper when the search found something: plays once. */
+  .analysis-ring > .confetti {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .confetti i {
+    --a: calc(var(--n) * 36deg);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 9px;
+    height: 13px;
+    margin: -6px 0 0 -4px;
+    border-radius: 3px;
+    background: var(--pastel-peach);
+    opacity: 0;
+    animation: confetti 900ms 160ms both var(--ease-out-strong);
+  }
+  .confetti i:nth-child(3n) {
+    background: var(--brand-soft);
+  }
+  .confetti i:nth-child(3n + 1) {
+    background: #f5d98a;
+    border-radius: 50%;
+    height: 9px;
+  }
+  .confetti i:nth-child(4n + 2) {
+    background: #bfe3cd;
+  }
+  .confetti i:nth-child(5n) {
+    background: #cdbff3;
+  }
+
+  /* The accent word, run over with a highlighter. */
+  .page-title em.marker {
+    padding: 0 0.12em;
+    background: linear-gradient(
+        transparent 58%,
+        color-mix(in srgb, #ffd666 62%, transparent) 58% 92%,
+        transparent 92%
+      )
+      no-repeat left / 0% 100%;
+    animation: marker 620ms 420ms both var(--ease-out-strong);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* The fan of hidden cards above the search result. */
+  .result-stack {
+    position: relative;
+    width: 15.5rem;
+    height: 9.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .result-card {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    width: 9.5rem;
+    height: 7.6rem;
+    margin-left: -4.75rem;
+    padding: 0.85rem;
+    border: 1px solid rgba(59, 37, 26, 0.09);
+    border-radius: 1.1rem;
+    background: var(--card);
+    box-shadow: 0 16px 30px rgba(74, 46, 28, 0.12);
+    transform-origin: 50% 120%;
+    animation: result-fan 640ms both var(--ease-out-strong);
+  }
+  .result-card[data-card="0"] {
+    --r: -13deg;
+    --x: -3.6rem;
+    background: var(--pastel-sun);
+    animation-delay: 120ms;
+  }
+  .result-card[data-card="1"] {
+    --r: 12deg;
+    --x: 3.6rem;
+    background: var(--pastel-mint);
+    animation-delay: 200ms;
+  }
+  .result-card[data-card="2"] {
+    --r: -1deg;
+    --x: 0rem;
+    z-index: 1;
+    animation-delay: 300ms;
+  }
+  .result-card-mark {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 0.55rem;
+    background: var(--pastel-peach);
+  }
+  .result-card-line {
+    height: 0.5rem;
+    border-radius: 999px;
+    background: rgba(59, 37, 26, 0.14);
+  }
+  .result-card-line[data-short] {
+    width: 62%;
+    background: rgba(59, 37, 26, 0.08);
+  }
+  .result-card-chips {
+    display: flex;
+    gap: 0.3rem;
+  }
+  .result-card-chips i {
+    width: 2rem;
+    height: 0.8rem;
+    border-radius: 0.3rem;
+    background: var(--pastel-lilac);
+  }
+  .result-card-chips i + i {
+    width: 1.4rem;
+    background: var(--pastel-rose);
+  }
+  .result-sticker {
+    position: absolute;
+    top: 0.2rem;
+    right: 1.6rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border: 3px solid var(--background);
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(214, 74, 24, 0.35);
+    animation: sticker 520ms 620ms both var(--ease-out-strong);
+  }
   /* Each answer arrives just after the previous one: --i carries its rank. */
   .q-in {
     animation: q-in 320ms both var(--ease-out-strong);
@@ -494,8 +747,9 @@
     position: relative;
     display: grid;
     place-items: center;
-    width: 132px;
-    height: 132px;
+    width: 148px;
+    height: 148px;
+    box-shadow: 0 18px 38px rgba(214, 74, 24, 0.16);
     border-radius: 50%;
     background: conic-gradient(var(--brand) calc(var(--p, 0) * 1%), var(--muted) 0);
     /* Updated several times a second while the search runs, then sealed in one move. */
@@ -748,6 +1002,52 @@
   }
 }
 
+@keyframes confetti {
+  from {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(-30px) scale(0.4);
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(-112px) rotate(60deg) scale(1);
+  }
+}
+@keyframes marker {
+  to {
+    background-size: 100% 100%;
+  }
+}
+@keyframes result-fan {
+  from {
+    opacity: 0;
+    transform: translateY(18px) rotate(0deg) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(var(--x)) rotate(var(--r));
+  }
+}
+@keyframes sticker {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-30deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(8deg);
+  }
+}
+@keyframes q-segment {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(0.55);
+  }
+}
 @keyframes q-in {
   from {
     opacity: 0;
@@ -782,6 +1082,25 @@
   .swap,
   .analysis-line[data-state="active"] .analysis-check {
     animation: none;
+  }
+  .confetti {
+    display: none;
+  }
+  .q-segments span[data-state="now"]::after {
+    animation: none;
+    transform: scaleX(0.55);
+  }
+  .page-title em.marker {
+    animation: none;
+    background-size: 100% 100%;
+  }
+  .result-card {
+    animation: none;
+    transform: translateX(var(--x)) rotate(var(--r));
+  }
+  .result-sticker {
+    animation: none;
+    transform: rotate(8deg);
   }
   .analysis-ring,
   .seg-thumb,

@@ -7,7 +7,18 @@ import { cn } from "@/lib/utils";
 
 /** One question, one click: each card submits its own value (docs/QUESTIONS.md C92). */
 
-export type Choice = { value: string; label: string; hint?: string };
+/** `icon` is a short mark drawn in a pastel tile: an emoji, or two or three characters. */
+export type Choice = { value: string; label: string; hint?: string; icon?: string };
+
+/** The six stationery pastels, one per card in turn. */
+const TILES = [
+  "var(--pastel-peach)",
+  "var(--pastel-sun)",
+  "var(--pastel-mint)",
+  "var(--pastel-lilac)",
+  "var(--pastel-rose)",
+  "var(--pastel-sky)",
+] as const;
 
 function ChoiceCard({
   choice,
@@ -26,23 +37,29 @@ function ChoiceCard({
       name="value"
       value={choice.value}
       disabled={pending}
-      style={{ "--i": index } as CSSProperties}
+      style={{ "--i": index, "--tile": TILES[index % TILES.length] } as CSSProperties}
+      data-picked={selected || chosen ? "true" : undefined}
       className={cn(
-        "q-card q-in panel group flex min-h-16 items-center justify-between gap-4 rounded-2xl border bg-card p-4 text-left",
-        "hover:border-foreground hover:bg-muted/40 disabled:opacity-60",
-        selected && "border-foreground bg-primary/5",
-        chosen && "border-brand bg-primary/5",
+        "q-card q-in panel group flex min-h-[4.5rem] items-center gap-3.5 rounded-[1.35rem] border bg-card p-3.5 text-left",
+        "hover:border-foreground/60 disabled:opacity-60",
+        (selected || chosen) && "border-brand bg-[var(--pastel-peach)]/45",
       )}
     >
-      <span className="grid gap-0.5">
-        <span className="font-medium text-[1.0625rem] sm:text-base">{choice.label}</span>
-        {choice.hint ? <span className="text-sm text-muted-foreground">{choice.hint}</span> : null}
+      {choice.icon ? (
+        <span aria-hidden className="q-tile">
+          {choice.icon}
+        </span>
+      ) : null}
+      <span className="grid min-w-0 flex-1 gap-0.5">
+        <span className="font-heading text-[1.0625rem] leading-tight font-semibold tracking-[-0.02em]">
+          {choice.label}
+        </span>
+        {choice.hint ? (
+          <span className="text-sm leading-snug text-muted-foreground">{choice.hint}</span>
+        ) : null}
       </span>
-      <span
-        aria-hidden
-        className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
-      >
-        {chosen ? "…" : "→"}
+      <span aria-hidden className="q-go">
+        {chosen ? "…" : selected ? "✓" : "→"}
       </span>
     </button>
   );
