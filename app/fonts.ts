@@ -1,15 +1,21 @@
-import { DM_Mono, DM_Sans, Instrument_Serif } from "next/font/google";
+import { Bricolage_Grotesque, DM_Mono, Figtree, Fraunces } from "next/font/google";
 
-// Fonts of the landing mock-up, shared by the whole site and self-hosted by next/font
-// (no request to Google at runtime).
-const dmSans = DM_Sans({ subsets: ["latin"], axes: ["opsz"], variable: "--font-dm-sans" });
-const dmMono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-dm-mono" });
-const instrumentSerif = Instrument_Serif({
+// A warm, study-desk voice (C107): a characterful grotesque for the titles, a soft italic
+// serif for the accent words, a friendly sans for reading. Self-hosted by next/font (no
+// request to Google at runtime).
+const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: "400",
+  axes: ["opsz", "wdth"],
+  variable: "--font-display",
+});
+const body = Figtree({ subsets: ["latin"], variable: "--font-body" });
+const mono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-dm-mono" });
+const accent = Fraunces({
+  subsets: ["latin"],
   style: ["normal", "italic"],
-  variable: "--font-instrument-serif",
+  axes: ["SOFT", "WONK", "opsz"],
+  variable: "--font-accent",
 });
 
 /** Classes that define the font variables, for the root element. */
-export const fontVariables = `${dmSans.variable} ${dmMono.variable} ${instrumentSerif.variable}`;
+export const fontVariables = `${display.variable} ${body.variable} ${mono.variable} ${accent.variable}`;

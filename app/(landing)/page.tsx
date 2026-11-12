@@ -69,8 +69,8 @@ export default async function HomePage({
             </h1>
             <p className="hero-copy">
               JobGPT lit ton CV, en tire ton métier, ton niveau et ta ville, puis garde les offres
-              qui collent. Aujourd’hui on sert les offres d’alternance publiées ; le stage et le job
-              étudiant arrivent.
+              qui collent. Pour un stage ou un job étudiant, on te montre les entreprises de ton
+              domaine près de chez toi.
             </p>
           </div>
           <div className="hero-stage reveal reveal-delay">

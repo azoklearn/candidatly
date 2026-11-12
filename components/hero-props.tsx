@@ -18,7 +18,7 @@ function Prop({ name, children }: { name: string; children: ReactNode }) {
 
 /** The soft shadow every object casts, so they read as volumes and not stickers. */
 function Shadow({ cx = 50, rx = 26, cy = 92 }: { cx?: number; rx?: number; cy?: number }) {
-  return <ellipse cx={cx} cy={cy} rx={rx} ry="4.5" fill="#2b4a6f" opacity="0.07" />;
+  return <ellipse cx={cx} cy={cy} rx={rx} ry="4.5" fill="#673d28" opacity="0.07" />;
 }
 
 function PaperPlane() {
@@ -27,17 +27,17 @@ function PaperPlane() {
       <defs>
         <linearGradient id="hp-plane-a" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#ffffff" />
-          <stop offset="1" stopColor="#e4f0ff" />
+          <stop offset="1" stopColor="#ffede4" />
         </linearGradient>
         <linearGradient id="hp-plane-b" x1="1" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#cfe3fb" />
-          <stop offset="1" stopColor="#a8caf3" />
+          <stop offset="0" stopColor="#fbddcf" />
+          <stop offset="1" stopColor="#f3c1a8" />
         </linearGradient>
       </defs>
       <Shadow cx={52} rx={22} />
       <path d="M94 9 L7 43 L44 57 Z" fill="url(#hp-plane-a)" />
       <path d="M94 9 L44 57 L55 88 Z" fill="url(#hp-plane-b)" />
-      <path d="M94 9 L44 57 L50 71 Z" fill="#dceafb" opacity="0.85" />
+      <path d="M94 9 L44 57 L50 71 Z" fill="#fbe6dc" opacity="0.85" />
     </Prop>
   );
 }
@@ -47,20 +47,20 @@ function Laptop() {
     <Prop name="laptop">
       <defs>
         <linearGradient id="hp-lap-lid" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#efeaff" />
-          <stop offset="1" stopColor="#d3c8f7" />
+          <stop offset="0" stopColor="#fff5ea" />
+          <stop offset="1" stopColor="#f7e0c8" />
         </linearGradient>
         <linearGradient id="hp-lap-base" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#e6ddff" />
-          <stop offset="1" stopColor="#c5b7ef" />
+          <stop offset="1" stopColor="#efd3b7" />
         </linearGradient>
       </defs>
       <Shadow cx={50} rx={34} cy={90} />
       <path d="M22 18h56a5 5 0 0 1 5 5v39H17V23a5 5 0 0 1 5-5z" fill="url(#hp-lap-lid)" />
-      <rect x="23" y="24" width="54" height="31" rx="3" fill="#fbfdff" />
-      <rect x="29" y="31" width="27" height="3.6" rx="1.8" fill="#b7d5f8" />
-      <rect x="29" y="39" width="19" height="3.6" rx="1.8" fill="#e2ecfa" />
-      <rect x="29" y="47" width="24" height="3.6" rx="1.8" fill="#e2ecfa" />
+      <rect x="23" y="24" width="54" height="31" rx="3" fill="#fffcfb" />
+      <rect x="29" y="31" width="27" height="3.6" rx="1.8" fill="#f8ccb7" />
+      <rect x="29" y="39" width="19" height="3.6" rx="1.8" fill="#faeae2" />
+      <rect x="29" y="47" width="24" height="3.6" rx="1.8" fill="#faeae2" />
       <path d="M12 62h76l6 11a4 4 0 0 1-3.5 6H9.5A4 4 0 0 1 6 73z" fill="url(#hp-lap-base)" />
       <rect x="39" y="68" width="22" height="5" rx="2.5" fill="#ffffff" opacity="0.65" />
     </Prop>
@@ -153,11 +153,11 @@ function Pencil() {
       <Shadow cx={50} rx={22} cy={94} />
       <g transform="rotate(33 50 50)">
         <rect x="41" y="12" width="18" height="8" rx="3" fill="#ffc0d2" />
-        <rect x="41" y="19" width="18" height="4" fill="#e3ecf6" />
+        <rect x="41" y="19" width="18" height="4" fill="#f6e9e3" />
         <rect x="41" y="22" width="18" height="46" fill="url(#hp-pencil)" />
         <rect x="52" y="22" width="7" height="46" fill="#e8c372" opacity="0.6" />
         <path d="M41 68h18l-9 18z" fill="#ffeed6" />
-        <path d="M45.5 78h9l-4.5 8z" fill="#50708f" />
+        <path d="M45.5 78h9l-4.5 8z" fill="#855d4a" />
       </g>
     </Prop>
   );
@@ -168,12 +168,12 @@ function Folder() {
     <Prop name="folder">
       <defs>
         <linearGradient id="hp-folder-back" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#dbeaff" />
-          <stop offset="1" stopColor="#b9d4f7" />
+          <stop offset="0" stopColor="#ffe7db" />
+          <stop offset="1" stopColor="#f7ceb9" />
         </linearGradient>
         <linearGradient id="hp-folder-front" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#cfe3ff" />
-          <stop offset="1" stopColor="#a7c8f2" />
+          <stop offset="0" stopColor="#ffdfcf" />
+          <stop offset="1" stopColor="#f2c0a7" />
         </linearGradient>
       </defs>
       <Shadow cx={50} rx={34} cy={88} />
@@ -182,8 +182,8 @@ function Folder() {
         fill="url(#hp-folder-back)"
       />
       <rect x="24" y="30" width="52" height="34" rx="3" fill="#fffdf8" />
-      <rect x="31" y="39" width="26" height="4" rx="2" fill="#d6e5f6" />
-      <rect x="31" y="48" width="34" height="4" rx="2" fill="#eaf1f9" />
+      <rect x="31" y="39" width="26" height="4" rx="2" fill="#f6e0d6" />
+      <rect x="31" y="48" width="34" height="4" rx="2" fill="#f9efea" />
       <path
         d="M7 46h86a4 4 0 0 1 4 4.6l-4 25a5 5 0 0 1-5 4.4H12a5 5 0 0 1-5-4.4z"
         fill="url(#hp-folder-front)"
@@ -207,12 +207,12 @@ function Clock() {
       <path
         d="M50 32v16h12"
         fill="none"
-        stroke="#5b7898"
+        stroke="#8d6755"
         strokeWidth="4.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="50" cy="48" r="3.2" fill="#5b7898" />
+      <circle cx="50" cy="48" r="3.2" fill="#8d6755" />
     </Prop>
   );
 }
@@ -222,7 +222,7 @@ function Envelope() {
     <Prop name="envelope">
       <defs>
         <linearGradient id="hp-env" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#e9e2ff" />
+          <stop offset="0" stopColor="#fff1e2" />
           <stop offset="1" stopColor="#c8b9f3" />
         </linearGradient>
       </defs>
@@ -251,12 +251,12 @@ function GraduationCap() {
     <Prop name="cap">
       <defs>
         <linearGradient id="hp-cap" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#cfe2fb" />
-          <stop offset="1" stopColor="#9dc0ef" />
+          <stop offset="0" stopColor="#fbdecf" />
+          <stop offset="1" stopColor="#efb89d" />
         </linearGradient>
       </defs>
       <Shadow cx={50} rx={28} cy={90} />
-      <path d="M30 44v16c0 7 9 12 20 12s20-5 20-12V44L50 56z" fill="#b6d1f2" />
+      <path d="M30 44v16c0 7 9 12 20 12s20-5 20-12V44L50 56z" fill="#f2cab6" />
       <path d="M50 18 L94 38 L50 58 L6 38 Z" fill="url(#hp-cap)" />
       <path d="M50 26 L78 38 L50 50 L22 38 Z" fill="#ffffff" opacity="0.35" />
       <path d="M88 41v18" fill="none" stroke="#f7b8cd" strokeWidth="3.4" strokeLinecap="round" />
