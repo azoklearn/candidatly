@@ -175,18 +175,46 @@ export function parseWhopEnv(source: EnvSource): WhopEnv {
 
 export const getWhopEnv = memoize(() => parseWhopEnv(process.env));
 
+/** Payments through Mollie (docs/QUESTIONS.md C109, docs/RUNBOOK.md). */
+const MollieEnvSchema = z.object({
+  // "test_…" charges nothing; "live_…" charges for real. The key decides the mode.
+  MOLLIE_API_KEY: z.string().regex(/^(test|live)_[A-Za-z0-9]{20,}$/),
+  MOLLIE_API_BASE_URL: z.url().default("https://api.mollie.com/v2"),
+});
+export type MollieEnv = z.output<typeof MollieEnvSchema>;
+
+export function parseMollieEnv(source: EnvSource): MollieEnv {
+  return parseGroup("mollie", MollieEnvSchema, source);
+}
+
+export const getMollieEnv = memoize(() => parseMollieEnv(process.env));
+
+export type BillingProvider = "mollie" | "whop";
+
 /**
- * The paywall is on once Whop is configured, never with BILLING_DISABLED=1 (end-to-end
- * tests, which must not call Whop).
+ * Who takes the new payments: Mollie as soon as its key is set, otherwise Whop. Null when
+ * neither is configured, or with BILLING_DISABLED=1 (end-to-end tests, which must not call
+ * a payment provider). Memberships already sold on Whop keep working either way.
  */
-export function isBillingConfigured(): boolean {
-  if (process.env.BILLING_DISABLED === "1") return false;
+export function billingProvider(): BillingProvider | null {
+  if (process.env.BILLING_DISABLED === "1") return null;
+  try {
+    getMollieEnv();
+    return "mollie";
+  } catch {
+    // Not configured: fall through to Whop.
+  }
   try {
     getWhopEnv();
-    return true;
+    return "whop";
   } catch {
-    return false;
+    return null;
   }
+}
+
+/** The paywall is on once a payment provider is configured. */
+export function isBillingConfigured(): boolean {
+  return billingProvider() !== null;
 }
 
 const LOG_LEVELS = ["debug", "info", "warn", "error"] as const;

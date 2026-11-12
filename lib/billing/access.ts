@@ -10,8 +10,8 @@ import type { Database } from "@/lib/supabase/database.types";
 import { ACTIVE_STATUSES } from "./subscriptions";
 
 /**
- * What a student may use (docs/QUESTIONS.md C83). The paywall is on only once Whop is
- * configured; until then, and for exempt accounts, everything stays open.
+ * What a student may use (docs/QUESTIONS.md C83). The paywall is on only once a payment
+ * provider is configured; until then, and for exempt accounts, everything stays open.
  */
 
 export type SubscriptionSummary = {
@@ -21,6 +21,8 @@ export type SubscriptionSummary = {
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   manage_url: string | null;
+  /** "mollie" subscriptions are stopped from the account page; "whop" ones on Whop. */
+  provider?: string;
 };
 
 export type Access = {
@@ -41,11 +43,21 @@ export function resolveAccess(input: {
   paywall: boolean;
   exempt: boolean;
   subscriptions: StoredSubscription[];
+  now?: Date;
 }): Access {
+  const now = (input.now ?? new Date()).getTime();
+  // A plan stopped by the student stays open until the end of what was paid, then closes
+  // by the calendar: Mollie sends nothing when that day comes (C109).
+  const lapsed = (row: StoredSubscription) =>
+    row.status === "canceling" &&
+    row.current_period_end !== null &&
+    new Date(row.current_period_end).getTime() < now;
   const active = input.subscriptions
     .filter(
       (row): row is SubscriptionSummary =>
-        ACTIVE_STATUSES.has(row.status) && (PLAN_IDS as readonly string[]).includes(row.plan),
+        ACTIVE_STATUSES.has(row.status) &&
+        !lapsed(row) &&
+        (PLAN_IDS as readonly string[]).includes(row.plan),
     )
     .sort((a, b) => PLAN_RANK[b.plan] - PLAN_RANK[a.plan]);
   const subscription = active[0] ?? null;
@@ -79,7 +91,9 @@ export async function loadAccess(
     supabase.from("profiles").select("billing_exempt").eq("user_id", userId).maybeSingle(),
     supabase
       .from("subscriptions")
-      .select("plan, billing, status, current_period_end, cancel_at_period_end, manage_url")
+      .select(
+        "plan, billing, status, current_period_end, cancel_at_period_end, manage_url, provider",
+      )
       .eq("user_id", userId),
   ]);
   if (profile.error) throw new DatabaseError("profiles.select", profile.error);

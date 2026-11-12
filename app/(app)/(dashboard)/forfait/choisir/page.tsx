@@ -7,6 +7,7 @@ import { PricingTable } from "@/components/pricing-table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { requireUserId } from "@/lib/auth/session";
 import { loadAccess } from "@/lib/billing/access";
+import { billingProvider } from "@/lib/env";
 import { DatabaseError } from "@/lib/errors";
 import { STUDY_LEVEL_LABELS, cityFromAddress, formatDistance } from "@/lib/format";
 import { companiesOnly } from "@/lib/offers/contract-mode";
@@ -101,8 +102,9 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
 
       <PricingTable badge={featuredBadge(counts)} choose={choosePlan} />
       <p className="mx-auto -mt-6 max-w-2xl text-center text-xs text-muted-foreground">
-        Paiement sécurisé par Whop. En formule annuelle, le prix barré est le prix du même forfait
-        payé au mois. Les fonctions marquées « Bientôt » ne sont pas encore disponibles.
+        Paiement sécurisé par {billingProvider() === "mollie" ? "Mollie" : "Whop"}. En formule
+        annuelle, le prix barré est le prix du même forfait payé au mois. Les fonctions marquées «
+        Bientôt » ne sont pas encore disponibles.
       </p>
 
       {chips.length > 0 ? (

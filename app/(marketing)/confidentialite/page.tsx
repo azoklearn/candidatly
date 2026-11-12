@@ -66,8 +66,13 @@ export default function PrivacyPage() {
         </li>
         <li>Vercel : hébergement de l’application et mesure d’audience (Vercel Web Analytics).</li>
         <li>
-          Whop : paiement des forfaits. Whop reçoit votre identifiant JobGPT et les informations de
-          paiement que vous saisissez sur sa page, jamais vos documents.
+          Mollie : paiement des forfaits. Mollie reçoit votre identifiant JobGPT et les informations
+          de paiement que vous saisissez sur sa page, jamais vos documents ni votre adresse email.
+        </li>
+        <li>
+          Whop : paiement des forfaits souscrits avant le passage à Mollie. Whop reçoit votre
+          identifiant JobGPT et les informations de paiement que vous saisissez sur sa page, jamais
+          vos documents.
         </li>
         <li>
           API Alternance : reçoit vos critères de recherche (métiers, zone, niveau), jamais votre

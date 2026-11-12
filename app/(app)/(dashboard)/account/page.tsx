@@ -16,6 +16,7 @@ import { formatDate } from "@/lib/format";
 import { PLANS } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
 
+import { CancelSubscriptionButton } from "./cancel-subscription-button";
 import { DeleteAccountForm } from "./delete-account-form";
 
 export const metadata: Metadata = { title: "Compte" };
@@ -79,6 +80,9 @@ export default async function AccountPage() {
                   {subscription.cancel_at_period_end ? "Se termine le " : "Renouvellement le "}
                   {periodEnd}.
                 </p>
+              ) : null}
+              {subscription.provider === "mollie" && !subscription.cancel_at_period_end ? (
+                <CancelSubscriptionButton periodEnd={periodEnd} />
               ) : null}
               {subscription.manage_url ? (
                 <a

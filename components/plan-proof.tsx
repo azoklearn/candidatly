@@ -40,7 +40,7 @@ function questions(preview: ReactNode): Question[] {
     {
       question: "Je peux arrêter quand je veux ?",
       answer:
-        "Oui. Ton abonnement se gère depuis Whop, qui encaisse le paiement : tu l’arrêtes en deux clics et tu gardes l’accès jusqu’à la fin de la période déjà payée. En mensuel, c’est un mois au maximum.",
+        "Oui. Tu arrêtes ton abonnement depuis ta page Compte, en deux clics, et tu gardes l’accès jusqu’à la fin de la période déjà payée. En mensuel, c’est un mois au maximum.",
     },
     { question: "Combien d’offres je vais voir ?", answer: preview },
     {

@@ -17,7 +17,7 @@ export type FetchJsonOptions<T> = {
   source: string;
   url: URL;
   schema: z.ZodType<T>;
-  method?: "GET" | "POST";
+  method?: "GET" | "POST" | "DELETE";
   headers?: Record<string, string>;
   /** Serialised as JSON. */
   body?: unknown;
@@ -59,7 +59,7 @@ function retryDelay(error: ExternalApiError, attempt: number, policy: RetryPolic
 
 async function attempt<T>(
   options: FetchJsonOptions<T>,
-  method: "GET" | "POST",
+  method: "GET" | "POST" | "DELETE",
 ): Promise<FetchJsonResult<T>> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const timeout = AbortSignal.timeout(options.timeoutMs);

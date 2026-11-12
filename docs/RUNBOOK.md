@@ -49,6 +49,24 @@ Lancer une synchronisation à la main, en local avec `npm run dev` et la valeur 
 curl -X POST http://localhost:3000/api/cron/sync-offers -H "Authorization: Bearer <CRON_SECRET>"
 ```
 
+## Paiements Mollie
+
+Depuis le 12 novembre 2026 (C109), les nouveaux paiements passent par Mollie dès que `MOLLIE_API_KEY` est définie ; sans elle, Whop reste en service. Les abonnements déjà vendus sur Whop continuent de fonctionner : ne retirez ni `WHOP_API_KEY` ni `WHOP_WEBHOOK_SECRET` tant qu'il en reste d'actifs.
+
+Mise en service :
+
+1. Dans le tableau de bord Mollie, Developers > API keys : copier la clé du profil. `test_...` ne débite rien, `live_...` débite pour de vrai. Ne jamais la coller dans une conversation ni dans le dépôt.
+2. Activer dans Mollie au moins un moyen de paiement qui accepte le prélèvement récurrent (carte bancaire ; PayPal ou prélèvement SEPA si souhaité). Sans cela, la page de paiement refuse le premier paiement.
+3. Sur Vercel, Settings > Environment Variables : ajouter `MOLLIE_API_KEY` (Production), puis redéployer. Vérifier que `NEXT_PUBLIC_SITE_URL` vaut `https://www.gptjob.io` : Mollie appelle `https://www.gptjob.io/api/mollie/webhook`, et un POST ne suit pas la redirection du domaine nu.
+4. Aucun webhook à créer dans Mollie : son adresse part avec chaque paiement.
+5. Essai : commencer avec la clé `test_...`, choisir un forfait, payer sur la page de test de Mollie (statut « Paid »), vérifier que `/forfait/merci` ouvre les offres et que la page Compte affiche le forfait et « Arrêter mon abonnement ». Passer ensuite à la clé `live_...`.
+
+Fonctionnement : l'étudiant paie la première période sur la page de Mollie, ce qui crée un mandat ; le webhook crée alors l'abonnement Mollie, qui débite la période suivante un mois ou douze mois plus tard. Chaque débit revient par le même webhook. Un renouvellement en échec laisse l'accès ouvert pendant que Mollie réessaie ; si Mollie abandonne, l'accès se ferme. L'étudiant arrête son abonnement depuis la page Compte : les renouvellements cessent, l'accès reste jusqu'à la fin de la période payée, rien n'est remboursé. Supprimer son compte arrête d'abord l'abonnement.
+
+En local, le paiement Mollie ne démarre pas : Mollie refuse une adresse de webhook qu'il ne peut pas joindre (`localhost`).
+
+Non couvert : les remboursements et les contestations se traitent dans le tableau de bord Mollie, et ne ferment pas l'accès tout seuls ; le changement de forfait se fait en arrêtant l'abonnement puis en en prenant un autre.
+
 ## Paiements Whop
 
 Les forfaits se paient sur Whop (`docs/QUESTIONS.md` C83). Tant que `WHOP_API_KEY` et `WHOP_WEBHOOK_SECRET` manquent, il n'y a pas de mur de paiement : chaque étudiant garde l'accès complet.

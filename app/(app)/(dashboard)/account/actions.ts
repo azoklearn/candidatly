@@ -1,9 +1,14 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUserId } from "@/lib/auth/session";
+import { createMollieClient } from "@/lib/billing/mollie";
+import { cancelMollieSubscriptions } from "@/lib/billing/mollie-billing";
+import { getMollieEnv } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { allowAction } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -11,6 +16,44 @@ export type DeleteAccountState = { error?: string };
 
 const log = logger.child({ area: "account" });
 const FAILED = "La suppression a échoué. Réessayez dans un instant.";
+
+function mollieConfigured(): boolean {
+  try {
+    getMollieEnv();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export type CancelSubscriptionState = { error?: string; done?: boolean };
+
+/**
+ * Stops the renewals of the student's plan paid through Mollie (C109). The period already
+ * paid stays open until its end and nothing is refunded; Whop plans are stopped on Whop.
+ */
+export async function cancelSubscription(): Promise<CancelSubscriptionState> {
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  if (!mollieConfigured()) return { error: "La résiliation est indisponible pour le moment." };
+  if (!(await allowAction(supabase, "start_checkout"))) {
+    return { error: "Trop de tentatives. Réessayez dans quelques minutes." };
+  }
+  try {
+    const stopped = await cancelMollieSubscriptions({
+      db: createAdminClient(),
+      mollie: createMollieClient(),
+      userId,
+      logger: log,
+    });
+    if (stopped === 0) return { error: "Aucun abonnement en cours à arrêter." };
+  } catch (error) {
+    log.error("subscription_cancel_failed", { error });
+    return { error: "L’arrêt de l’abonnement a échoué. Réessayez dans un instant." };
+  }
+  revalidatePath("/account");
+  return { done: true };
+}
 
 /**
  * Real deletion (brief section 5.7): stored files first, since rows are removed with the
@@ -26,6 +69,24 @@ export async function deleteAccount(
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
   const admin = createAdminClient();
+  // A deleted account must never be charged again: the renewals stop first, and the
+  // deletion waits if they cannot be stopped.
+  if (mollieConfigured()) {
+    try {
+      await cancelMollieSubscriptions({
+        db: admin,
+        mollie: createMollieClient(),
+        userId,
+        logger: log,
+      });
+    } catch (error) {
+      log.error("account_subscription_cancel_failed", { error });
+      return {
+        error:
+          "Votre abonnement n’a pas pu être arrêté, donc le compte n’a pas été supprimé. Réessayez dans un instant.",
+      };
+    }
+  }
   const paths: string[] = [];
   for (const folder of ["cv", "letter"]) {
     const { data, error } = await admin.storage

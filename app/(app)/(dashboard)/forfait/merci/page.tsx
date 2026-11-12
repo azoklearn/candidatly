@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Paiement" };
 
-/** Return page of the Whop checkout: waits for the webhook, then opens the offers (C83). */
+/** Return page of the checkout (Mollie or Whop): waits for the webhook, then opens the offers (C83). */
 export default async function CheckoutReturnPage() {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
@@ -25,7 +25,7 @@ export default async function CheckoutReturnPage() {
           </>
         }
         messages={[
-          "Whop nous confirme votre paiement…",
+          "On attend la confirmation de votre paiement…",
           "On ouvre vos offres…",
           "Encore un instant…",
         ]}
