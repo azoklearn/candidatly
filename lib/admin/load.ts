@@ -47,6 +47,10 @@ export type AdminData = {
   billingEvents: BillingEventRow[];
   searchRuns: SearchRunRow[];
   recentApplications: RecentApplicationRow[];
+  /** Official labels of every job chosen by someone, by ROME code. */
+  romeLabels: Record<string, string>;
+  /** Last sign-in of each account, from Supabase Auth. */
+  lastSignIn: Record<string, string>;
   truncated: boolean;
 };
 
@@ -82,7 +86,7 @@ export async function loadAdminData(): Promise<AdminData> {
     supabase
       .from("profiles")
       .select(
-        "user_id, email, first_name, last_name, created_at, onboarding_completed, chosen_plan, chosen_billing, billing_exempt, location_label",
+        "user_id, email, first_name, last_name, created_at, onboarding_completed, chosen_plan, chosen_billing, billing_exempt, location_label, target_contract, domain_free_text, rome_codes, diploma_level, search_radius_km, contract_chosen_at, plan_chosen_at, updated_at",
       )
       .order("created_at", { ascending: false })
       .limit(PROFILE_LIMIT),
@@ -112,11 +116,29 @@ export async function loadAdminData(): Promise<AdminData> {
       .from("applications")
       .select("user_id, status, sent_at, created_at, offer:offers(title, company_name)")
       .order("created_at", { ascending: false })
-      .limit(20),
+      .limit(40),
   ]);
 
   const profileRows = rowsOrThrow("admin.profiles", profiles);
+  const codes = [...new Set(profileRows.flatMap((row) => row.rome_codes ?? []))];
+  const [rome, users] = await Promise.all([
+    codes.length > 0
+      ? supabase.from("rome_codes").select("code, label").in("code", codes)
+      : Promise.resolve({ data: [], error: null }),
+    supabase.auth.admin.listUsers({ perPage: PROFILE_LIMIT }),
+  ]);
+  const romeLabels = Object.fromEntries(
+    rowsOrThrow("admin.rome_codes", rome).map((row) => [row.code, row.label]),
+  );
+  // A failure here only hides the last sign-in; the rest of the page stays useful.
+  const lastSignIn = Object.fromEntries(
+    (users.data?.users ?? []).flatMap((user) =>
+      user.last_sign_in_at ? [[user.id, user.last_sign_in_at]] : [],
+    ),
+  );
   return {
+    romeLabels,
+    lastSignIn,
     profiles: profileRows,
     subscriptions: rowsOrThrow("admin.subscriptions", subscriptions),
     applications: rowsOrThrow("admin.applications", applications),

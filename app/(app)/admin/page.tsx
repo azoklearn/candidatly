@@ -3,12 +3,30 @@ import Link from "next/link";
 
 import { requireAdmin } from "@/lib/admin/guard";
 import { loadAdminData } from "@/lib/admin/load";
-import { buildAccounts, buildOverview, percent } from "@/lib/admin/overview";
+import { buildAccounts, buildActivity, buildOverview, percent } from "@/lib/admin/overview";
 import { matchesAccountQuery } from "@/lib/admin/search";
-import { formatDate, formatRelativeDays } from "@/lib/format";
+import {
+  formatDateTime,
+  formatDistance,
+  formatRelativeDays,
+  STUDY_LEVEL_LABELS,
+} from "@/lib/format";
 import { formatEuros, PLANS } from "@/lib/pricing";
 
-import { APPLICATION_STATUS_LABELS, Section, Stat, Table } from "./_components/ui";
+import type { ReactNode } from "react";
+
+import { APPLICATION_STATUS_LABELS, CONTRACT_LABELS, Section, Stat, Table } from "./_components/ui";
+
+/** The exact moment, with "il y a 3 jours" underneath. */
+function When({ at }: { at: string | null | undefined }): ReactNode {
+  if (!at) return "—";
+  return (
+    <span className="grid whitespace-nowrap">
+      <span className="tabular-nums">{formatDateTime(at)}</span>
+      <span className="text-xs text-muted-foreground">{formatRelativeDays(at)}</span>
+    </span>
+  );
+}
 
 export const metadata: Metadata = { title: "Admin", robots: { index: false, follow: false } };
 
@@ -31,6 +49,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   const chosePlan = data.profiles.filter((profile) => profile.chosen_plan !== null).length;
   const planName = (id: string | null) =>
     PLANS.find((plan) => plan.id === id)?.name ?? (id ? id : "—");
+  const activity = buildActivity({
+    profiles: data.profiles,
+    applications: data.recentApplications,
+    billingEvents: data.billingEvents,
+    planName,
+  });
 
   return (
     <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-8">
@@ -94,6 +118,28 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         />
       </Section>
 
+      <Section title="Fil d’activité">
+        <p className="text-sm text-muted-foreground">
+          Heure de Paris. Les réponses des visiteurs sans compte ne sont pas enregistrées : elles
+          restent dans leur navigateur jusqu’à la création du compte.
+        </p>
+        <Table
+          head={["Quand", "Quoi", "Compte", "Détail"]}
+          rows={activity.map((item) => [
+            <When key="at" at={item.at} />,
+            item.kind,
+            item.userId ? (
+              <Link key="who" href={`/admin/comptes/${item.userId}`} className="hover:underline">
+                {emailOf.get(item.userId) ?? "—"}
+              </Link>
+            ) : (
+              "—"
+            ),
+            item.detail || "—",
+          ])}
+        />
+      </Section>
+
       <Section title="Forfaits">
         <Table
           head={["Forfait", "Choisi après le questionnaire", "Abonnements actifs"]}
@@ -151,45 +197,78 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
           head={[
             "Compte",
             "Inscrit",
-            "Questionnaire",
-            "Ville",
+            "Dernière connexion",
+            "Réponses au questionnaire",
             "Forfait choisi",
             "Abonnement",
             "Candidatures",
           ]}
-          rows={accounts.map((account) => [
-            <Link
-              key="mail"
-              href={`/admin/comptes/${account.userId}`}
-              className="grid hover:underline"
-            >
-              <span className="font-medium">{account.email ?? "—"}</span>
-              {account.name ? (
-                <span className="text-xs text-muted-foreground">{account.name}</span>
-              ) : null}
-            </Link>,
-            <span key="date" className="whitespace-nowrap">
-              {formatRelativeDays(account.createdAt) ?? formatDate(account.createdAt)}
-            </span>,
-            account.onboarded ? "Terminé" : "En cours",
-            account.location ?? "—",
-            account.chosenPlan
-              ? `${planName(account.chosenPlan)}${account.chosenBilling === "annual" ? " (annuel)" : ""}`
-              : "—",
-            account.subscription
-              ? `${planName(account.subscription.plan)} · ${account.subscription.status}`
-              : account.exempt
-                ? "Exempté"
-                : "—",
-            `${account.applications} dont ${account.sent} envoyées`,
-          ])}
+          rows={accounts.map((account) => {
+            const jobs = account.answers.romeCodes.map((code) => data.romeLabels[code] ?? code);
+            const level = account.answers.level as keyof typeof STUDY_LEVEL_LABELS | null;
+            return [
+              <Link
+                key="mail"
+                href={`/admin/comptes/${account.userId}`}
+                className="grid hover:underline"
+              >
+                <span className="font-medium">{account.email ?? "—"}</span>
+                {account.name ? (
+                  <span className="text-xs text-muted-foreground">{account.name}</span>
+                ) : null}
+              </Link>,
+              <When key="created" at={account.createdAt} />,
+              <When key="seen" at={data.lastSignIn[account.userId]} />,
+              <span key="answers" className="grid min-w-56 gap-0.5 text-xs">
+                <span className="text-sm font-medium">
+                  {[
+                    account.answers.contract ? CONTRACT_LABELS[account.answers.contract] : null,
+                    level ? STUDY_LEVEL_LABELS[level] : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ") || "—"}
+                </span>
+                {account.answers.domain ? <span>{account.answers.domain}</span> : null}
+                {jobs.length > 0 ? (
+                  <span className="text-muted-foreground">{jobs.join(", ")}</span>
+                ) : null}
+                {account.location ? (
+                  <span className="text-muted-foreground">
+                    {account.location}
+                    {account.answers.radiusKm !== null
+                      ? ` · ${formatDistance(account.answers.radiusKm)}`
+                      : ""}
+                  </span>
+                ) : null}
+                <span className={account.onboarded ? "text-brand" : "text-muted-foreground"}>
+                  {account.onboarded ? "Questionnaire terminé" : "Questionnaire en cours"}
+                </span>
+              </span>,
+              account.chosenPlan ? (
+                <span key="plan" className="grid">
+                  <span>{planName(account.chosenPlan)}</span>
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    {formatDateTime(account.planChosenAt) ?? ""}
+                  </span>
+                </span>
+              ) : (
+                "—"
+              ),
+              account.subscription
+                ? `${planName(account.subscription.plan)} · ${account.subscription.status}`
+                : account.exempt
+                  ? "Exempté"
+                  : "—",
+              `${account.applications} dont ${account.sent} envoyées`,
+            ];
+          })}
         />
       </Section>
 
       <Section title="Dernières candidatures">
         <Table
           head={["Compte", "Offre", "Statut", "Créée"]}
-          rows={data.recentApplications.map((row) => [
+          rows={data.recentApplications.slice(0, 20).map((row) => [
             <Link key="who" href={`/admin/comptes/${row.user_id}`} className="hover:underline">
               {emailOf.get(row.user_id) ?? "—"}
             </Link>,
@@ -198,7 +277,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
               <span className="text-xs text-muted-foreground">{row.offer?.company_name ?? ""}</span>
             </span>,
             APPLICATION_STATUS_LABELS[row.status] ?? row.status,
-            formatRelativeDays(row.created_at) ?? "—",
+            <When key="at" at={row.created_at} />,
           ])}
         />
       </Section>
@@ -208,7 +287,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
           head={["Type", "Reçu", "Traité"]}
           rows={data.billingEvents.map((event) => [
             `${event.provider} · ${event.type}`,
-            formatRelativeDays(event.created_at) ?? "—",
+            <When key="at" at={event.created_at} />,
             event.processed_at ? "oui" : "non",
           ])}
         />
@@ -224,7 +303,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
             run.source,
             run.result_count === null ? "—" : String(run.result_count),
             run.status_code === null ? "—" : String(run.status_code),
-            formatRelativeDays(run.fetched_at) ?? "—",
+            <When key="at" at={run.fetched_at} />,
           ])}
         />
       </Section>

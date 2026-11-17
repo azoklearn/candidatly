@@ -25,6 +25,15 @@ export type ProfileRow = {
   chosen_billing: string | null;
   billing_exempt: boolean;
   location_label: string | null;
+  /** The questionnaire answers (C114); optional so older callers and tests keep working. */
+  target_contract?: string | null;
+  domain_free_text?: string | null;
+  rome_codes?: string[] | null;
+  diploma_level?: string | null;
+  search_radius_km?: number | null;
+  contract_chosen_at?: string | null;
+  plan_chosen_at?: string | null;
+  updated_at?: string | null;
 };
 
 export type SubscriptionRow = {
@@ -122,6 +131,15 @@ export type AccountSummary = {
   exempt: boolean;
   applications: number;
   sent: number;
+  answers: {
+    contract: string | null;
+    domain: string | null;
+    romeCodes: string[];
+    level: string | null;
+    radiusKm: number | null;
+  };
+  planChosenAt: string | null;
+  updatedAt: string | null;
 };
 
 /** One line per account, newest first, with its membership and its activity. */
@@ -160,6 +178,15 @@ export function buildAccounts(input: {
         exempt: profile.billing_exempt,
         applications: activity.total,
         sent: activity.sent,
+        answers: {
+          contract: profile.target_contract ?? null,
+          domain: profile.domain_free_text ?? null,
+          romeCodes: profile.rome_codes ?? [],
+          level: profile.diploma_level ?? null,
+          radiusKm: profile.search_radius_km ?? null,
+        },
+        planChosenAt: profile.plan_chosen_at ?? null,
+        updatedAt: profile.updated_at ?? null,
       };
     });
 }
@@ -210,4 +237,70 @@ export function buildOverview(input: {
 /** Share as a whole percent, 0 when there is nothing to divide by. */
 export function percent(part: number, total: number): number {
   return total > 0 ? Math.round((part / total) * 100) : 0;
+}
+
+export type ActivityItem = { at: string; userId: string | null; kind: string; detail: string };
+
+/**
+ * What happened, minute by minute, newest first (C114): sign-ups, plans chosen,
+ * applications created and sent, payments received. Built from rows already loaded.
+ */
+export function buildActivity(input: {
+  profiles: readonly ProfileRow[];
+  applications: readonly {
+    user_id: string;
+    created_at: string;
+    sent_at: string | null;
+    offer: { title: string; company_name: string | null } | null;
+  }[];
+  billingEvents: readonly { created_at: string; provider: string; type: string }[];
+  planName: (id: string | null) => string;
+  limit?: number;
+}): ActivityItem[] {
+  const items: ActivityItem[] = [];
+  for (const profile of input.profiles) {
+    items.push({
+      at: profile.created_at,
+      userId: profile.user_id,
+      kind: "Inscription",
+      detail: "",
+    });
+    if (profile.plan_chosen_at) {
+      items.push({
+        at: profile.plan_chosen_at,
+        userId: profile.user_id,
+        kind: "Forfait choisi",
+        detail: input.planName(profile.chosen_plan),
+      });
+    }
+  }
+  for (const row of input.applications) {
+    const offer = [row.offer?.title, row.offer?.company_name].filter(Boolean).join(" · ");
+    items.push({
+      at: row.created_at,
+      userId: row.user_id,
+      kind: "Candidature préparée",
+      detail: offer,
+    });
+    if (row.sent_at) {
+      items.push({
+        at: row.sent_at,
+        userId: row.user_id,
+        kind: "Candidature envoyée",
+        detail: offer,
+      });
+    }
+  }
+  for (const event of input.billingEvents) {
+    items.push({
+      at: event.created_at,
+      userId: null,
+      kind: "Paiement",
+      detail: `${event.provider} · ${event.type}`,
+    });
+  }
+  return items
+    .filter((item) => !Number.isNaN(new Date(item.at).getTime()))
+    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+    .slice(0, input.limit ?? 40);
 }

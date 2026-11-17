@@ -14,7 +14,11 @@ test("the admin dashboard opens for the owner only", async ({ page }) => {
   await expect(page.getByText("Questionnaires terminés")).toBeVisible();
   await expect(page.getByRole("heading", { name: /^Comptes \(\d+\)$/ })).toBeVisible();
   // The seeded student is listed, with its activity.
-  await expect(page.getByText(users.student.email)).toBeVisible();
+  await expect(page.getByText(users.student.email).first()).toBeVisible();
+  // Precise times and the questionnaire answers (C114).
+  await expect(page.getByRole("heading", { name: "Fil d’activité" })).toBeVisible();
+  await expect(page.getByText(/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/).first()).toBeVisible();
+  await expect(page.getByText("Alternance · Bac+3").first()).toBeVisible();
 
   // The search narrows the list; each account opens on its own page (C112).
   await page.getByRole("searchbox", { name: "Chercher un compte" }).fill(users.student.email);

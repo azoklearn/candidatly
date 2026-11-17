@@ -15,6 +15,22 @@ export function formatDate(iso: string | null | undefined): string | null {
   return Number.isNaN(date.getTime()) ? null : DATE_FORMAT.format(date);
 }
 
+const DATE_TIME_FORMAT = new Intl.DateTimeFormat("fr-FR", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Paris",
+});
+
+/** "17/11/2026 14:32", Paris time: the precise moment, for the admin pages (C114). */
+export function formatDateTime(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? null : DATE_TIME_FORMAT.format(date).replace(",", "");
+}
+
 export function formatRelativeDays(
   iso: string | null | undefined,
   now: Date = new Date(),

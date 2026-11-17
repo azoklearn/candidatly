@@ -5,7 +5,13 @@ import { notFound } from "next/navigation";
 import { loadAdminAccount } from "@/lib/admin/account";
 import { requireAdmin } from "@/lib/admin/guard";
 import { parseUserId } from "@/lib/admin/search";
-import { formatDate, formatDistance, formatRelativeDays, STUDY_LEVEL_LABELS } from "@/lib/format";
+import {
+  formatDate,
+  formatDateTime,
+  formatDistance,
+  formatRelativeDays,
+  STUDY_LEVEL_LABELS,
+} from "@/lib/format";
 import { ACTIVE_STATUSES } from "@/lib/billing/subscriptions";
 import { PLANS } from "@/lib/pricing";
 
@@ -24,8 +30,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/** "17/11/2026 14:32 (aujourd’hui)", Paris time (C114). */
 const when = (iso: string | null | undefined) =>
-  iso ? `${formatDate(iso)} (${formatRelativeDays(iso) ?? "—"})` : "—";
+  iso ? `${formatDateTime(iso)} (${formatRelativeDays(iso) ?? "—"})` : "—";
 const planName = (id: string | null) => PLANS.find((plan) => plan.id === id)?.name ?? id ?? "—";
 const bytes = (size: number | null) =>
   size === null
@@ -89,6 +96,9 @@ export default async function AdminAccountPage({ params }: { params: Promise<{ i
             ["Adresse email", profile.email],
             ["Téléphone", profile.phone],
             ["Questionnaire", profile.onboarding_completed ? "Terminé" : "En cours"],
+            ["Inscription", when(profile.created_at)],
+            ["Dernière connexion", when(account.lastSignInAt)],
+            ["Contrat choisi le", when(profile.contract_chosen_at)],
             [
               "Contrat cherché",
               profile.target_contract ? CONTRACT_LABELS[profile.target_contract] : null,

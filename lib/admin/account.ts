@@ -30,7 +30,7 @@ export async function loadAdminAccount(userId: string) {
       db
         .from("profiles")
         .select(
-          "user_id, email, first_name, last_name, phone, school, degree_label, diploma_level, target_contract, domain_free_text, rome_codes, location_label, search_radius_km, onboarding_completed, chosen_plan, chosen_billing, plan_chosen_at, billing_exempt, created_at, updated_at",
+          "user_id, email, first_name, last_name, phone, school, degree_label, diploma_level, target_contract, domain_free_text, rome_codes, location_label, search_radius_km, contract_chosen_at, onboarding_completed, chosen_plan, chosen_billing, plan_chosen_at, billing_exempt, created_at, updated_at",
         )
         .eq("user_id", userId)
         .maybeSingle(),
@@ -83,6 +83,7 @@ export async function loadAdminAccount(userId: string) {
           await db.from("rome_codes").select("code, label").in("code", romeCodes),
         )
       : [];
+  const auth = await db.auth.admin.getUserById(userId);
   const matchStatuses: Record<string, number> = {};
   for (const item of list("admin.account.match_counts", matchCounts)) {
     matchStatuses[item.status] = (matchStatuses[item.status] ?? 0) + 1;
@@ -97,6 +98,7 @@ export async function loadAdminAccount(userId: string) {
     matchStatuses,
     applications: list("admin.account.applications", applications),
     credits: check("admin.account.credits", credits)?.balance ?? null,
+    lastSignInAt: auth.data.user?.last_sign_in_at ?? null,
     events: list("admin.account.events", events),
   };
 }
