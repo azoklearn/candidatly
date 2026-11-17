@@ -16,9 +16,10 @@ import { readDraft } from "@/lib/onboarding/draft-cookie";
 import {
   ACCOUNT_STEP,
   ANALYSIS_PATH,
-  DOCUMENTS_STEP,
+  FINISH_PATH,
   firstIncompleteStep,
   LAST_STEP,
+  nextOnboardingPath,
   VISITOR_LAST_STEP,
 } from "@/lib/onboarding/state";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +30,7 @@ import { loadOnboarding } from "../data";
 
 export const metadata: Metadata = { title: "Créer mon compte" };
 
-const NEXT_STEP = `/onboarding/${DOCUMENTS_STEP}`;
+const NEXT_STEP = FINISH_PATH;
 const STEP_NUMBER = ACCOUNT_STEP;
 
 /**
@@ -41,11 +42,7 @@ export default async function AccountStepPage() {
   const userId = await currentUserId(supabase);
   if (userId) {
     const data = await loadOnboarding(supabase, userId);
-    redirect(
-      data.profile.onboarding_completed
-        ? "/offers"
-        : `/onboarding/${firstIncompleteStep(data.snapshot)}`,
-    );
+    redirect(data.profile.onboarding_completed ? "/offers" : nextOnboardingPath(data.snapshot));
   }
   const draft = await readDraft();
   const pending = firstIncompleteStep(draftSnapshot(draft));

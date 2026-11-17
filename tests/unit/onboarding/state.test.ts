@@ -4,10 +4,13 @@ import {
   ACCOUNT_STEP,
   ANALYSIS_PATH,
   completedSteps,
+  FINISH_PATH,
   firstIncompleteStep,
+  isQuestionnaireDone,
   isStepAccessible,
   LAST_STEP,
   nextAfterScan,
+  nextOnboardingPath,
   parseStep,
   RECAP_PATH,
   VISITOR_LAST_STEP,
@@ -25,7 +28,6 @@ const empty: OnboardingSnapshot = {
     location_lat: null,
     location_lng: null,
     onboarding_completed: false,
-    documents_skipped_at: null,
   },
   hasCv: false,
   hasLetter: false,
@@ -73,29 +75,18 @@ describe("onboarding progress", () => {
     expect(firstIncompleteStep(located)).toBe(ACCOUNT_STEP);
   });
 
-  it("asks the name once, then the CV, and never the letter (C104)", () => {
+  it("ends with the account: no CV, no letter (C111)", () => {
+    expect(isQuestionnaireDone(answered)).toBe(false);
+    expect(nextOnboardingPath(answered)).toBe(`/onboarding/${ACCOUNT_STEP}`);
     const named = {
       ...answered,
       profile: { ...answered.profile, first_name: "Camille", last_name: "Martin" },
     };
-    expect(firstIncompleteStep(named)).toBe(ACCOUNT_STEP + 1);
-    // The CV alone finishes the questionnaire: the letter is added later, from the account.
-    expect(firstIncompleteStep({ ...named, hasCv: true })).toBe(LAST_STEP);
-    expect(firstIncompleteStep({ ...named, hasCv: true, hasLetter: true })).toBe(LAST_STEP);
-  });
-
-  it("lets students skip the CV (C89)", () => {
-    const named = {
-      ...answered,
-      profile: {
-        ...answered.profile,
-        first_name: "Camille",
-        last_name: "Martin",
-        documents_skipped_at: "2026-09-13T09:00:00Z",
-      },
-    };
-    expect(firstIncompleteStep(named)).toBe(LAST_STEP);
-    expect(isStepAccessible(LAST_STEP, named)).toBe(true);
+    expect(LAST_STEP).toBe(ACCOUNT_STEP);
+    expect(isQuestionnaireDone(named)).toBe(true);
+    // The CV is dropped on the landing page, not asked at the end.
+    expect(nextOnboardingPath(named)).toBe(FINISH_PATH);
+    expect(nextOnboardingPath({ ...named, hasCv: true })).toBe(FINISH_PATH);
   });
 
   it("ignores blank answers", () => {
@@ -111,7 +102,6 @@ describe("onboarding progress", () => {
     expect(isStepAccessible(1, answered)).toBe(true);
     expect(isStepAccessible(5, answered)).toBe(true);
     expect(isStepAccessible(ACCOUNT_STEP, answered)).toBe(true);
-    expect(isStepAccessible(ACCOUNT_STEP + 1, answered)).toBe(false);
     expect(isStepAccessible(0, answered)).toBe(false);
   });
 

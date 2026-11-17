@@ -3,12 +3,10 @@
 import { useActionState, useState } from "react";
 
 import { ActionForm } from "@/components/action-form";
-import { PendingOverlay } from "@/components/pending-overlay";
-import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { finishOnboarding, saveLetterText, skipDocuments, type FormState } from "../actions";
+import { saveLetterText, type FormState } from "../actions";
 import type { DocumentSummary } from "../data";
 import { CvHandoff } from "./cv-handoff";
 import { FieldError, FieldHint, textareaClassName } from "./fields";
@@ -125,24 +123,18 @@ export function DocumentsStep({
   userId,
   cv,
   letter,
-  showContinue = true,
   showLetter = true,
-  failed = false,
 }: {
   userId: string;
   cv: DocumentSummary | null;
   letter: DocumentSummary | null;
-  showContinue?: boolean;
   /**
    * The questionnaire no longer asks for the cover letter: it is one thing too many
    * between the account and the offers. It is added later, from the account page, when
    * the student wants a letter tailored to an offer.
    */
   showLetter?: boolean;
-  /** The last attempt to open the results did not go through. */
-  failed?: boolean;
 }) {
-  const ready = cv !== null && (letter !== null || !showLetter);
   return (
     <div className="grid gap-10">
       <section className="grid gap-3">
@@ -179,44 +171,6 @@ export function DocumentsStep({
           />
           <LetterText />
         </section>
-      ) : null}
-      {failed && showContinue ? (
-        <Alert variant="destructive">
-          <AlertDescription>Ça n’a pas abouti. Réessaie dans un instant.</AlertDescription>
-        </Alert>
-      ) : null}
-      {!showContinue ? null : ready ? (
-        <form action={finishOnboarding}>
-          <SubmitButton variant="shiny" size="lg" pendingLabel="On ouvre tes offres…">
-            Voir mes offres
-          </SubmitButton>
-        </form>
-      ) : (
-        <div className="grid gap-3">
-          <FieldHint>Avec ton CV, les correspondances sont plus précises.</FieldHint>
-          <form action={skipDocuments}>
-            <SubmitButton variant="outline" size="lg" pendingLabel="On ouvre tes offres…">
-              Passer cette étape
-            </SubmitButton>
-          </form>
-          <FieldHint>
-            Tu pourras l’ajouter plus tard depuis ton compte, avec ta lettre de motivation.
-          </FieldHint>
-        </div>
-      )}
-      {showContinue ? (
-        <PendingOverlay
-          title={
-            <>
-              On ouvre <em>tes offres</em>
-            </>
-          }
-          messages={[
-            "On met ta sélection à jour…",
-            "On classe les offres par correspondance…",
-            "On prépare ton espace…",
-          ]}
-        />
       ) : null}
     </div>
   );

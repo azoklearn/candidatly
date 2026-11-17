@@ -70,6 +70,11 @@ test("the answers of a visitor land on the profile created at the end", async ({
     },
   ]);
   const db = adminClient();
+  // The end of the questionnaire runs the first search, which calls the offers API: the
+  // test stops at its door.
+  await page.route("**/onboarding/fin", (route) =>
+    route.fulfill({ status: 200, contentType: "text/plain", body: "fin" }),
+  );
   try {
     await page.goto("/onboarding/compte");
     await expect(page.getByRole("heading", { level: 1, name: "Crée ton compte" })).toBeVisible();
@@ -81,8 +86,8 @@ test("the answers of a visitor land on the profile created at the end", async ({
     await page.getByLabel("Mot de passe").fill(password);
     await page.getByRole("button", { name: "Créer mon compte" }).click();
 
-    // Straight to the CV and letter step: everything else is answered.
-    await expect(page).toHaveURL(/\/onboarding\/7$/);
+    // Straight to the end: everything is answered, the CV is not asked again (C111).
+    await expect(page).toHaveURL(/\/onboarding\/fin$/);
     const profile = await db
       .from("profiles")
       .select(

@@ -7,7 +7,7 @@ import type { Database } from "@/lib/supabase/database.types";
 
 import { draftProfileUpdate, draftSnapshot, isDraftEmpty } from "./draft";
 import { clearDraft, readDraft } from "./draft-cookie";
-import { firstIncompleteStep } from "./state";
+import { nextOnboardingPath } from "./state";
 
 /**
  * Copies the answers given before the account existed onto the fresh profile and drops the
@@ -38,5 +38,5 @@ export async function applyDraftAfterAuth(
     return null;
   }
   await clearDraft();
-  return `/onboarding/${firstIncompleteStep(draftSnapshot(draft))}`;
+  return nextOnboardingPath(draftSnapshot(draft));
 }

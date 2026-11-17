@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { CvHandoff } from "@/app/(questionnaire)/onboarding/_components/cv-handoff";
 import { ResultStack } from "@/components/result-stack";
 import { buttonVariants } from "@/components/ui/button";
 import { requireUserId } from "@/lib/auth/session";
@@ -60,6 +61,8 @@ export default async function SearchResultPage() {
 
   return (
     <header className="grid min-h-[62svh] content-center justify-items-center gap-4 text-center">
+      {/* The CV dropped on the landing page joins the account here (C111). */}
+      <CvHandoff userId={userId} quiet />
       <ResultStack />
       <h1 className="page-title fade-up max-w-3xl">
         {summary.before}

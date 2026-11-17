@@ -1,8 +1,9 @@
 import type { Tables } from "@/lib/supabase/database.types";
 
 /**
- * The questionnaire (docs/QUESTIONS.md C92 to C94): five questions answered with the
- * thumb, the analysis screen, then the account and the documents. Visitors go through the
+ * The questionnaire (docs/QUESTIONS.md C92 to C94, C111): five questions answered with the
+ * thumb, the analysis screen, then the account. The CV is dropped on the landing page, not
+ * at the end. Visitors go through the
  * questions and the analysis without an account; their answers wait in a cookie (C91).
  * The questionnaire says "tu", like the landing page visitors arrive from.
  */
@@ -14,15 +15,18 @@ export const ONBOARDING_STEPS = [
   { step: 4, title: "T’en es où dans tes études ?" },
   { step: 5, title: "Tu veux bosser où ?" },
   { step: 6, title: "Ton compte" },
-  { step: 7, title: "Ton CV" },
 ] as const;
 
 export const LAST_STEP = ONBOARDING_STEPS.length;
 /** Everything a visitor can answer before the account exists. */
 export const VISITOR_LAST_STEP = 5;
 export const ACCOUNT_STEP = 6;
-export const DOCUMENTS_STEP = 7;
 export const ACCOUNT_STEP_PATH = "/onboarding/compte";
+/**
+ * Closes the questionnaire once every step is answered and opens the result (C111): the
+ * step that asked for the CV is gone, the CV is dropped on the landing page.
+ */
+export const FINISH_PATH = "/onboarding/fin";
 /**
  * The analysis sits between the questions and the account (docs/QUESTIONS.md C94): the
  * student sees what the search found before being asked to sign up.
@@ -54,19 +58,18 @@ export type OnboardingProfile = Pick<
   | "location_lat"
   | "location_lng"
   | "onboarding_completed"
-  | "documents_skipped_at"
 >;
 
 export type OnboardingSnapshot = {
   profile: OnboardingProfile;
+  /** Kept for the account page; the questionnaire no longer asks for documents (C111). */
   hasCv: boolean;
-  /** Kept for the account page; the questionnaire no longer waits for it (C104). */
   hasLetter: boolean;
 };
 
 const filled = (value: string | null) => (value ?? "").trim().length > 0;
 
-export function completedSteps({ profile, hasCv }: OnboardingSnapshot): Set<number> {
+export function completedSteps({ profile }: OnboardingSnapshot): Set<number> {
   const done = new Set<number>();
   if (profile.contract_chosen_at !== null) done.add(1);
   if (filled(profile.domain_free_text)) done.add(2);
@@ -74,9 +77,6 @@ export function completedSteps({ profile, hasCv }: OnboardingSnapshot): Set<numb
   if (profile.diploma_level !== null) done.add(4);
   if (profile.location_lat !== null && profile.location_lng !== null) done.add(5);
   if (filled(profile.first_name) && filled(profile.last_name)) done.add(ACCOUNT_STEP);
-  // The last step only asks for the CV, and even that is optional (C89, C104): the cover
-  // letter is added later from the account, when a tailored letter is wanted.
-  if (hasCv || profile.documents_skipped_at !== null) done.add(DOCUMENTS_STEP);
   return done;
 }
 
@@ -84,6 +84,18 @@ export function completedSteps({ profile, hasCv }: OnboardingSnapshot): Set<numb
 export function firstIncompleteStep(snapshot: OnboardingSnapshot): number {
   const done = completedSteps(snapshot);
   return ONBOARDING_STEPS.find(({ step }) => !done.has(step))?.step ?? LAST_STEP;
+}
+
+/** Every step answered: the questionnaire can close. */
+export function isQuestionnaireDone(snapshot: OnboardingSnapshot): boolean {
+  return completedSteps(snapshot).size === ONBOARDING_STEPS.length;
+}
+
+/** Where to go next: the first unanswered step, or the end of the questionnaire. */
+export function nextOnboardingPath(snapshot: OnboardingSnapshot): string {
+  return isQuestionnaireDone(snapshot)
+    ? FINISH_PATH
+    : `/onboarding/${firstIncompleteStep(snapshot)}`;
 }
 
 /** Steps can be revisited, never skipped. */

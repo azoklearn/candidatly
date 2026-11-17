@@ -8,7 +8,7 @@ import { readDraft } from "@/lib/onboarding/draft-cookie";
 import {
   ACCOUNT_STEP_PATH,
   firstIncompleteStep,
-  LAST_STEP,
+  nextOnboardingPath,
   VISITOR_LAST_STEP,
 } from "@/lib/onboarding/state";
 import { createClient } from "@/lib/supabase/server";
@@ -35,7 +35,7 @@ export default async function AnalysisPage() {
     if (data.profile.onboarding_completed) redirect("/offers");
     const step = firstIncompleteStep(data.snapshot);
     if (step <= VISITOR_LAST_STEP) redirect(`/onboarding/${step}`);
-    next = `/onboarding/${Math.min(step, LAST_STEP)}`;
+    next = nextOnboardingPath(data.snapshot);
     cta = "Continuer";
   } else {
     const pending = firstIncompleteStep(draftSnapshot(draft));

@@ -7,8 +7,6 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getAnthropicClient, getModels } from "@/lib/ai/client";
-import { EVENTS } from "@/lib/analytics";
-import { trackServerEvent } from "@/lib/analytics-server";
 import { suggestRomeCodes, toSearchTerms, type RomeSuggestion } from "@/lib/ai/rome-mapping";
 import { currentUserId, requireUserId } from "@/lib/auth/session";
 import { allowAnonymousAction } from "@/lib/anon-rate-limit";
@@ -30,12 +28,7 @@ import { DEFAULT_RADIUS_KM, findPresetCity, RADIUS_OPTIONS } from "@/lib/onboard
 import { findDomain } from "@/lib/onboarding/domains";
 import { draftProfileValuesForAnalysis } from "@/lib/onboarding/draft";
 import { readDraft, saveDraft } from "@/lib/onboarding/draft-cookie";
-import {
-  ANALYSIS_PATH,
-  DOCUMENTS_STEP,
-  firstIncompleteStep,
-  LAST_STEP,
-} from "@/lib/onboarding/state";
+import { ANALYSIS_PATH, FINISH_PATH } from "@/lib/onboarding/state";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database, TablesInsert } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
@@ -163,7 +156,7 @@ export async function saveIdentity(_previous: FormState, formData: FormData): Pr
     log.error("identity_update_failed", { code: error.code });
     return { error: GENERIC_ERROR };
   }
-  redirect(`/onboarding/${DOCUMENTS_STEP}`);
+  redirect(FINISH_PATH);
 }
 
 const ProfileSchema = z.object({
@@ -575,7 +568,6 @@ export async function registerDocument(
     extracted_text: text,
   });
   if (!saved) return { ok: false, error: GENERIC_ERROR };
-  revalidatePath(`/onboarding/${DOCUMENTS_STEP}`);
   revalidatePath("/account");
   return { ok: true };
 }
@@ -601,7 +593,6 @@ export async function saveLetterText(_previous: FormState, formData: FormData): 
     extracted_text: text,
   });
   if (!saved) return { error: GENERIC_ERROR };
-  revalidatePath(`/onboarding/${DOCUMENTS_STEP}`);
   revalidatePath("/account");
   return { saved: true };
 }
@@ -652,49 +643,4 @@ export async function analyseQuestionnaire(): Promise<AnalysisResult> {
     log.error("analysis_failed", { error });
     return { ok: false, error: "L’analyse n’a pas abouti. Réessaie dans un instant." };
   }
-}
-
-/** Grants the bonus, marks the questionnaire done and runs the student's own first search. */
-async function completeOnboarding(): Promise<never> {
-  const supabase = await createClient();
-  const userId = await requireUserId(supabase);
-  const { snapshot } = await loadOnboarding(supabase, userId);
-  const next = firstIncompleteStep(snapshot);
-  if (next < LAST_STEP) redirect(`/onboarding/${next}`);
-
-  const bonus = await supabase.rpc("grant_signup_bonus");
-  if (bonus.error) log.error("signup_bonus_failed", { code: bonus.error.code });
-  const { error } = await supabase
-    .from("profiles")
-    .update({ onboarding_completed: true })
-    .eq("user_id", userId);
-  if (error) {
-    log.error("onboarding_completion_failed", { code: error.code });
-    redirect(`/onboarding/${LAST_STEP}?error=1`);
-  }
-  // The search of the questionnaire already warmed the cache: this mostly scores offers.
-  const refresh = await requestOffersRefresh(userId);
-  log.info("onboarding_completed", { refresh });
-  await trackServerEvent(EVENTS.onboardingDone);
-  redirect("/forfait");
-}
-
-/** Last step: the student keeps their documents and goes to their results. */
-export async function finishOnboarding(): Promise<void> {
-  await completeOnboarding();
-}
-
-/** The student skips the CV and the letter (C89); both can be added later from the account. */
-export async function skipDocuments(): Promise<void> {
-  const supabase = await createClient();
-  const userId = await requireUserId(supabase);
-  const { error } = await supabase
-    .from("profiles")
-    .update({ documents_skipped_at: new Date().toISOString() })
-    .eq("user_id", userId);
-  if (error) {
-    log.error("documents_skip_failed", { code: error.code });
-    redirect(`/onboarding/${DOCUMENTS_STEP}?error=1`);
-  }
-  await completeOnboarding();
 }

@@ -81,7 +81,6 @@ export function draftSnapshot(draft: OnboardingDraft): OnboardingSnapshot {
     location_lat: draft.location_lat ?? null,
     location_lng: draft.location_lng ?? null,
     onboarding_completed: false,
-    documents_skipped_at: null,
   };
   return { profile, hasCv: false, hasLetter: false };
 }

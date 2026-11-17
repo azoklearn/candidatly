@@ -139,7 +139,7 @@ export default async function AccountPage() {
         title="CV et lettre de base"
         description="La nouvelle lettre servira pour vos prochaines candidatures."
       >
-        <DocumentsStep userId={userId} cv={data.cv} letter={data.letter} showContinue={false} />
+        <DocumentsStep userId={userId} cv={data.cv} letter={data.letter} />
       </Section>
       <Section
         title="Vos données"

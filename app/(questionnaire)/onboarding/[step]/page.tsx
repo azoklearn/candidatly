@@ -10,10 +10,10 @@ import { readDraft } from "@/lib/onboarding/draft-cookie";
 import {
   ACCOUNT_STEP,
   ANALYSIS_PATH,
-  DOCUMENTS_STEP,
   firstIncompleteStep,
   isStepAccessible,
   parseStep,
+  FINISH_PATH,
   VISITOR_LAST_STEP,
 } from "@/lib/onboarding/state";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -21,7 +21,6 @@ import { createClient } from "@/lib/supabase/server";
 
 import { ContractStep } from "../_components/contract-step";
 import { CityStep } from "../_components/city-step";
-import { DocumentsStep } from "../_components/documents-step";
 import { DomainStep } from "../_components/domain-step";
 import { IdentityStep } from "../_components/identity-step";
 import { JobStep, type JobOption } from "../_components/job-step";
@@ -101,12 +100,13 @@ async function VisitorStep({ step, draft }: { step: number; draft: OnboardingDra
 
 export default async function OnboardingStepPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ step: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const step = parseStep((await params).step);
+  const raw = (await params).step;
+  // The former CV step (C111): links and tabs left open on it lead to the end instead.
+  if (raw === "7") redirect(FINISH_PATH);
+  const step = parseStep(raw);
   if (step === null) notFound();
   const supabase = await createClient();
   const userId = await currentUserId(supabase);
@@ -144,15 +144,6 @@ export default async function OnboardingStepPage({
       ) : null}
       {step === ACCOUNT_STEP ? (
         <IdentityStep firstName={data.profile.first_name} lastName={data.profile.last_name} />
-      ) : null}
-      {step === DOCUMENTS_STEP ? (
-        <DocumentsStep
-          userId={userId}
-          cv={data.cv}
-          letter={data.letter}
-          showLetter={false}
-          failed={Boolean((await searchParams).error)}
-        />
       ) : null}
     </Shell>
   );
