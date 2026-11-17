@@ -1,90 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
 
+import { requireAdmin } from "@/lib/admin/guard";
 import { loadAdminData } from "@/lib/admin/load";
-import { isAdminEmail } from "@/lib/admin/emails";
 import { buildAccounts, buildOverview, percent } from "@/lib/admin/overview";
-import { getAdminEmails } from "@/lib/env";
+import { matchesAccountQuery } from "@/lib/admin/search";
 import { formatDate, formatRelativeDays } from "@/lib/format";
 import { formatEuros, PLANS } from "@/lib/pricing";
-import { createClient } from "@/lib/supabase/server";
+
+import { APPLICATION_STATUS_LABELS, Section, Stat, Table } from "./_components/ui";
 
 export const metadata: Metadata = { title: "Admin", robots: { index: false, follow: false } };
 
-const STATUS_LABELS: Record<string, string> = {
-  draft: "Lettre en préparation",
-  ready: "Prête à envoyer",
-  sent: "Envoyée",
-  viewed: "Vue",
-  replied_positive: "Réponse positive",
-  replied_negative: "Réponse négative",
-  no_answer: "Sans réponse",
-  unknown: "Statut inconnu",
-};
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="panel grid gap-1 rounded-2xl border bg-card p-4">
-      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{label}</p>
-      <p className="text-3xl font-bold tracking-[-0.04em]">{value}</p>
-      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="grid gap-3">
-      <h2 className="text-lg font-bold tracking-[-0.03em]">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
-  if (rows.length === 0) {
-    return <p className="text-sm text-muted-foreground">Rien pour l’instant.</p>;
-  }
-  return (
-    <div className="panel overflow-x-auto rounded-2xl border bg-card">
-      <table className="w-full min-w-[42rem] text-left text-sm">
-        <thead className="border-b text-xs tracking-wide text-muted-foreground uppercase">
-          <tr>
-            {head.map((label) => (
-              <th key={label} className="px-3 py-2 font-medium">
-                {label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((cells, index) => (
-            <tr key={index} className="border-b last:border-b-0">
-              {cells.map((cell, cellIndex) => (
-                <td key={cellIndex} className="px-3 py-2 align-top">
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-/** Read-only view of the whole service, for the owner only (docs/QUESTIONS.md C90). */
-export default async function AdminPage() {
-  const supabase = await createClient();
-  const { data: claims } = await supabase.auth.getClaims();
-  const email = typeof claims?.claims.email === "string" ? claims.claims.email : null;
-  if (!isAdminEmail(email, getAdminEmails())) notFound();
+/**
+ * Read-only view of the whole service, for the accounts of ADMIN_EMAILS (docs/QUESTIONS.md
+ * C90, C112). Each account opens on its own page.
+ */
+export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
+  await requireAdmin();
+  const params = await searchParams;
+  const query = typeof params.q === "string" ? params.q : "";
 
   const data = await loadAdminData();
   const overview = buildOverview(data);
-  const accounts = buildAccounts(data);
+  const allAccounts = buildAccounts(data);
+  const accounts = allAccounts.filter((account) => matchesAccountQuery(account, query));
+  const emailOf = new Map(allAccounts.map((account) => [account.userId, account.email]));
+  const chosePlan = data.profiles.filter((profile) => profile.chosen_plan !== null).length;
   const planName = (id: string | null) =>
     PLANS.find((plan) => plan.id === id)?.name ?? (id ? id : "—");
 
@@ -134,6 +78,22 @@ export default async function AdminPage() {
         <Stat label="Entreprises qui recrutent" value={String(overview.hiringCompanies)} />
       </div>
 
+      <Section title="Entonnoir">
+        <Table
+          head={["Étape", "Comptes", "Part des comptes"]}
+          rows={[
+            ["Compte créé", overview.accounts, overview.accounts],
+            ["Questionnaire terminé", overview.onboarded, overview.accounts],
+            ["Forfait choisi", chosePlan, overview.accounts],
+            ["Abonnement actif", overview.activeSubscriptions, overview.accounts],
+          ].map(([label, count, total]) => [
+            String(label),
+            String(count),
+            `${percent(Number(count), Number(total))} %`,
+          ])}
+        />
+      </Section>
+
       <Section title="Forfaits">
         <Table
           head={["Forfait", "Choisi après le questionnaire", "Abonnements actifs"]}
@@ -150,11 +110,38 @@ export default async function AdminPage() {
           head={["Statut", "Nombre"]}
           rows={Object.entries(overview.applicationsByStatus)
             .sort((a, b) => b[1] - a[1])
-            .map(([status, count]) => [STATUS_LABELS[status] ?? status, String(count)])}
+            .map(([status, count]) => [APPLICATION_STATUS_LABELS[status] ?? status, String(count)])}
         />
       </Section>
 
-      <Section title={`Comptes (${accounts.length})`}>
+      <Section
+        title={
+          query
+            ? `Comptes (${accounts.length} sur ${allAccounts.length})`
+            : `Comptes (${accounts.length})`
+        }
+      >
+        <form className="flex flex-wrap gap-2" role="search">
+          <input
+            type="search"
+            name="q"
+            defaultValue={query}
+            placeholder="Adresse, nom ou ville"
+            aria-label="Chercher un compte"
+            className="h-10 min-w-0 flex-1 rounded-full border bg-card px-4 text-sm"
+          />
+          <button
+            type="submit"
+            className="h-10 rounded-full border bg-card px-4 text-sm font-medium"
+          >
+            Chercher
+          </button>
+          {query ? (
+            <Link href="/admin" className="self-center text-sm underline underline-offset-4">
+              Tout afficher
+            </Link>
+          ) : null}
+        </form>
         {data.truncated ? (
           <p className="text-sm text-muted-foreground">
             Seuls les 1 000 comptes les plus récents sont comptés ici.
@@ -171,12 +158,16 @@ export default async function AdminPage() {
             "Candidatures",
           ]}
           rows={accounts.map((account) => [
-            <span key="mail" className="grid">
+            <Link
+              key="mail"
+              href={`/admin/comptes/${account.userId}`}
+              className="grid hover:underline"
+            >
               <span className="font-medium">{account.email ?? "—"}</span>
               {account.name ? (
                 <span className="text-xs text-muted-foreground">{account.name}</span>
               ) : null}
-            </span>,
+            </Link>,
             <span key="date" className="whitespace-nowrap">
               {formatRelativeDays(account.createdAt) ?? formatDate(account.createdAt)}
             </span>,
@@ -191,6 +182,23 @@ export default async function AdminPage() {
                 ? "Exempté"
                 : "—",
             `${account.applications} dont ${account.sent} envoyées`,
+          ])}
+        />
+      </Section>
+
+      <Section title="Dernières candidatures">
+        <Table
+          head={["Compte", "Offre", "Statut", "Créée"]}
+          rows={data.recentApplications.map((row) => [
+            <Link key="who" href={`/admin/comptes/${row.user_id}`} className="hover:underline">
+              {emailOf.get(row.user_id) ?? "—"}
+            </Link>,
+            <span key="offer" className="grid">
+              <span className="font-medium">{row.offer?.title ?? "Offre retirée"}</span>
+              <span className="text-xs text-muted-foreground">{row.offer?.company_name ?? ""}</span>
+            </span>,
+            APPLICATION_STATUS_LABELS[row.status] ?? row.status,
+            formatRelativeDays(row.created_at) ?? "—",
           ])}
         />
       </Section>

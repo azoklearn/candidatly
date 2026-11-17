@@ -29,6 +29,14 @@ export type SearchRunRow = {
   status_code: number | null;
 };
 
+export type RecentApplicationRow = {
+  user_id: string;
+  status: string;
+  sent_at: string | null;
+  created_at: string;
+  offer: { title: string; company_name: string | null } | null;
+};
+
 export type AdminData = {
   profiles: ProfileRow[];
   subscriptions: SubscriptionRow[];
@@ -38,6 +46,7 @@ export type AdminData = {
   hiringCompanies: number;
   billingEvents: BillingEventRow[];
   searchRuns: SearchRunRow[];
+  recentApplications: RecentApplicationRow[];
   truncated: boolean;
 };
 
@@ -68,6 +77,7 @@ export async function loadAdminData(): Promise<AdminData> {
     hiringCompanies,
     billingEvents,
     searchRuns,
+    recentApplications,
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -98,6 +108,11 @@ export async function loadAdminData(): Promise<AdminData> {
       .select("query_key, source, fetched_at, result_count, status_code")
       .order("fetched_at", { ascending: false })
       .limit(EVENT_LIMIT),
+    supabase
+      .from("applications")
+      .select("user_id, status, sent_at, created_at, offer:offers(title, company_name)")
+      .order("created_at", { ascending: false })
+      .limit(20),
   ]);
 
   const profileRows = rowsOrThrow("admin.profiles", profiles);
@@ -110,6 +125,7 @@ export async function loadAdminData(): Promise<AdminData> {
     hiringCompanies: countOrThrow("admin.hiring_companies", hiringCompanies),
     billingEvents: rowsOrThrow("admin.billing_events", billingEvents),
     searchRuns: rowsOrThrow("admin.offer_search_runs", searchRuns),
+    recentApplications: rowsOrThrow("admin.recent_applications", recentApplications),
     truncated: profileRows.length >= PROFILE_LIMIT,
   };
 }
