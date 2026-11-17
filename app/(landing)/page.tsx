@@ -28,7 +28,9 @@ export default async function HomePage({
       <header className="site-header lp-container">
         <a className="brand" href="#top" aria-label="JobGPT, accueil">
           <span className="brand-mark">J</span>
-          <span>JobGPT</span>
+          <span>
+            gptjob<span className="brand-tld">.io</span>
+          </span>
         </a>
         <nav aria-label="Navigation principale">
           <a href="#comment-ca-marche">Comment ça marche</a>
@@ -326,7 +328,9 @@ export default async function HomePage({
       <footer className="site-footer lp-container">
         <a className="brand" href="#top">
           <span className="brand-mark">J</span>
-          <span>JobGPT</span>
+          <span>
+            gptjob<span className="brand-tld">.io</span>
+          </span>
         </a>
         <p>© 2026 JobGPT. Cherche moins. Décroche plus.</p>
         <div>
