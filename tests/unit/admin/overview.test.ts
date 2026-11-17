@@ -37,20 +37,26 @@ const subscription = (
 });
 
 describe("admin overview", () => {
-  it("counts an annual membership as ten months spread over twelve", () => {
-    expect(monthlyCentsOf("basic", "monthly")).toBe(999);
-    expect(monthlyCentsOf("basic", "annual")).toBe(833);
-    expect(monthlyCentsOf("premium", "annual")).toBe(1666);
+  it("spreads each plan over its period, and counts nothing recurring for À vie (C113)", () => {
+    expect(monthlyCentsOf("basic", "monthly")).toBe(1990);
+    expect(monthlyCentsOf("plus", "quarterly")).toBe(997);
+    expect(monthlyCentsOf("premium", "lifetime")).toBe(0);
+  });
+
+  it("keeps the old prices for the memberships sold on Whop", () => {
+    expect(monthlyCentsOf("basic", "monthly", "whop")).toBe(999);
+    expect(monthlyCentsOf("basic", "annual", "whop")).toBe(833);
+    expect(monthlyCentsOf("premium", "annual", "whop")).toBe(1666);
   });
 
   it("only counts the memberships that are really open", () => {
     const rows = [
       subscription({ user_id: "a" }),
       subscription({ user_id: "b", plan: "plus", status: "expired" }),
-      subscription({ user_id: "c", plan: "premium", status: "canceling" }),
+      subscription({ user_id: "c", plan: "plus", billing: "quarterly", status: "canceling" }),
       subscription({ user_id: "d", plan: "unknown-plan" }),
     ];
-    expect(monthlyRevenueCents(rows)).toBe(999 + 1999);
+    expect(monthlyRevenueCents(rows)).toBe(1990 + 997);
   });
 
   it("counts recent sign-ups from a given day", () => {
@@ -120,7 +126,7 @@ describe("admin overview", () => {
       signups7d: 2,
       onboarded: 2,
       activeSubscriptions: 1,
-      monthlyRevenueCents: 999,
+      monthlyRevenueCents: 1990,
       applications: 2,
       applicationsSent: 1,
       liveOffers: 59,

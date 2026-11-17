@@ -4,7 +4,15 @@
  */
 
 import { ACTIVE_STATUSES } from "@/lib/billing/subscriptions";
-import { ANNUAL_MONTHS_CHARGED, PLANS, PLAN_IDS, type PlanId } from "@/lib/pricing";
+import {
+  billingMonths,
+  findPlan,
+  LEGACY_ANNUAL_MONTHS_CHARGED,
+  LEGACY_MONTHLY_CENTS,
+  PLAN_IDS,
+  type Billing,
+  type PlanId,
+} from "@/lib/pricing";
 
 export type ProfileRow = {
   user_id: string;
@@ -21,6 +29,8 @@ export type ProfileRow = {
 
 export type SubscriptionRow = {
   user_id: string;
+  /** "whop" rows were sold at the prices before C113. */
+  provider?: string;
   plan: string;
   billing: string | null;
   status: string;
@@ -44,17 +54,31 @@ export function isActiveSubscription(row: { status: string }): boolean {
   return ACTIVE_STATUSES.has(row.status);
 }
 
-/** What a membership brings in each month: an annual one charges ten months up front. */
-export function monthlyCentsOf(plan: PlanId, billing: string | null): number {
-  const monthly = PLANS.find((candidate) => candidate.id === plan)?.monthlyCents ?? 0;
-  if (billing === "annual") return Math.round((monthly * ANNUAL_MONTHS_CHARGED) / 12);
-  return monthly;
+/**
+ * What a membership brings in each month. A Whop membership keeps the price it was sold at
+ * (an annual one charged ten months up front); a current plan is spread over its period;
+ * the plan paid once brings nothing recurring (C113).
+ */
+export function monthlyCentsOf(
+  plan: PlanId,
+  billing: string | null,
+  provider: string = "mollie",
+): number {
+  if (provider === "whop") {
+    const monthly = LEGACY_MONTHLY_CENTS[plan];
+    if (billing === "annual") return Math.round((monthly * LEGACY_ANNUAL_MONTHS_CHARGED) / 12);
+    return monthly;
+  }
+  const current = findPlan(plan);
+  if (!current) return 0;
+  const months = billingMonths((billing ?? current.billing) as Billing);
+  return months === null ? 0 : Math.round(current.priceCents / months);
 }
 
 export function monthlyRevenueCents(subscriptions: readonly SubscriptionRow[]): number {
   return subscriptions.filter(isActiveSubscription).reduce((total, row) => {
     const plan = asPlanId(row.plan);
-    return plan ? total + monthlyCentsOf(plan, row.billing) : total;
+    return plan ? total + monthlyCentsOf(plan, row.billing, row.provider) : total;
   }, 0);
 }
 

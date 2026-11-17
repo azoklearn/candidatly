@@ -168,8 +168,8 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
               ) : !canPrepareLetters(access) ? (
                 <div className="grid gap-3 rounded-2xl border border-dashed border-foreground/20 p-4 text-sm">
                   <p>
-                    La lettre adaptée à chaque entreprise est incluse dans les forfaits Plus et
-                    Premium.
+                    La lettre adaptée à chaque entreprise est incluse dans les forfaits 3 mois et À
+                    vie.
                   </p>
                   {access.subscription?.manage_url ? (
                     <a
@@ -178,7 +178,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                       rel="noopener noreferrer"
                       className={buttonVariants({ variant: "shiny" })}
                     >
-                      Passer au forfait Plus
+                      Passer au forfait 3 mois
                     </a>
                   ) : (
                     <Link href="/forfait/choisir" className={buttonVariants({ variant: "shiny" })}>

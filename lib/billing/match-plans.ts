@@ -21,44 +21,42 @@ export type PlanLink = {
   priceCents: number;
 };
 
-/** Days between two charges accepted for each billing, as set in the Whop dashboard. */
-const PERIOD_DAYS: Record<Billing, readonly [number, number]> = {
+/**
+ * Days between two charges accepted for each billing, as set in the Whop dashboard. The
+ * plan paid once is sold on Mollie only (C113): no Whop plan ever fits it.
+ */
+const PERIOD_DAYS: Record<Exclude<Billing, "lifetime">, readonly [number, number]> = {
   monthly: [28, 31],
+  quarterly: [89, 92],
   annual: [360, 366],
 };
-
-export function expectedPriceCents(plan: Plan, billing: Billing, annualMonths: number): number {
-  return billing === "monthly" ? plan.monthlyCents : plan.monthlyCents * annualMonths;
-}
 
 const toCents = (euros: number | null | undefined) =>
   typeof euros === "number" ? Math.round(euros * 100) : null;
 
 function fits(listing: WhopPlanListing, billing: Billing, cents: number): boolean {
+  const currency = (listing.currency ?? "eur").toLowerCase();
+  // A hidden plan cannot be sold again: Whop only keeps it alive for the memberships
+  // already bought on it. Counting it would make a replacement plan look ambiguous.
+  if ((listing.visibility ?? "visible") === "hidden" || currency !== "eur") return false;
+  if (billing === "lifetime") return false;
   const [min, max] = PERIOD_DAYS[billing];
   const period = listing.billing_period ?? -1;
-  const currency = (listing.currency ?? "eur").toLowerCase();
   return (
-    // A hidden plan cannot be sold again: Whop only keeps it alive for the memberships
-    // already bought on it. Counting it would make a replacement plan look ambiguous.
-    (listing.visibility ?? "visible") !== "hidden" &&
     (listing.plan_type ?? "renewal") === "renewal" &&
     period >= min &&
     period <= max &&
-    currency === "eur" &&
     toCents(listing.renewal_price ?? listing.initial_price) === cents
   );
 }
 
 /**
- * Pairs our six plans with the plans the owner created on Whop: same billing period and
- * same recurring price in euros. Ids given explicitly win. A plan without exactly one
- * match is reported, never guessed.
+ * Pairs our renewing plans with the plans the owner created on Whop: same billing period and
+ * same price in euros. Ids given explicitly win. A plan without exactly one match is
+ * reported, never guessed.
  */
 export function matchWhopPlans(input: {
   plans: readonly Plan[];
-  billings: readonly Billing[];
-  annualMonths: number;
   listings: WhopPlanListing[];
   explicit?: Record<string, string>;
 }): { links: PlanLink[]; missing: string[]; ambiguous: string[] } {
@@ -66,23 +64,22 @@ export function matchWhopPlans(input: {
   const missing: string[] = [];
   const ambiguous: string[] = [];
   for (const plan of input.plans) {
-    for (const billing of input.billings) {
-      const key = `${plan.id}:${billing}`;
-      const priceCents = expectedPriceCents(plan, billing, input.annualMonths);
-      const forced = input.explicit?.[key];
-      if (forced) {
-        links.push({ plan: plan.id, billing, providerPlanId: forced, priceCents });
-        continue;
-      }
-      const candidates = input.listings.filter((listing) => fits(listing, billing, priceCents));
-      const [only] = candidates;
-      if (candidates.length === 1 && only) {
-        links.push({ plan: plan.id, billing, providerPlanId: only.id, priceCents });
-      } else if (candidates.length === 0) {
-        missing.push(key);
-      } else {
-        ambiguous.push(key);
-      }
+    const billing = plan.billing;
+    const key = `${plan.id}:${billing}`;
+    const priceCents = plan.priceCents;
+    const forced = input.explicit?.[key];
+    if (forced) {
+      links.push({ plan: plan.id, billing, providerPlanId: forced, priceCents });
+      continue;
+    }
+    const candidates = input.listings.filter((listing) => fits(listing, billing, priceCents));
+    const [only] = candidates;
+    if (candidates.length === 1 && only) {
+      links.push({ plan: plan.id, billing, providerPlanId: only.id, priceCents });
+    } else if (candidates.length === 0) {
+      missing.push(key);
+    } else {
+      ambiguous.push(key);
     }
   }
   return { links, missing, ambiguous };

@@ -102,7 +102,7 @@ export default async function AdminAccountPage({ params }: { params: Promise<{ i
             [
               "Forfait choisi",
               profile.chosen_plan
-                ? `${planName(profile.chosen_plan)}${profile.chosen_billing === "annual" ? " (annuel)" : " (mensuel)"} · ${when(profile.plan_chosen_at)}`
+                ? `${planName(profile.chosen_plan)}${profile.chosen_billing === "annual" ? " (annuel, ancien tarif)" : ""} · ${when(profile.plan_chosen_at)}`
                 : null,
             ],
             ["Dernière modification", when(profile.updated_at)],
@@ -126,7 +126,7 @@ export default async function AdminAccountPage({ params }: { params: Promise<{ i
         <Table
           head={["Forfait", "Fournisseur", "Statut", "Fin de période", "Créé"]}
           rows={account.subscriptions.map((row) => [
-            `${planName(row.plan)}${row.billing === "annual" ? " (annuel)" : ""}`,
+            `${planName(row.plan)}${row.provider === "whop" ? ` (ancien tarif${row.billing === "annual" ? ", annuel" : ""})` : ""}`,
             row.provider,
             `${row.status}${row.cancel_at_period_end ? " · arrêt prévu" : ""}`,
             when(row.current_period_end),

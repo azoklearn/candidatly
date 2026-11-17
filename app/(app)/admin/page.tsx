@@ -66,7 +66,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         <Stat
           label="Revenu mensuel"
           value={formatEuros(overview.monthlyRevenueCents)}
-          hint="Annuel ramené au mois"
+          hint="3 mois ramené au mois, À vie non compté"
         />
         <Stat
           label="Candidatures"

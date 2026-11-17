@@ -1,13 +1,19 @@
 /**
- * Plans shown on /tarifs and after the questionnaire (docs/QUESTIONS.md C82). Prices in
- * euro cents; annual billing charges 10 months (two months free). Features that are not
- * built yet are flagged `soon` and shown as such: nothing is sold before it exists.
- * The wording says "tu": the plans belong to the entry funnel (C93).
+ * Plans shown on /tarifs and after the questionnaire (docs/QUESTIONS.md C82, C113): three
+ * durations, each with its own features. "1 mois" and "3 mois" renew by themselves and can
+ * be stopped from the account; "À vie" is paid once. Prices in euro cents. Features that
+ * are not built yet are flagged `soon` and shown as such: nothing is sold before it exists.
+ * The ids stay "basic", "plus" and "premium": the access rules and the stored choices keep
+ * their meaning. The wording says "tu": the plans belong to the entry funnel (C93).
  */
 
 export const PLAN_IDS = ["basic", "plus", "premium"] as const;
 export type PlanId = (typeof PLAN_IDS)[number];
-export const BILLINGS = ["monthly", "annual"] as const;
+/**
+ * Every billing that can be stored. "annual" only belongs to the memberships sold on Whop
+ * before C113; new plans use the first three.
+ */
+export const BILLINGS = ["monthly", "quarterly", "lifetime", "annual"] as const;
 export type Billing = (typeof BILLINGS)[number];
 
 export type PlanFeature = { label: string; soon?: boolean };
@@ -15,53 +21,67 @@ export type Plan = {
   id: PlanId;
   name: string;
   tagline: string;
-  monthlyCents: number;
+  /** How this plan is charged: every month, every three months, or once. */
+  billing: Billing;
+  priceCents: number;
   features: PlanFeature[];
 };
 
-export const ANNUAL_MONTHS_CHARGED = 10;
 const DAYS_PER_MONTH = 30;
-const DAYS_PER_YEAR = 365;
 
 export const PLANS: readonly Plan[] = [
   {
     id: "basic",
-    name: "Basic",
-    tagline: "Pour trouver les bonnes offres",
-    monthlyCents: 999,
+    name: "1 mois",
+    tagline: "Pour tester et trouver les bonnes offres",
+    billing: "monthly",
+    priceCents: 1990,
     features: [
       { label: "Les offres d’alternance de ta zone et de ton domaine" },
       { label: "Un score de correspondance pour chaque offre" },
       { label: "Les entreprises qui recrutent près de chez toi" },
       { label: "3 recherches par jour" },
+      { label: "Sans engagement, tu arrêtes quand tu veux" },
     ],
   },
   {
     id: "plus",
-    name: "Plus",
-    tagline: "Pour candidater sans y passer tes soirées",
-    monthlyCents: 1499,
+    name: "3 mois",
+    tagline: "Le temps d’une vraie recherche, sans y passer tes soirées",
+    billing: "quarterly",
+    priceCents: 2990,
     features: [
-      { label: "Tout le forfait Basic" },
+      { label: "Tout le forfait 1 mois" },
       { label: "Ta lettre de motivation adaptée à chaque entreprise" },
       { label: "Ta candidature prête avec ton CV, et le suivi des réponses" },
+      { label: "10 recherches par jour" },
       { label: "Ton CV adapté à chaque entreprise", soon: true },
       { label: "L’envoi direct de tes candidatures", soon: true },
-      { label: "10 recherches par jour" },
     ],
   },
   {
     id: "premium",
-    name: "Premium",
-    tagline: "Pour mettre toutes les chances de ton côté",
-    monthlyCents: 1999,
+    name: "À vie",
+    tagline: "Un seul paiement, pour toutes tes recherches",
+    billing: "lifetime",
+    priceCents: 12000,
     features: [
-      { label: "Tout le forfait Plus" },
+      { label: "Tout le forfait 3 mois" },
       { label: "Recherches illimitées" },
+      { label: "Un seul paiement, aucun abonnement" },
+      { label: "Les nouvelles fonctions incluses dès leur sortie" },
       { label: "L’optimisation de ton CV", soon: true },
     ],
   },
 ];
+
+/** Monthly prices of the memberships sold on Whop before C113, for the admin revenue. */
+export const LEGACY_MONTHLY_CENTS: Record<PlanId, number> = {
+  basic: 999,
+  plus: 1499,
+  premium: 1999,
+};
+export const LEGACY_ANNUAL_MONTHS_CHARGED = 10;
 
 const euros = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" });
 
@@ -69,40 +89,65 @@ export function formatEuros(cents: number): string {
   return euros.format(cents / 100);
 }
 
-export function annualCents(plan: Plan): number {
-  return plan.monthlyCents * ANNUAL_MONTHS_CHARGED;
+export function findPlan(id: string | null | undefined): Plan | undefined {
+  return PLANS.find((plan) => plan.id === id);
 }
 
-/** What the annual formula keeps in the student's pocket: the months that are not charged. */
-export function annualSavingsCents(plan: Plan): number {
-  return plan.monthlyCents * (12 - ANNUAL_MONTHS_CHARGED);
+/** Months covered by one payment; null for a plan paid once. */
+export function billingMonths(billing: Billing): number | null {
+  if (billing === "monthly") return 1;
+  if (billing === "quarterly") return 3;
+  if (billing === "annual") return 12;
+  return null;
+}
+
+/** What three months cost when paid month by month, against the 3 months plan. */
+export function savingsCents(plan: Plan): number {
+  const months = billingMonths(plan.billing);
+  const monthly = findPlan("basic")?.priceCents ?? 0;
+  if (months === null || months <= 1) return 0;
+  return Math.max(0, monthly * months - plan.priceCents);
 }
 
 export type PriceView = {
-  /** Price per month shown in large type. */
+  /** Price shown in large type: what is charged. */
   mainCents: number;
-  /** Monthly price struck through next to the annual price per month, null in monthly mode. */
-  struckCents: number | null;
-  perDayCents: number;
-  /** "facturé 249,90 € par an" in annual mode. */
-  billedLabel: string | null;
+  /** "/mois", "/3 mois", or "une fois". */
+  unit: string;
+  /** "soit 9,97 € par mois", or null. */
+  perMonthLabel: string | null;
+  /** "soit 0,66 € par jour", or null for the plan paid once. */
+  perDayLabel: string | null;
+  /** How it is charged, in small print. */
+  billedLabel: string;
+  /** What it saves against the monthly plan, or null. */
+  savingLabel: string | null;
 };
 
-export function priceView(plan: Plan, billing: Billing): PriceView {
-  if (billing === "monthly") {
+export function priceView(plan: Plan): PriceView {
+  const months = billingMonths(plan.billing);
+  if (months === null) {
     return {
-      mainCents: plan.monthlyCents,
-      struckCents: null,
-      perDayCents: Math.round(plan.monthlyCents / DAYS_PER_MONTH),
-      billedLabel: null,
+      mainCents: plan.priceCents,
+      unit: "une fois",
+      perMonthLabel: null,
+      perDayLabel: null,
+      billedLabel: "un seul paiement, accès pour toujours",
+      savingLabel: "Pas d’abonnement, plus jamais rien à payer",
     };
   }
-  const yearly = annualCents(plan);
+  const saving = savingsCents(plan);
   return {
-    mainCents: Math.round(yearly / 12),
-    struckCents: plan.monthlyCents,
-    perDayCents: Math.round(yearly / DAYS_PER_YEAR),
-    billedLabel: `facturé ${formatEuros(yearly)} par an`,
+    mainCents: plan.priceCents,
+    unit: months === 1 ? "/mois" : `/${months} mois`,
+    perMonthLabel:
+      months === 1 ? null : `soit ${formatEuros(Math.round(plan.priceCents / months))} par mois`,
+    perDayLabel: `soit ${formatEuros(Math.round(plan.priceCents / (months * DAYS_PER_MONTH)))} par jour`,
+    billedLabel:
+      months === 1
+        ? "renouvelé chaque mois, sans engagement"
+        : `renouvelé tous les ${months} mois, sans engagement`,
+    savingLabel: saving > 0 ? `${formatEuros(saving)} de moins que ${months} mois au mois` : null,
   };
 }
 

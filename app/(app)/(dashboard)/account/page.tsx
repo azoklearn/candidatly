@@ -41,6 +41,14 @@ function Section({
   );
 }
 
+/** How the plan is charged, after its name (C113). */
+const BILLED_AS: Record<string, string> = {
+  monthly: ", renouvelé chaque mois",
+  quarterly: ", renouvelé tous les 3 mois",
+  annual: ", facturé à l’année",
+  lifetime: ", payé une fois : accès à vie",
+};
+
 export default async function AccountPage() {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
@@ -73,7 +81,7 @@ export default async function AccountPage() {
             <div className="grid gap-2 text-sm">
               <p>
                 Forfait <strong>{planName}</strong>
-                {subscription.billing === "annual" ? ", facturé à l’année" : ", facturé au mois"}.
+                {BILLED_AS[subscription.billing ?? ""] ?? ""}.
               </p>
               {periodEnd ? (
                 <p className="text-muted-foreground">
@@ -81,7 +89,9 @@ export default async function AccountPage() {
                   {periodEnd}.
                 </p>
               ) : null}
-              {subscription.provider === "mollie" && !subscription.cancel_at_period_end ? (
+              {subscription.provider === "mollie" &&
+              subscription.billing !== "lifetime" &&
+              !subscription.cancel_at_period_end ? (
                 <CancelSubscriptionButton periodEnd={periodEnd} />
               ) : null}
               {subscription.manage_url ? (

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { matchWhopPlans, parsePlanMap, type WhopPlanListing } from "@/lib/billing/match-plans";
-import { ANNUAL_MONTHS_CHARGED, BILLINGS, PLANS } from "@/lib/pricing";
+import { PLANS } from "@/lib/pricing";
 
 const listing = (
   id: string,
@@ -19,72 +19,58 @@ const listing = (
   ...extra,
 });
 
-const OWNER_PLANS = [
-  listing("plan_b_m", 9.99, 30),
-  listing("plan_p_m", 14.99, 30),
-  listing("plan_x_m", 19.99, 30),
-  listing("plan_b_y", 99.9, 365),
-  listing("plan_p_y", 149.9, 365),
-  listing("plan_x_y", 199.9, 365),
-];
+// The renewing plans of C113; the plan paid once is sold on Mollie only.
+const RENEWING = PLANS.filter((plan) => plan.billing !== "lifetime");
+const OWNER_PLANS = [listing("plan_1m", 19.9, 30), listing("plan_3m", 29.9, 90)];
 
 const match = (listings: WhopPlanListing[], explicit?: Record<string, string>) =>
-  matchWhopPlans({
-    plans: PLANS,
-    billings: BILLINGS,
-    annualMonths: ANNUAL_MONTHS_CHARGED,
-    listings,
-    explicit,
-  });
+  matchWhopPlans({ plans: RENEWING, listings, explicit });
 
 describe("matchWhopPlans", () => {
   it("ignores a retired plan that still carries its old memberships", () => {
-    // Real case of 12 September 2026: a plan that had sold a membership cannot change
-    // price, so it was hidden and replaced by an identical one. Both are still listed.
     const result = match([
       ...OWNER_PLANS,
-      listing("plan_p_y_old", 149.9, 365, { visibility: "hidden" }),
+      listing("plan_3m_old", 29.9, 90, { visibility: "hidden" }),
     ]);
     expect(result.ambiguous).toEqual([]);
     expect(result.missing).toEqual([]);
-    expect(
-      result.links.find((l) => l.plan === "plus" && l.billing === "annual")?.providerPlanId,
-    ).toBe("plan_p_y");
+    expect(result.links.find((l) => l.plan === "plus")?.providerPlanId).toBe("plan_3m");
   });
 
-  it("links the owner's six plans by period and price", () => {
+  it("links 1 mois and 3 mois by period and price (C113)", () => {
     const result = match(OWNER_PLANS);
     expect(result.missing).toEqual([]);
-    expect(result.ambiguous).toEqual([]);
-    expect(result.links).toContainEqual({
-      plan: "plus",
-      billing: "annual",
-      providerPlanId: "plan_p_y",
-      priceCents: 14990,
+    expect(result.links).toEqual([
+      { plan: "basic", billing: "monthly", providerPlanId: "plan_1m", priceCents: 1990 },
+      { plan: "plus", billing: "quarterly", providerPlanId: "plan_3m", priceCents: 2990 },
+    ]);
+  });
+
+  it("never links the lifetime plan on Whop", () => {
+    const result = matchWhopPlans({
+      plans: PLANS,
+      listings: [...OWNER_PLANS, listing("plan_life", 120, 0, { plan_type: "one_time" })],
     });
-    expect(result.links).toHaveLength(6);
+    expect(result.missing).toEqual(["premium:lifetime"]);
   });
 
   it("reports plans with another price, period or currency instead of guessing", () => {
     const result = match([
-      listing("plan_b_m", 9.99, 30),
-      listing("plan_p_m", 12.99, 30),
-      listing("plan_x_m", 19.99, 7),
-      listing("plan_usd", 99.9, 365, { currency: "usd" }),
+      listing("plan_1m", 19.9, 30),
+      listing("plan_3m_wrong", 29.9, 30),
+      listing("plan_usd", 29.9, 90, { currency: "usd" }),
     ]);
-    expect(result.links.map((link) => link.providerPlanId)).toEqual(["plan_b_m"]);
-    expect(result.missing).toContain("plus:monthly");
-    expect(result.missing).toContain("premium:monthly");
-    expect(result.missing).toContain("basic:annual");
+    expect(result.links.map((link) => link.providerPlanId)).toEqual(["plan_1m"]);
+    expect(result.missing).toEqual(["plus:quarterly"]);
   });
 
   it("flags two plans at the same price and lets explicit ids decide", () => {
-    const twins = [...OWNER_PLANS, listing("plan_b_m2", 9.99, 30)];
+    const twins = [...OWNER_PLANS, listing("plan_1m_b", 19.9, 30)];
     expect(match(twins).ambiguous).toEqual(["basic:monthly"]);
-    const forced = match(twins, { "basic:monthly": "plan_b_m2" });
+    const forced = match(twins, { "basic:monthly": "plan_1m_b" });
     expect(forced.ambiguous).toEqual([]);
     expect(forced.links).toContainEqual(
-      expect.objectContaining({ plan: "basic", billing: "monthly", providerPlanId: "plan_b_m2" }),
+      expect.objectContaining({ plan: "basic", billing: "monthly", providerPlanId: "plan_1m_b" }),
     );
   });
 });

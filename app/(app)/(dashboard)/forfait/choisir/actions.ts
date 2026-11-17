@@ -15,12 +15,12 @@ import { startMollieCheckout } from "@/lib/billing/mollie-billing";
 import { createWhopClient } from "@/lib/billing/whop";
 import { billingProvider, getPublicEnv } from "@/lib/env";
 import { logger } from "@/lib/logger";
-import { BILLINGS, PLAN_IDS } from "@/lib/pricing";
+import { findPlan, PLAN_IDS } from "@/lib/pricing";
 import { allowAction } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-const ChoiceSchema = z.object({ plan: z.enum(PLAN_IDS), billing: z.enum(BILLINGS) });
+const ChoiceSchema = z.object({ plan: z.enum(PLAN_IDS) });
 const UNAVAILABLE = "/forfait/choisir?paiement=indisponible";
 
 /**
@@ -28,12 +28,11 @@ const UNAVAILABLE = "/forfait/choisir?paiement=indisponible";
  * Mollie or Whop. Until one of them is configured, access stays open and the student goes to the offers.
  */
 export async function choosePlan(formData: FormData): Promise<void> {
-  const parsed = ChoiceSchema.safeParse({
-    plan: formData.get("plan"),
-    billing: formData.get("billing"),
-  });
+  const parsed = ChoiceSchema.safeParse({ plan: formData.get("plan") });
   if (!parsed.success) redirect("/forfait/choisir");
-  const { plan, billing } = parsed.data;
+  const { plan } = parsed.data;
+  // Each plan has one billing since C113: 1 mois monthly, 3 mois quarterly, À vie once.
+  const billing = findPlan(plan)?.billing ?? "monthly";
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
   const admin = createAdminClient();

@@ -96,8 +96,12 @@ export function createMollieClient(options: MollieClientOptions = optionsFromEnv
       return data;
     },
 
-    /** The checkout the student pays in person: it creates the mandate for the renewals. */
+    /**
+     * The checkout the student pays in person. "first" creates the mandate for the
+     * renewals; "oneoff" is a single charge, for the plan paid once (C113).
+     */
     async createFirstPayment(input: {
+      sequenceType?: "first" | "oneoff";
       customerId: string;
       amountCents: number;
       description: string;
@@ -115,7 +119,7 @@ export function createMollieClient(options: MollieClientOptions = optionsFromEnv
           redirectUrl: input.redirectUrl,
           webhookUrl: input.webhookUrl,
           customerId: check(CUSTOMER_ID, input.customerId, "customerId"),
-          sequenceType: "first",
+          sequenceType: input.sequenceType ?? "first",
           locale: "fr_FR",
           metadata: input.metadata,
         },

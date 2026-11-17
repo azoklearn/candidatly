@@ -40,7 +40,7 @@ function questions(preview: ReactNode): Question[] {
     {
       question: "Je peux arrêter quand je veux ?",
       answer:
-        "Oui. Tu arrêtes ton abonnement depuis ta page Compte, en deux clics, et tu gardes l’accès jusqu’à la fin de la période déjà payée. En mensuel, c’est un mois au maximum.",
+        "Oui. Tu arrêtes ton abonnement depuis ta page Compte, en deux clics, et tu gardes l’accès jusqu’à la fin de la période déjà payée. Avec À vie, il n’y a rien à arrêter : tu paies une fois et c’est tout.",
     },
     { question: "Combien d’offres je vais voir ?", answer: preview },
     {
@@ -55,7 +55,13 @@ function questions(preview: ReactNode): Question[] {
     },
     {
       question: "Et si je trouve mon alternance ?",
-      answer: "Tu arrêtes ton abonnement. C’est exactement le but du produit.",
+      answer:
+        "Tu arrêtes ton abonnement. C’est exactement le but du produit. Avec À vie, ton accès reste ouvert pour ta prochaine recherche.",
+    },
+    {
+      question: "Quelle différence entre les forfaits ?",
+      answer:
+        "1 mois te montre les offres et les entreprises qui recrutent. 3 mois ajoute ta lettre adaptée à chaque entreprise, ta candidature prête et le suivi des réponses. À vie donne tout, sans limite de recherches, pour un seul paiement.",
     },
   ];
 }

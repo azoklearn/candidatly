@@ -1,13 +1,16 @@
 import { logger as defaultLogger, type Logger } from "@/lib/logger";
 import type { Db } from "@/lib/offers/sync";
-import { ANNUAL_MONTHS_CHARGED, PLANS, type Billing, type PlanId } from "@/lib/pricing";
+import { findPlan, type Billing, type PlanId } from "@/lib/pricing";
 
 import type { WhopClient } from "./whop";
 
-/** Price the page displays for a plan, in cents. */
+/**
+ * Price the page displays for a plan, in cents. A billing the plan is not sold with gives
+ * 0, which no checkout or payment can match (C113).
+ */
 export function expectedPriceCents(plan: PlanId, billing: Billing): number {
-  const monthly = PLANS.find((candidate) => candidate.id === plan)?.monthlyCents ?? 0;
-  return billing === "monthly" ? monthly : monthly * ANNUAL_MONTHS_CHARGED;
+  const found = findPlan(plan);
+  return found && found.billing === billing ? found.priceCents : 0;
 }
 
 /**
@@ -24,6 +27,11 @@ export async function startWhopCheckout(options: {
   logger?: Logger;
 }): Promise<string | null> {
   const log = (options.logger ?? defaultLogger).child({ area: "billing", plan: options.plan });
+  // The plan paid once is sold on Mollie only (C113).
+  if (options.billing === "lifetime") {
+    log.error("whop_lifetime_unsupported");
+    return null;
+  }
   const row = await options.db
     .from("billing_plans")
     .select("provider_plan_id, price_cents")

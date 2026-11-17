@@ -3,7 +3,14 @@ import { z } from "zod";
 import { DatabaseError } from "@/lib/errors";
 import { logger as defaultLogger, type Logger } from "@/lib/logger";
 import type { Db } from "@/lib/offers/sync";
-import { BILLINGS, PLAN_IDS, PLANS, type Billing, type PlanId } from "@/lib/pricing";
+import {
+  BILLINGS,
+  billingMonths,
+  findPlan,
+  PLAN_IDS,
+  type Billing,
+  type PlanId,
+} from "@/lib/pricing";
 
 import { expectedPriceCents } from "./checkout";
 import { toMollieAmount, type MollieClient, type MollieSubscription } from "./mollie";
@@ -12,11 +19,13 @@ import { toMollieAmount, type MollieClient, type MollieSubscription } from "./mo
  * Subscriptions on Mollie (docs/QUESTIONS.md C109). Mollie has no hosted subscription
  * page: the student pays the first period in a normal checkout, which gives a mandate;
  * the webhook then creates the subscription that renews it, starting one period later.
- * Every later charge comes back through the same webhook.
+ * Every later charge comes back through the same webhook. The plan paid once ("À vie",
+ * C113) is a single "oneoff" payment: no mandate, no subscription, access without an end.
  */
 
-export const MOLLIE_INTERVAL: Record<Billing, string> = {
+export const MOLLIE_INTERVAL: Record<Exclude<Billing, "lifetime">, string> = {
   monthly: "1 month",
+  quarterly: "3 months",
   annual: "12 months",
 };
 
@@ -27,8 +36,8 @@ const CheckoutMetadataSchema = z.object({
 });
 
 /** Same day one period later, in UTC; the 31st of a short month falls on its last day. */
-export function addPeriod(from: Date, billing: Billing): Date {
-  const months = billing === "monthly" ? 1 : 12;
+export function addPeriod(from: Date, billing: Exclude<Billing, "lifetime">): Date {
+  const months = billingMonths(billing) ?? 1;
   const target = new Date(
     Date.UTC(from.getUTCFullYear(), from.getUTCMonth() + months, 1, 12, 0, 0),
   );
@@ -47,9 +56,8 @@ function dateOnlyToIso(value: string | null | undefined): string | null {
   return `${value}T12:00:00.000Z`;
 }
 
-export function planLabel(plan: PlanId, billing: Billing): string {
-  const name = PLANS.find((candidate) => candidate.id === plan)?.name ?? plan;
-  return `JobGPT ${name} ${billing === "monthly" ? "mensuel" : "annuel"}`;
+export function planLabel(plan: PlanId): string {
+  return `JobGPT ${findPlan(plan)?.name ?? plan}`;
 }
 
 type SubscriptionWrite = {
@@ -108,9 +116,10 @@ export async function startMollieCheckout(options: {
       known.data?.provider_customer_id ??
       (await options.mollie.createCustomer({ user_id: options.userId })).id;
     const payment = await options.mollie.createFirstPayment({
+      sequenceType: options.billing === "lifetime" ? "oneoff" : "first",
       customerId,
       amountCents: expectedPriceCents(options.plan, options.billing),
-      description: planLabel(options.plan, options.billing),
+      description: planLabel(options.plan),
       redirectUrl: options.returnUrl,
       webhookUrl: options.webhookUrl,
       metadata: { user_id: options.userId, plan: options.plan, billing: options.billing },
@@ -221,16 +230,42 @@ export async function handleMolliePayment(options: {
     return { kind: "ignored", reason: `renewal_${payment.status}` };
   }
 
-  // The first payment, made in person: it opens the plan and starts the renewals.
-  if (payment.sequenceType !== "first") return { kind: "ignored", reason: "not_first" };
+  // The first payment, made in person: it opens the plan and starts the renewals. The plan
+  // paid once comes as a "oneoff" payment and opens access without an end (C113).
+  const oneoff = payment.sequenceType === "oneoff";
+  if (payment.sequenceType !== "first" && !oneoff) return { kind: "ignored", reason: "not_first" };
   if (payment.status !== "paid") return { kind: "ignored", reason: `first_${payment.status}` };
   const metadata = CheckoutMetadataSchema.safeParse(payment.metadata ?? {});
   if (!metadata.success) return { kind: "ignored", reason: "payment_not_linked" };
   const { user_id, plan, billing } = metadata.data;
+  if (oneoff !== (billing === "lifetime")) return { kind: "ignored", reason: "sequence_mismatch" };
   const amountCents = expectedPriceCents(plan, billing);
-  if (payment.amount.value !== toMollieAmount(amountCents).value) {
+  if (amountCents === 0 || payment.amount.value !== toMollieAmount(amountCents).value) {
     log.error("mollie_amount_mismatch", { plan, billing });
     return { kind: "ignored", reason: "amount_mismatch" };
+  }
+
+  if (billing === "lifetime") {
+    // Keyed on the payment: a webhook delivered twice writes the same row.
+    const stored = await upsertSubscription(
+      options.db,
+      {
+        user_id,
+        provider: "mollie",
+        provider_subscription_id: payment.id,
+        provider_customer_id: customerId,
+        plan,
+        billing,
+        status: "active",
+        current_period_end: null,
+        cancel_at_period_end: false,
+        manage_url: null,
+      },
+      log,
+    );
+    if (!stored) return { kind: "ignored", reason: "user_missing" };
+    log.info("mollie_lifetime_activated", { plan });
+    return { kind: "activated", plan, billing };
   }
 
   // A webhook delivered twice must not start two subscriptions, hence two charges.
@@ -247,7 +282,7 @@ export async function handleMolliePayment(options: {
       interval: MOLLIE_INTERVAL[billing],
       startDate,
       // Unique per customer, as Mollie requires.
-      description: `${planLabel(plan, billing)} · ${payment.id}`,
+      description: `${planLabel(plan)} · ${payment.id}`,
       webhookUrl: options.webhookUrl,
       metadata: { user_id, plan, billing, first_payment_id: payment.id },
     }));
@@ -288,6 +323,7 @@ export async function cancelMollieSubscriptions(options: {
     .select("provider_subscription_id, provider_customer_id")
     .eq("user_id", options.userId)
     .eq("provider", "mollie")
+    .neq("billing", "lifetime")
     .in("status", ["active", "past_due"]);
   if (rows.error) throw new DatabaseError("subscriptions.select", rows.error);
   let stopped = 0;

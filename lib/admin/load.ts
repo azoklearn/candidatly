@@ -88,7 +88,7 @@ export async function loadAdminData(): Promise<AdminData> {
       .limit(PROFILE_LIMIT),
     supabase
       .from("subscriptions")
-      .select("user_id, plan, billing, status, current_period_end, cancel_at_period_end")
+      .select("user_id, provider, plan, billing, status, current_period_end, cancel_at_period_end")
       .order("updated_at", { ascending: false }),
     supabase
       .from("applications")

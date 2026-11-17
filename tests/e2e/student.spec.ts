@@ -78,7 +78,7 @@ test("a student prepares, sends and tracks an application, then exports their da
   await expect(recap.getByText("Bac+3")).toBeVisible();
   await expect(page.getByRole("heading", { name: /Ce qu’on tient, noir sur blanc/ })).toBeVisible();
   await expect(page.getByText("Je peux arrêter quand je veux ?")).toBeVisible();
-  await page.getByRole("button", { name: "Choisir Plus" }).click();
+  await page.getByRole("button", { name: "Choisir 3 mois" }).click();
   await expect(page).toHaveURL(/\/offers$/);
 
   const response = await page.request.get("/api/account/export");
@@ -86,8 +86,8 @@ test("a student prepares, sends and tracks an application, then exports their da
   const data = await response.json();
   expect(data.profile.first_name).toBe("Camille");
   expect(data.profile.chosen_plan).toBe("plus");
-  // The plans open on annual billing, so that is what the choice records.
-  expect(data.profile.chosen_billing).toBe("annual");
+  // Each plan has its own billing: 3 mois renews every three months (C113).
+  expect(data.profile.chosen_billing).toBe("quarterly");
   expect(data.applications).toHaveLength(1);
   expect(data.applications[0].status).toBe("replied_positive");
 });

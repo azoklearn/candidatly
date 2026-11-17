@@ -28,6 +28,7 @@ function fakeDb(stored: Record<string, unknown> | Record<string, unknown>[] | nu
     select: () => chain,
     eq: () => chain,
     not: () => chain,
+    neq: () => chain,
     in: () => chain,
     limit: () => chain,
     maybeSingle: async () => ({
@@ -51,12 +52,12 @@ function fakeDb(stored: Record<string, unknown> | Record<string, unknown>[] | nu
 const payment = (overrides: Partial<MolliePayment> = {}): MolliePayment => ({
   id: "tr_first1",
   status: "paid",
-  amount: { currency: "EUR", value: "14.99" },
+  amount: { currency: "EUR", value: "29.90" },
   sequenceType: "first",
   customerId: "cst_abc123",
   mandateId: "mdt_abc123",
   subscriptionId: null,
-  metadata: { user_id: USER, plan: "plus", billing: "monthly" },
+  metadata: { user_id: USER, plan: "plus", billing: "quarterly" },
   ...overrides,
 });
 
@@ -144,6 +145,7 @@ describe("Mollie client", () => {
 describe("addPeriod", () => {
   it("lands on the same day one period later", () => {
     expect(toDateOnly(addPeriod(NOW, "monthly"))).toBe("2026-12-12");
+    expect(toDateOnly(addPeriod(NOW, "quarterly"))).toBe("2027-02-12");
     expect(toDateOnly(addPeriod(NOW, "annual"))).toBe("2027-11-12");
   });
 
@@ -165,8 +167,8 @@ describe("startMollieCheckout", () => {
       db: fakeDb(null).db,
       mollie,
       userId: USER,
-      plan: "premium",
-      billing: "annual",
+      plan: "plus",
+      billing: "quarterly",
       returnUrl: "https://www.gptjob.io/forfait/merci",
       webhookUrl: HOOK,
       logger: silent,
@@ -174,7 +176,35 @@ describe("startMollieCheckout", () => {
     expect(url).toBe("https://www.mollie.com/checkout/x");
     expect(mollie.createCustomer).toHaveBeenCalledWith({ user_id: USER });
     expect(mollie.createFirstPayment).toHaveBeenCalledWith(
-      expect.objectContaining({ customerId: "cst_new1", amountCents: 19990, webhookUrl: HOOK }),
+      expect.objectContaining({
+        sequenceType: "first",
+        customerId: "cst_new1",
+        amountCents: 2990,
+        description: "JobGPT 3 mois",
+        webhookUrl: HOOK,
+      }),
+    );
+  });
+
+  it("charges the lifetime plan once, without a mandate (C113)", async () => {
+    const mollie = {
+      createCustomer: vi.fn().mockResolvedValue({ id: "cst_new1" }),
+      createFirstPayment: vi
+        .fn()
+        .mockResolvedValue({ id: "tr_1", checkoutUrl: "https://www.mollie.com/checkout/x" }),
+    };
+    await startMollieCheckout({
+      db: fakeDb(null).db,
+      mollie,
+      userId: USER,
+      plan: "premium",
+      billing: "lifetime",
+      returnUrl: "https://www.gptjob.io/forfait/merci",
+      webhookUrl: HOOK,
+      logger: silent,
+    });
+    expect(mollie.createFirstPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ sequenceType: "oneoff", amountCents: 12000 }),
     );
   });
 
@@ -222,18 +252,18 @@ describe("handleMolliePayment", () => {
       now: NOW,
       logger: silent,
     });
-    expect(outcome).toEqual({ kind: "activated", plan: "plus", billing: "monthly" });
+    expect(outcome).toEqual({ kind: "activated", plan: "plus", billing: "quarterly" });
     expect(mollie.createSubscription).toHaveBeenCalledWith(
       expect.objectContaining({
         customerId: "cst_abc123",
         mandateId: "mdt_abc123",
-        amountCents: 1499,
-        interval: "1 month",
-        startDate: "2026-12-12",
+        amountCents: 2990,
+        interval: "3 months",
+        startDate: "2027-02-12",
         metadata: {
           user_id: USER,
           plan: "plus",
-          billing: "monthly",
+          billing: "quarterly",
           first_payment_id: "tr_first1",
         },
       }),
@@ -245,6 +275,58 @@ describe("handleMolliePayment", () => {
       status: "active",
       current_period_end: "2026-12-12T12:00:00.000Z",
     });
+  });
+
+  it("opens the lifetime plan from a one-off payment, without any renewal (C113)", async () => {
+    const mollie = client(
+      payment({
+        id: "tr_life1",
+        sequenceType: "oneoff",
+        mandateId: null,
+        amount: { currency: "EUR", value: "120.00" },
+        metadata: { user_id: USER, plan: "premium", billing: "lifetime" },
+      }),
+    );
+    const { db, writes } = fakeDb();
+    const outcome = await handleMolliePayment({
+      db,
+      mollie,
+      paymentId: "tr_life1",
+      webhookUrl: HOOK,
+      now: NOW,
+      logger: silent,
+    });
+    expect(outcome).toEqual({ kind: "activated", plan: "premium", billing: "lifetime" });
+    expect(mollie.createSubscription).not.toHaveBeenCalled();
+    expect(writes[0]?.value).toMatchObject({
+      provider_subscription_id: "tr_life1",
+      plan: "premium",
+      billing: "lifetime",
+      status: "active",
+      current_period_end: null,
+    });
+  });
+
+  it("refuses a one-off payment for a renewing plan, and the reverse", async () => {
+    for (const paid of [
+      payment({ sequenceType: "oneoff" }),
+      payment({
+        amount: { currency: "EUR", value: "120.00" },
+        metadata: { user_id: USER, plan: "premium", billing: "lifetime" },
+      }),
+    ]) {
+      const { db, writes } = fakeDb();
+      const outcome = await handleMolliePayment({
+        db,
+        mollie: client(paid),
+        paymentId: paid.id,
+        webhookUrl: HOOK,
+        now: NOW,
+        logger: silent,
+      });
+      expect(outcome).toEqual({ kind: "ignored", reason: "sequence_mismatch" });
+      expect(writes).toHaveLength(0);
+    }
   });
 
   it("never starts a second subscription when the webhook comes twice", async () => {
@@ -300,7 +382,12 @@ describe("handleMolliePayment", () => {
       id: "sub_new1",
       status: subscriptionStatus,
       nextPaymentDate: "2027-01-12",
-      metadata: { user_id: USER, plan: "plus", billing: "monthly", first_payment_id: "tr_first1" },
+      metadata: {
+        user_id: USER,
+        plan: "plus",
+        billing: "quarterly",
+        first_payment_id: "tr_first1",
+      },
     }),
   });
   const run = (mollie: ReturnType<typeof renewal>, stored: Record<string, unknown> | null) => {

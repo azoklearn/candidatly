@@ -1,12 +1,8 @@
-<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Symbole JobGPT">
-  <defs>
-    <linearGradient id="mark" x1="11" y1="7" x2="66" y2="74" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#1764D8"/>
-      <stop offset="1" stop-color="#0A2A52"/>
-    </linearGradient>
-  </defs>
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Symbole gptjob.io">
+  <!-- Same mark as the header (C113): espresso tile with a sharp bottom-left corner, peach J. -->
   <g transform="rotate(-6 40 40)">
-    <rect x="8" y="8" width="64" height="64" rx="22" ry="22" fill="url(#mark)"/>
-    <path d="M46.5 21v27.5c0 6.9-5.2 11.5-12.6 11.5-5.3 0-9.6-2.3-11.9-6.3l7.1-4.3c1 1.9 2.6 3 4.7 3 2.6 0 4.2-1.7 4.2-4.6V21h8.5Z" fill="#BCD4FF"/>
+    <path d="M30 8h20c12.15 0 22 9.85 22 22v20c0 12.15-9.85 22-22 22H14a6 6 0 0 1-6-6V30C8 17.85 17.85 8 30 8Z" fill="#3B251A"/>
+    <path d="M47.5 20v28.5c0 7.2-5.4 12-13.1 12-5.5 0-10-2.4-12.4-6.6l7.4-4.5c1 2 2.7 3.1 4.9 3.1 2.7 0 4.4-1.8 4.4-4.8V20h8.8Z" fill="#FFB08C"/>
+    <circle cx="58" cy="57" r="4.5" fill="#D64A18"/>
   </g>
 </svg>

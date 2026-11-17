@@ -102,9 +102,9 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
 
       <PricingTable badge={featuredBadge(counts)} choose={choosePlan} />
       <p className="mx-auto -mt-6 max-w-2xl text-center text-xs text-muted-foreground">
-        Paiement sécurisé par {billingProvider() === "mollie" ? "Mollie" : "Whop"}. En formule
-        annuelle, le prix barré est le prix du même forfait payé au mois. Les fonctions marquées «
-        Bientôt » ne sont pas encore disponibles.
+        Paiement sécurisé par {billingProvider() === "mollie" ? "Mollie" : "Whop"}. 1 mois et 3 mois
+        se renouvellent tout seuls et s’arrêtent en deux clics depuis ton compte ; À vie se paie une
+        seule fois. Les fonctions marquées « Bientôt » ne sont pas encore disponibles.
       </p>
 
       {chips.length > 0 ? (

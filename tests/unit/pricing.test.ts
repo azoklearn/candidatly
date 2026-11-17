@@ -3,11 +3,10 @@ import { describe, expect, it } from "vitest";
 import { searchSummary } from "@/lib/offers/search-summary";
 import {
   PLANS,
-  annualCents,
-  annualSavingsCents,
   featuredBadge,
   formatEuros,
   priceView,
+  savingsCents,
   type Plan,
 } from "@/lib/pricing";
 
@@ -16,41 +15,53 @@ const plan = (id: string): Plan => {
   if (!found) throw new Error(id);
   return found;
 };
-const text = (cents: number) => formatEuros(cents).replace(/\s/g, " ");
+const text = (value: string | null) => value?.replace(/\s/g, " ") ?? null;
 
-describe("prices", () => {
-  it("keeps the owner's monthly prices, with two free months a year", () => {
-    expect(PLANS.map((p) => p.monthlyCents)).toEqual([999, 1499, 1999]);
-    expect(PLANS.map(annualCents)).toEqual([9990, 14990, 19990]);
+describe("prices (C113)", () => {
+  it("keeps the owner's prices: 1 mois, 3 mois and À vie", () => {
+    expect(PLANS.map((p) => [p.name, p.billing, p.priceCents])).toEqual([
+      ["1 mois", "monthly", 1990],
+      ["3 mois", "quarterly", 2990],
+      ["À vie", "lifetime", 12000],
+    ]);
   });
 
-  it("shows the monthly price and its price per day", () => {
-    expect(priceView(plan("plus"), "monthly")).toEqual({
-      mainCents: 1499,
-      struckCents: null,
-      perDayCents: 50,
-      billedLabel: null,
-    });
-    expect(priceView(plan("basic"), "monthly").perDayCents).toBe(33);
+  it("shows the monthly plan with its price per day", () => {
+    const view = priceView(plan("basic"));
+    expect(view).toMatchObject({ mainCents: 1990, unit: "/mois", perMonthLabel: null });
+    expect(text(view.perDayLabel)).toBe("soit 0,66 € par jour");
+    expect(view.savingLabel).toBeNull();
   });
 
-  it("says in euros what the annual formula keeps, for each plan", () => {
-    expect(PLANS.map(annualSavingsCents)).toEqual([1998, 2998, 3998]);
-    PLANS.forEach((p) => expect(annualCents(p) + annualSavingsCents(p)).toBe(p.monthlyCents * 12));
+  it("brings the 3 months plan back to a month and says what it saves", () => {
+    const view = priceView(plan("plus"));
+    expect(view).toMatchObject({ mainCents: 2990, unit: "/3 mois" });
+    expect(text(view.perMonthLabel)).toBe("soit 9,97 € par mois");
+    expect(savingsCents(plan("plus"))).toBe(3 * 1990 - 2990);
+    expect(text(view.savingLabel)).toBe("29,80 € de moins que 3 mois au mois");
+    expect(view.billedLabel).toBe("renouvelé tous les 3 mois, sans engagement");
+  });
+
+  it("charges the lifetime plan once, without a renewal", () => {
+    const view = priceView(plan("premium"));
+    expect(view).toMatchObject({ mainCents: 12000, unit: "une fois", perDayLabel: null });
+    expect(text(formatEuros(view.mainCents))).toBe("120,00 €");
+    expect(view.billedLabel).toMatch(/un seul paiement/);
+  });
+
+  it("adds features from one plan to the next", () => {
+    expect(plan("plus").features[0]?.label).toBe("Tout le forfait 1 mois");
+    expect(plan("premium").features[0]?.label).toBe("Tout le forfait 3 mois");
+    expect(
+      plan("basic")
+        .features.map((f) => f.label)
+        .join(" "),
+    ).not.toMatch(/lettre/i);
   });
 
   it('speaks to the student with "tu", like the rest of the funnel', () => {
     const copy = PLANS.flatMap((p) => [p.tagline, ...p.features.map((f) => f.label)]).join(" ");
     expect(copy).not.toMatch(/\bvotre\b|\bvos\b|\bvous\b/i);
-  });
-
-  it("strikes the real monthly price next to the annual price per month", () => {
-    const view = priceView(plan("plus"), "annual");
-    expect(view.mainCents).toBe(1249);
-    expect(view.struckCents).toBe(1499);
-    expect(view.perDayCents).toBe(41);
-    expect(view.billedLabel?.replace(/\s/g, " ")).toBe("facturé 149,90 € par an");
-    expect(text(priceView(plan("premium"), "annual").mainCents)).toBe("16,66 €");
   });
 });
 

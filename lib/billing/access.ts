@@ -71,12 +71,12 @@ export function resolveAccess(input: {
   };
 }
 
-/** The tailored letter comes with the Plus and Premium plans. */
+/** The tailored letter comes with the 3 mois and À vie plans (ids plus and premium, C113). */
 export function canPrepareLetters(access: Access): boolean {
   return access.plan !== null && PLAN_RANK[access.plan] >= PLAN_RANK.plus;
 }
 
-/** Daily search quota of the plan (C82): 3 for Basic, 10 for Plus, none for Premium. */
+/** Daily search quota of the plan (C82): 3 for 1 mois, 10 for 3 mois, none for À vie (C113). */
 export function dailySearchAction(access: Access): RateLimitedAction | null {
   if (access.plan === "basic") return "refresh_offers_basic";
   if (access.plan === "plus") return "refresh_offers_plus";

@@ -21,10 +21,11 @@ test("the landing page and the legal pages are public", async ({ page }) => {
     page.getByRole("heading", { level: 1, name: "Un forfait pour chaque recherche" }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: /^Choisir / })).toHaveCount(3);
-  // Annual is shown first with its struck monthly price; monthly is one click away.
-  await expect(page.getByText("soit 0,41 € par jour")).toBeVisible();
-  await page.getByRole("radio", { name: "Mensuel" }).click();
-  await expect(page.getByText("soit 0,50 € par jour")).toBeVisible();
+  // 1 mois, 3 mois and À vie side by side, no billing switch (C113).
+  await expect(page.getByText("soit 0,66 € par jour")).toBeVisible();
+  await expect(page.getByText("soit 9,97 € par mois")).toBeVisible();
+  await expect(page.getByText("un seul paiement, accès pour toujours")).toBeVisible();
+  await expect(page.getByRole("radio")).toHaveCount(0);
   for (const [path, title] of [
     ["/mentions-legales", "Mentions légales"],
     ["/confidentialite", "Politique de confidentialité"],

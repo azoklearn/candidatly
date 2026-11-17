@@ -11,7 +11,7 @@ import { appendFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 
 import { matchWhopPlans, parsePlanMap, type WhopPlanListing } from "../lib/billing/match-plans.ts";
-import { ANNUAL_MONTHS_CHARGED, BILLINGS, PLANS } from "../lib/pricing.ts";
+import { PLANS } from "../lib/pricing.ts";
 import type { Database } from "../lib/supabase/database.types.ts";
 
 const option = (name: string) =>
@@ -91,9 +91,8 @@ async function main() {
   }
 
   const result = matchWhopPlans({
-    plans: PLANS,
-    billings: BILLINGS,
-    annualMonths: ANNUAL_MONTHS_CHARGED,
+    // The plan paid once is sold on Mollie only (C113).
+    plans: PLANS.filter((plan) => plan.billing !== "lifetime"),
     listings,
     explicit: parsePlanMap(option("map")),
   });

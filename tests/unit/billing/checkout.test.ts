@@ -23,10 +23,13 @@ const whop = (url = "https://whop.com/checkout/ch_1/") => ({
 });
 
 describe("expectedPriceCents", () => {
-  it("follows the displayed prices, ten months for a year", () => {
-    expect(expectedPriceCents("basic", "monthly")).toBe(999);
-    expect(expectedPriceCents("plus", "monthly")).toBe(1499);
-    expect(expectedPriceCents("premium", "annual")).toBe(19990);
+  it("follows the displayed prices, one billing per plan (C113)", () => {
+    expect(expectedPriceCents("basic", "monthly")).toBe(1990);
+    expect(expectedPriceCents("plus", "quarterly")).toBe(2990);
+    expect(expectedPriceCents("premium", "lifetime")).toBe(12000);
+    // A billing the plan is not sold with matches no payment.
+    expect(expectedPriceCents("plus", "monthly")).toBe(0);
+    expect(expectedPriceCents("premium", "annual")).toBe(0);
   });
 });
 
@@ -34,18 +37,18 @@ describe("startWhopCheckout", () => {
   it("opens the checkout of the linked plan", async () => {
     const client = whop();
     const url = await startWhopCheckout({
-      db: fakeDb({ provider_plan_id: "plan_plus_month", price_cents: 1499 }),
+      db: fakeDb({ provider_plan_id: "plan_plus_3m", price_cents: 2990 }),
       whop: client,
       userId: USER,
       plan: "plus",
-      billing: "monthly",
+      billing: "quarterly",
       returnUrl: "https://www.gptjob.io/forfait/merci",
       logger: silent,
     });
     expect(url).toBe("https://whop.com/checkout/ch_1/");
     expect(client.createCheckout).toHaveBeenCalledWith({
-      planId: "plan_plus_month",
-      metadata: { user_id: USER, plan: "plus", billing: "monthly" },
+      planId: "plan_plus_3m",
+      metadata: { user_id: USER, plan: "plus", billing: "quarterly" },
       redirectUrl: "https://www.gptjob.io/forfait/merci",
     });
   });
@@ -58,6 +61,21 @@ describe("startWhopCheckout", () => {
       userId: USER,
       plan: "plus",
       billing: "monthly",
+      returnUrl: "https://www.gptjob.io/forfait/merci",
+      logger: silent,
+    });
+    expect(url).toBeNull();
+    expect(client.createCheckout).not.toHaveBeenCalled();
+  });
+
+  it("never sells the lifetime plan on Whop (C113)", async () => {
+    const client = whop();
+    const url = await startWhopCheckout({
+      db: fakeDb({ provider_plan_id: "plan_life", price_cents: 12000 }),
+      whop: client,
+      userId: USER,
+      plan: "premium",
+      billing: "lifetime",
       returnUrl: "https://www.gptjob.io/forfait/merci",
       logger: silent,
     });
