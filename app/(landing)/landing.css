@@ -290,6 +290,23 @@ html:has(.lp) {
   white-space: nowrap;
   color: var(--coral);
 }
+/*
+ * The typed word keeps the room of the longest one: an invisible copy of it sizes the box,
+ * and the letters are written over it from the left. Nothing around it moves.
+ */
+.lp .typed {
+  display: inline-grid;
+  text-align: left;
+}
+.lp .typed::before {
+  content: attr(data-longest);
+  grid-area: 1 / 1;
+  padding-right: 0.12em;
+  visibility: hidden;
+}
+.lp .typed > span {
+  grid-area: 1 / 1;
+}
 /* Caret of the headline word being typed (components/rotating-word.tsx). */
 .lp .typed-caret {
   display: inline-block;

@@ -7,8 +7,13 @@ test("the landing page and the legal pages are public", async ({ page }) => {
   // The headline types "alternance", erases it and types "stage", over and over. The
   // check targets the animated span: the sibling text is there for screen readers.
   const typed = headline.locator("[aria-hidden='true']");
-  await expect(typed).toHaveText("stage", { timeout: 15_000 });
-  await expect(typed).toHaveText("alternance", { timeout: 15_000 });
+  await expect(typed).toHaveText("stage.", { timeout: 15_000 });
+  await expect(typed).toHaveText("alternance.", { timeout: 15_000 });
+  // The word types in a box as wide as the longest one: the headline never moves.
+  const box = headline.locator(".typed");
+  const wide = await box.boundingBox();
+  await expect(typed).toHaveText("stage.", { timeout: 15_000 });
+  expect((await box.boundingBox())?.width).toBe(wide?.width);
   // The CV is the way in; the questionnaire stays one click away (C95).
   await expect(page.getByRole("button", { name: "Analyser mon CV" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Je n’ai pas mon CV ici/ })).toBeVisible();

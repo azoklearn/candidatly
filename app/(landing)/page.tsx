@@ -92,7 +92,7 @@ export default async function HomePage({
             <br />
             on te trouve ton{" "}
             <span className="hero-word">
-              <RotatingWord words={["alternance", "stage"]} />.
+              <RotatingWord words={["alternance", "stage"]} suffix="." />
             </span>
           </h1>
 

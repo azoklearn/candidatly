@@ -6,13 +6,23 @@ import { useEffect, useState } from "react";
  * Word that erases itself letter by letter and types the next one, as if someone were at
  * the keyboard. The first word is rendered on the server, so the headline reads correctly
  * without JavaScript; screen readers get the plain list instead of the animation.
+ *
+ * The word keeps the room of the longest one (`data-longest`, sized in CSS by `.typed`), so
+ * the text around it never moves while it types. `suffix` is the punctuation that follows
+ * the word and stays glued to it.
  */
 
 const TYPE_MS = 95;
 const ERASE_MS = 55;
 const HOLD_MS = 2200;
 
-export function RotatingWord({ words }: { words: readonly [string, ...string[]] }) {
+export function RotatingWord({
+  words,
+  suffix = "",
+}: {
+  words: readonly [string, ...string[]];
+  suffix?: string;
+}) {
   const [index, setIndex] = useState(0);
   const [text, setText] = useState(words[0]);
   const [erasing, setErasing] = useState(false);
@@ -37,12 +47,19 @@ export function RotatingWord({ words }: { words: readonly [string, ...string[]] 
     return () => clearTimeout(timer);
   }, [erasing, index, text, words]);
 
+  const longest = words.reduce((a, b) => (b.length > a.length ? b : a));
   return (
     <>
-      <span className="sr-only">{words.join(" ou ")}</span>
-      <span aria-hidden="true">
-        {text}
-        <span className="typed-caret" />
+      <span className="sr-only">
+        {words.join(" ou ")}
+        {suffix}
+      </span>
+      <span className="typed" data-longest={`${longest}${suffix}`}>
+        <span aria-hidden="true">
+          {text}
+          <span className="typed-caret" />
+          {suffix}
+        </span>
       </span>
     </>
   );
