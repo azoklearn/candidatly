@@ -96,8 +96,7 @@ export default async function HomePage({
             </span>
           </h1>
           <p className="hero-copy enter" data-enter="2">
-            JobGPT lit ton CV et te sort les offres et les entreprises qui collent à ton profil,
-            près de chez toi.
+            JobGPT lit ton CV et te sort les offres qui collent à ton profil.
           </p>
 
           <div className="hero-stage">

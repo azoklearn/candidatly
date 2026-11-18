@@ -507,7 +507,7 @@ html:has(.lp) {
 }
 .lp .drop-cue-label {
   position: absolute;
-  right: -64px;
+  right: -88px;
   bottom: calc(100% - 16px);
   white-space: nowrap;
   font-family: var(--serif);
