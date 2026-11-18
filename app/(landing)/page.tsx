@@ -1,8 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BellRing,
+  BriefcaseBusiness,
+  Check,
+  Download,
+  GraduationCap,
+  Heart,
+  MapPin,
+  PenLine,
+  SlidersHorizontal,
+  Sparkles,
+} from "lucide-react";
+
 import { CvDropzone } from "@/components/cv-dropzone";
-import { DropCue, HeroProps } from "@/components/hero-props";
+import { DropCue } from "@/components/drop-cue";
 import { RotatingWord } from "@/components/rotating-word";
 import { TrackedLink } from "@/components/tracked-link";
 import { EVENTS } from "@/lib/analytics";
@@ -23,70 +38,131 @@ export default async function HomePage({
 
   return (
     <>
+      {/* The sky behind the glass: three slow lights on a fixed layer (C116). */}
+      <div className="lp-sky" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
       <div className="grain" aria-hidden="true" />
 
-      <header className="site-header lp-container">
-        <a className="brand" href="#top" aria-label="JobGPT, accueil">
-          <span className="brand-mark">J</span>
-          <span>
-            gptjob<span className="brand-tld">.io</span>
-          </span>
-        </a>
-        <nav aria-label="Navigation principale">
-          <a href="#comment-ca-marche">Comment ça marche</a>
-          <a href="#offres">Les offres</a>
-          <a href="#engagements">Nos engagements</a>
-          <Link href="/tarifs">Tarifs</Link>
-        </nav>
-        <div className="header-actions">
-          <Link className="header-login" href="/login">
-            Se connecter
-          </Link>
-          <TrackedLink
-            className="header-cta"
-            href="/onboarding/1"
-            event={EVENTS.signupClicked}
-            properties={{ emplacement: "en-tete" }}
-          >
-            Trouver mon stage/alternance <span>↗</span>
-          </TrackedLink>
+      <header className="site-header">
+        <div className="site-bar">
+          <a className="brand" href="#top" aria-label="JobGPT, accueil">
+            <span className="brand-mark">J</span>
+            <span>
+              gptjob<span className="brand-tld">.io</span>
+            </span>
+          </a>
+          <nav aria-label="Navigation principale">
+            <a href="#comment-ca-marche">Comment ça marche</a>
+            <a href="#offres">Les offres</a>
+            <a href="#engagements">Nos engagements</a>
+            <Link href="/tarifs">Tarifs</Link>
+          </nav>
+          <div className="header-actions">
+            <Link className="header-login" href="/login">
+              Se connecter
+            </Link>
+            <TrackedLink
+              className="header-cta"
+              href="/onboarding/1"
+              event={EVENTS.signupClicked}
+              properties={{ emplacement: "en-tete" }}
+            >
+              <span className="cta-long">Trouver mon stage/alternance</span>
+              <span className="cta-short" aria-hidden="true">
+                Commencer
+              </span>
+              <ArrowUpRight aria-hidden="true" />
+            </TrackedLink>
+          </div>
         </div>
       </header>
 
       <main id="top">
         <section className="hero lp-container">
-          <div className="hero-intro reveal">
-            {deleted ? (
-              <p role="status" className="deleted-notice">
-                Votre compte et vos données ont été supprimés.
-              </p>
-            ) : null}
-            <h1>
-              Dépose ton CV,
-              <br />
-              on te trouve ton{" "}
-              <span className="hero-word">
-                <RotatingWord words={["alternance", "stage"]} />.
-              </span>
-            </h1>
-            <p className="hero-copy">
-              JobGPT lit ton CV, en tire ton métier, ton niveau et ta ville, puis garde les offres
-              qui collent. Pour un stage ou un job étudiant, on te montre les entreprises de ton
-              domaine près de chez toi.
+          {deleted ? (
+            <p role="status" className="deleted-notice">
+              Votre compte et vos données ont été supprimés.
             </p>
-          </div>
-          <div className="hero-stage reveal reveal-delay">
-            <HeroProps />
-            <div className="hero-drop">
+          ) : null}
+          <h1 className="enter" data-enter="1">
+            Dépose ton CV,
+            <br />
+            on te trouve ton{" "}
+            <span className="hero-word">
+              <RotatingWord words={["alternance", "stage"]} />.
+            </span>
+          </h1>
+          <p className="hero-copy enter" data-enter="2">
+            JobGPT lit ton CV, en tire ton métier, ton niveau et ta ville, puis garde les offres qui
+            collent. Pour un stage ou un job étudiant, on te montre les entreprises de ton domaine
+            près de chez toi.
+          </p>
+
+          <div className="hero-stage">
+            <div className="hero-glow" aria-hidden="true" />
+            {/* What a CV gives us, shown as an example around the slab that takes it. */}
+            <ul className="hero-chips" aria-hidden="true">
+              <li data-chip="level">
+                <span className="chip-gem">
+                  <GraduationCap />
+                </span>
+                <span>
+                  <small>Niveau</small>
+                  <b>Bac+3</b>
+                </span>
+              </li>
+              <li data-chip="job">
+                <span className="chip-gem">
+                  <BriefcaseBusiness />
+                </span>
+                <span>
+                  <small>Métier</small>
+                  <b>Développeur web</b>
+                </span>
+              </li>
+              <li data-chip="city">
+                <span className="chip-gem">
+                  <MapPin />
+                </span>
+                <span>
+                  <small>Ville</small>
+                  <b>Lyon, 30 km autour</b>
+                </span>
+              </li>
+              <li data-chip="match">
+                <span className="chip-gem">
+                  <Sparkles />
+                </span>
+                <span>
+                  <small>Ensuite</small>
+                  <b>Les offres qui collent</b>
+                </span>
+              </li>
+            </ul>
+            <div className="hero-drop enter" data-enter="3">
               <DropCue />
               <CvDropzone />
             </div>
           </div>
+
+          <ul className="hero-proof enter" data-enter="4">
+            <li>
+              <Check aria-hidden="true" /> Des offres réellement publiées
+            </li>
+            <li>
+              <Check aria-hidden="true" /> Rien d’inventé dans ta lettre
+            </li>
+            <li>
+              <Check aria-hidden="true" /> Tu valides chaque envoi
+            </li>
+          </ul>
         </section>
 
         <section className="how lp-container" id="comment-ca-marche">
-          <div className="section-heading reveal">
-            <span className="section-number">01 — LA MÉTHODE</span>
+          <div className="section-head">
             <h2>
               Deux minutes pour toi.
               <br />
@@ -97,215 +173,288 @@ export default async function HomePage({
               méritent ton temps.
             </p>
           </div>
-          <div className="steps">
-            <article className="step-card reveal">
-              <span className="step-index">01</span>
-              <div className="step-icon profile-icon">
-                <i />
-                <i />
-                <i />
+          <ol className="steps">
+            <li className="step">
+              <div className="step-visual" aria-hidden="true">
+                <div className="v-scan">
+                  <div className="v-sheet">
+                    <i />
+                    <i />
+                    <i />
+                    <i />
+                    <i />
+                    <span className="v-beam" />
+                  </div>
+                  <span className="v-tag" data-tag="1">
+                    Bac+3
+                  </span>
+                  <span className="v-tag" data-tag="2">
+                    Marketing
+                  </span>
+                  <span className="v-tag" data-tag="3">
+                    Lyon
+                  </span>
+                </div>
               </div>
+              <span className="step-index">1</span>
               <h3>Tu déposes ton CV.</h3>
               <p>
                 On y lit ton niveau d’études, ton domaine et ta ville. Pas de CV sous la main ? Cinq
                 questions à cliquer font le même travail.
               </p>
-              <span className="step-arrow">↘</span>
-            </article>
-            <article className="step-card yellow-card reveal reveal-delay">
-              <span className="step-index">02</span>
-              <div className="step-icon radar-icon">
-                <i />
-                <i />
-                <i />
+            </li>
+            <li className="step">
+              <div className="step-visual" aria-hidden="true">
+                <div className="v-edit">
+                  <div className="v-row">
+                    <small>Métier</small>
+                    <span className="v-pill" data-on>
+                      Chef de projet <b>×</b>
+                    </span>
+                    <span className="v-pill">+</span>
+                  </div>
+                  <div className="v-row">
+                    <small>Niveau</small>
+                    <span className="v-seg">
+                      <i>Bac+2</i>
+                      <i data-on>Bac+3</i>
+                      <i>Bac+5</i>
+                    </span>
+                  </div>
+                  <div className="v-row">
+                    <small>Rayon</small>
+                    <span className="v-slider">
+                      <b />
+                    </span>
+                    <em>30 km</em>
+                  </div>
+                </div>
               </div>
+              <span className="step-index">2</span>
               <h3>Tu corriges en deux clics.</h3>
               <p>
                 Ce qu’on a lu s’affiche : métiers, niveau, ville. Tu ajustes si besoin, et la
                 recherche part. Ensuite on la relance pour toi plusieurs fois par jour.
               </p>
-              <span className="step-arrow">↘</span>
-            </article>
-            <article className="step-card dark-card reveal reveal-delay-2">
-              <span className="step-index">03</span>
-              <div className="step-icon spark-icon">✦</div>
+            </li>
+            <li className="step">
+              <div className="step-visual" aria-hidden="true">
+                <div className="v-offer">
+                  <div className="v-offer-top">
+                    <span className="v-logo">N</span>
+                    <span>
+                      <b>Assistant marketing</b>
+                      <small>Atelier Nova, Lyon</small>
+                    </span>
+                    <span className="v-match">97 %</span>
+                  </div>
+                  <div className="v-offer-line">
+                    <PenLine /> Lettre adaptée, prête à partir
+                  </div>
+                  <div className="v-offer-line">
+                    <BellRing /> Relance conseillée dans 5 jours
+                  </div>
+                </div>
+              </div>
+              <span className="step-index">3</span>
               <h3>Tu frappes en premier.</h3>
               <p>
                 Une sélection courte, une lettre déjà adaptée à l’entreprise, et le suivi de tes
                 réponses. Tu postules quand ça compte.
               </p>
-              <span className="step-arrow">↘</span>
-            </article>
-          </div>
+            </li>
+          </ol>
         </section>
 
-        <section className="opportunity-section" id="offres">
-          <div className="lp-container opportunity-grid">
-            <div className="opportunity-copy reveal">
-              <span className="section-number">02 — PAS JUSTE DES ANNONCES</span>
-              <h2>
-                Le feed qui ne te fait
-                <br />
-                <em>pas perdre ton temps.</em>
-              </h2>
-              <p>
-                Chaque offre est confrontée à ton profil : métier, distance, niveau, fraîcheur, mots
-                de ton CV. Contrat, début, durée, télétravail : tu vois l’essentiel en trois
-                secondes, pas en trois clics.
-              </p>
-              <ul className="check-list">
-                <li>
-                  <span>✓</span> Des offres vivantes, retirées dès qu’elles expirent
-                </li>
-                <li>
-                  <span>✓</span> Un score de compatibilité qui s’explique
-                </li>
-                <li>
-                  <span>✓</span> Une lettre réécrite pour chaque entreprise
-                </li>
-              </ul>
-              <TrackedLink
-                className="button button-dark"
-                href="/onboarding/1"
-                event={EVENTS.signupClicked}
-                properties={{ emplacement: "offres" }}
-              >
-                Voir mes offres <span>→</span>
-              </TrackedLink>
-            </div>
-            <div className="feed-demo reveal reveal-delay">
-              <div className="feed-head">
+        <section className="feed lp-container" id="offres">
+          <div className="feed-copy">
+            <h2>
+              Le feed qui ne te fait <em>pas perdre ton temps.</em>
+            </h2>
+            <p>
+              Chaque offre est confrontée à ton profil : métier, distance, niveau, fraîcheur, mots
+              de ton CV. Contrat, début, durée, télétravail : tu vois l’essentiel en trois secondes,
+              pas en trois clics.
+            </p>
+            <ul className="check-list">
+              <li>
                 <span>
-                  Pour Clara <b>⌄</b>
+                  <Check aria-hidden="true" />
                 </span>
-                <button type="button" tabIndex={-1} aria-hidden="true">
-                  ☷ Filtres
-                </button>
+                Des offres vivantes, retirées dès qu’elles expirent
+              </li>
+              <li>
+                <span>
+                  <Check aria-hidden="true" />
+                </span>
+                Un score de compatibilité qui s’explique
+              </li>
+              <li>
+                <span>
+                  <Check aria-hidden="true" />
+                </span>
+                Une lettre réécrite pour chaque entreprise
+              </li>
+            </ul>
+            <TrackedLink
+              className="button-ink"
+              href="/onboarding/1"
+              event={EVENTS.signupClicked}
+              properties={{ emplacement: "offres" }}
+            >
+              Voir mes offres <ArrowRight aria-hidden="true" />
+            </TrackedLink>
+          </div>
+
+          <div className="feed-stage" aria-hidden="true">
+            <div className="feed-glow" />
+            <div className="feed-demo">
+              <div className="feed-head">
+                <span className="feed-who">
+                  <i>C</i> Pour Clara
+                </span>
+                <span className="feed-filter">
+                  <SlidersHorizontal /> Filtres
+                </span>
               </div>
               <div className="feed-status">
                 <span>12 offres pour toi</span>
-                <span>
-                  Triées par pertinence <b>↕</b>
-                </span>
+                <span>Triées par pertinence</span>
               </div>
-              <article className="wide-job">
-                <div className="wide-job-top">
-                  <div className="company">
-                    <span className="company-symbol company-blue">N</span>
-                    <div>
-                      <strong>Atelier Nova</strong>
-                      <small>Studio produit · 40 salariés</small>
-                    </div>
-                  </div>
-                  <span className="heart">♡</span>
+              <article className="job">
+                <div className="job-top">
+                  <span className="job-logo" data-tone="ember">
+                    N
+                  </span>
+                  <span className="job-company">
+                    <strong>Atelier Nova</strong>
+                    <small>Studio produit, 40 salariés</small>
+                  </span>
+                  <Heart className="job-heart" />
                 </div>
-                <h3>
-                  Product Marketing Manager <em>— Alternance</em>
-                </h3>
-                <div className="wide-meta">
-                  <span>Paris · hybride</span>
+                <h3>Product Marketing Manager, alternance</h3>
+                <div className="job-meta">
+                  <span>Paris, hybride</span>
                   <span>Sept. 2026</span>
                   <span>12 mois</span>
                 </div>
-                <div className="wide-footer">
-                  <span className="match-pill">✦ 97% match</span>
+                <div className="job-foot">
+                  <span className="job-match">
+                    <Sparkles /> 97 % de correspondance
+                  </span>
                   <span>il y a 3 heures</span>
                 </div>
               </article>
-              <article className="wide-job dimmed">
-                <div className="wide-job-top">
-                  <div className="company">
-                    <span className="company-symbol company-navy">L</span>
-                    <div>
-                      <strong>Lumen</strong>
-                      <small>Fintech · 120 salariés</small>
-                    </div>
-                  </div>
-                  <span className="heart">♡</span>
+              <article className="job" data-dim>
+                <div className="job-top">
+                  <span className="job-logo" data-tone="ink">
+                    L
+                  </span>
+                  <span className="job-company">
+                    <strong>Lumen</strong>
+                    <small>Fintech, 120 salariés</small>
+                  </span>
+                  <Heart className="job-heart" />
                 </div>
-                <h3>
-                  Chargé·e de communication <em>— Alternance</em>
-                </h3>
-                <div className="wide-footer">
-                  <span className="match-pill soft-match">✦ 93% match</span>
+                <h3>Chargé·e de communication, alternance</h3>
+                <div className="job-foot">
+                  <span className="job-match" data-soft>
+                    <Sparkles /> 93 % de correspondance
+                  </span>
                   <span>il y a 6 heures</span>
                 </div>
               </article>
               <p className="feed-caption">Exemple d’affichage, entreprises fictives.</p>
-              <div className="cursor-note">
-                <span className="cursor">↖</span>
-                <p>
-                  <b>Pourquoi ce match ?</b>
-                  <br />
-                  Ton métier, ta ville
-                  <br />
-                  et ton CV sont alignés.
-                </p>
-              </div>
+            </div>
+            <div className="feed-why">
+              <b>Pourquoi ce match ?</b>
+              Ton métier, ta ville et ton CV sont alignés.
             </div>
           </div>
         </section>
 
-        <section className="testimonials lp-container" id="engagements">
-          <div className="testimonial-header reveal">
-            <span className="section-number">03 — NOS ENGAGEMENTS</span>
+        <section className="pledges lp-container" id="engagements">
+          <div className="section-head">
             <h2>
               Zéro blabla.
               <br />
               <em>Que du concret.</em>
             </h2>
+            <p>Ce qu’on promet ici, tu le retrouves tel quel dans le produit.</p>
           </div>
-          <div className="quote-layout">
-            <article className="quote quote-main reveal">
-              <span className="quote-mark">“</span>
-              <blockquote>
-                Ta lettre reste la tienne. JobGPT l’adapte à chaque entreprise sans rien inventer,
-                et te montre chaque mot changé.
-              </blockquote>
-              <footer>
-                <span className="person-avatar coral">✦</span>
-                <span>
-                  <strong>Notre engagement</strong>
-                  <small>Rien d’inventé, jamais</small>
+          <div className="bento">
+            <article className="pledge" data-pledge="letter">
+              <div className="letter-demo" aria-hidden="true">
+                <span className="letter-head">
+                  Lettre de motivation <b>Atelier Nova</b>
                 </span>
-                <b>J</b>
-              </footer>
+                <p>
+                  … c’est pourquoi je souhaite rejoindre <del>votre entreprise</del>{" "}
+                  <ins>Atelier Nova</ins> et <del>ce poste</del>{" "}
+                  <ins>le poste d’assistant marketing</ins> dès septembre.
+                </p>
+                <span className="letter-note">
+                  <PenLine /> 2 passages adaptés, montrés un par un
+                </span>
+              </div>
+              <h3>Ta lettre reste la tienne.</h3>
+              <p>
+                JobGPT l’adapte à chaque entreprise sans rien inventer, et te montre chaque mot
+                changé.
+              </p>
             </article>
-            <div className="quote-column">
-              <article className="quote quote-small reveal reveal-delay">
-                <blockquote>
-                  Tu candidates sur le site de l’offre, puis JobGPT suit tes réponses et te sonne
-                  quand il faut relancer.
-                </blockquote>
-                <footer>
-                  <span className="person-avatar violet">✓</span>
-                  <span>
-                    <strong>Aucune candidature oubliée</strong>
-                    <small>Relance conseillée après 5 jours</small>
-                  </span>
-                </footer>
-              </article>
-              <article className="quote-stat reveal reveal-delay-2">
-                <strong>100 %</strong>
-                <p>des changements apportés à ta lettre te sont montrés, un par un.</p>
-                <span>✦</span>
-              </article>
-            </div>
+            <article className="pledge" data-pledge="follow">
+              <ol className="follow-line" aria-hidden="true">
+                <li data-done>
+                  <i />
+                  Envoyée
+                </li>
+                <li data-now>
+                  <i />
+                  Relance à 5 jours
+                </li>
+                <li>
+                  <i />
+                  Réponse
+                </li>
+              </ol>
+              <h3>Aucune candidature oubliée.</h3>
+              <p>
+                Tu candidates sur le site de l’offre, puis JobGPT suit tes réponses et te sonne
+                quand il faut relancer.
+              </p>
+            </article>
+            <article className="pledge" data-pledge="stat">
+              <strong>100 %</strong>
+              <p>des changements apportés à ta lettre te sont montrés, un par un.</p>
+            </article>
+            <article className="pledge" data-pledge="data">
+              <span className="pledge-gem" aria-hidden="true">
+                <Download />
+              </span>
+              <h3>Tes données t’appartiennent.</h3>
+              <p>
+                Tu exportes tout en un clic et tu supprimes ton compte quand tu veux. La suppression
+                est réelle.
+              </p>
+            </article>
           </div>
         </section>
 
-        <section className="final-cta">
-          <div className="final-dots" aria-hidden="true" />
-          <div className="lp-container final-inner reveal">
-            <span className="eyebrow light">
-              <span className="pulse" /> LES OFFRES DE LA RENTRÉE SONT EN LIGNE
-            </span>
+        <section className="final lp-container">
+          <div className="final-slab">
+            <div className="final-orbs" aria-hidden="true" />
+            <p className="final-live">
+              <span className="pulse" /> Les offres de la rentrée sont en ligne
+            </p>
             <h2>
               Les bonnes offres
               <br />
               partent <em>vite.</em>
             </h2>
-            <p>Pendant que tu hésites, quelqu’un d’autre envoie sa candidature.</p>
+            <p className="final-copy">
+              Pendant que tu hésites, quelqu’un d’autre envoie sa candidature.
+            </p>
             <div className="final-actions">
               <TrackedLink
                 className="shiny-cta"
@@ -314,7 +463,7 @@ export default async function HomePage({
                 properties={{ emplacement: "final" }}
               >
                 <span>
-                  Prendre une longueur d’avance <b>→</b>
+                  Prendre une longueur d’avance <ArrowRight aria-hidden="true" />
                 </span>
               </TrackedLink>
               <Link className="final-login" href="/login">

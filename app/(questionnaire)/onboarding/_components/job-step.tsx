@@ -81,7 +81,7 @@ export function JobStep({
         </Alert>
       ) : null}
       {/* Always under the thumb: the list is long on a phone. */}
-      <div className="sticky bottom-3 z-20 flex items-center gap-3 rounded-full border bg-card/95 p-1.5 pl-4 shadow-[0_14px_30px_rgba(74,46,28,0.16)] backdrop-blur-md sm:static sm:w-fit sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none">
+      <div className="glass-bar sticky bottom-3 z-20 flex items-center gap-3 p-1.5 pl-5 sm:static sm:w-fit sm:border-0 sm:bg-none sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-filter-none">
         <span className="text-sm font-medium text-muted-foreground tabular-nums sm:hidden">
           {checked.length} / {MAX_CODES}
         </span>

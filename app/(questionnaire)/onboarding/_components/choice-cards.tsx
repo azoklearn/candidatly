@@ -40,9 +40,8 @@ function ChoiceCard({
       style={{ "--i": index, "--tile": TILES[index % TILES.length] } as CSSProperties}
       data-picked={selected || chosen ? "true" : undefined}
       className={cn(
-        "q-card q-in panel group flex min-h-[4.5rem] items-center gap-3.5 rounded-[1.35rem] border bg-card p-3.5 text-left",
-        "hover:border-foreground/60 disabled:opacity-60",
-        (selected || chosen) && "border-brand bg-[var(--pastel-peach)]/45",
+        "q-card q-in panel group flex min-h-[4.75rem] items-center gap-4 rounded-[1.5rem] border bg-card p-3.5 pr-4 text-left",
+        "disabled:opacity-60",
       )}
     >
       {choice.icon ? (

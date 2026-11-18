@@ -11,14 +11,16 @@ export function stepLabel(step: number): string {
 
 export function StepHeader({ step }: { step: number }) {
   return (
-    <header className="sticky top-0 z-30 -mx-4 mb-6 grid gap-3 bg-background/90 px-4 pt-2 pb-4 backdrop-blur-md sm:static sm:mx-0 sm:mb-8 sm:gap-4 sm:bg-transparent sm:px-0 sm:pt-0 sm:backdrop-blur-none">
+    <header className="sticky top-0 z-30 -mx-4 mb-6 grid gap-3 border-b border-white/70 bg-[rgb(255_250_245/0.62)] px-4 pt-3 pb-4 backdrop-blur-xl backdrop-saturate-150 sm:static sm:mx-0 sm:mb-8 sm:gap-4 sm:border-0 sm:bg-transparent sm:px-0 sm:pt-0 sm:backdrop-filter-none">
       <div className="flex items-center justify-between">
-        <span className="eyebrow">{stepLabel(step)}</span>
+        <span className="text-[0.8125rem] font-semibold text-muted-foreground tabular-nums">
+          {stepLabel(step)}
+        </span>
         {/* No way back while the analysis runs: it is already writing the profile. */}
         {step > 1 && step < LAST_STEP ? (
           <Link
             href={`/onboarding/${step - 1}`}
-            className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="btn-glass rounded-full px-3 py-1 text-[0.8125rem] font-semibold text-muted-foreground hover:text-foreground"
           >
             <span aria-hidden>← </span>Retour
           </Link>

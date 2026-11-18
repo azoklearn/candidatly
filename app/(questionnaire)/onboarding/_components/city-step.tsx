@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PRESET_CITIES, RADIUS_OPTIONS } from "@/lib/onboarding/cities";
-import { cn } from "@/lib/utils";
 
 import { saveLocation, type FormState } from "../actions";
 
@@ -137,10 +136,7 @@ export function CityStep({
               type="button"
               onClick={() => setRadius(option)}
               aria-pressed={radius === option}
-              className={cn(
-                "q-card min-h-11 rounded-full border px-4 py-2 text-sm hover:bg-muted/60",
-                radius === option && "border-foreground bg-foreground text-background",
-              )}
+              className="q-card chip min-h-11 rounded-full px-4 py-2 text-sm"
             >
               {option} km
             </button>
@@ -172,10 +168,8 @@ export function CityStep({
               disabled={busy}
               style={{ "--i": index } as CSSProperties}
               onClick={() => submitWith({ city: city.id })}
-              className={cn(
-                "q-card q-in min-h-14 rounded-2xl border bg-card p-3 text-sm font-medium hover:border-foreground hover:bg-muted/40 disabled:opacity-60",
-                initialLabel === city.label && "border-foreground bg-primary/5",
-              )}
+              data-picked={initialLabel === city.label ? "true" : undefined}
+              className="q-card q-in panel min-h-14 rounded-2xl border bg-card p-3 text-sm font-semibold disabled:opacity-60"
             >
               {city.label}
             </button>
@@ -198,12 +192,12 @@ export function CityStep({
             {searching ? "Recherche…" : "Tape au moins 3 lettres, puis choisis."}
           </p>
           {places.length > 0 ? (
-            <ul className="grid gap-1 rounded-xl border p-1">
+            <ul className="panel grid gap-1 rounded-2xl border bg-card p-1.5">
               {places.map((place) => (
                 <li key={`${place.label}-${place.citycode}`}>
                   <button
                     type="button"
-                    className="w-full rounded-lg px-2 py-1.5 text-left text-sm hover:bg-muted"
+                    className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-white/80"
                     disabled={!place.citycode || busy}
                     onClick={() =>
                       place.citycode

@@ -164,7 +164,7 @@ export function CvDropzone() {
         />
 
         <svg className="cv-dashes" aria-hidden focusable="false">
-          <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="27" />
+          <rect x="9" y="9" width="calc(100% - 18px)" height="calc(100% - 18px)" rx="25" />
         </svg>
 
         <span className="cv-sheet" aria-hidden>

@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 
 /** Native select and textarea styled like the shadcn Input, plus field helpers. */
 export const selectClassName =
-  "h-8 w-full rounded-lg border border-input bg-transparent px-2 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm";
+  "field h-10 w-full rounded-xl border px-3 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm";
 
 export const textareaClassName =
-  "min-h-32 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm";
+  "field min-h-32 w-full rounded-xl border px-3.5 py-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm";
 
 export function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;

@@ -18,7 +18,6 @@ import {
   ANALYSIS_PATH,
   FINISH_PATH,
   firstIncompleteStep,
-  LAST_STEP,
   nextOnboardingPath,
   VISITOR_LAST_STEP,
 } from "@/lib/onboarding/state";
@@ -56,19 +55,18 @@ export default async function AccountStepPage() {
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:py-10">
       <header className="fade-up mb-8 grid gap-4">
         <div className="flex items-center justify-between">
-          <span className="eyebrow">{stepLabel(STEP_NUMBER)}</span>
+          <span className="text-[0.8125rem] font-semibold text-muted-foreground">
+            {stepLabel(STEP_NUMBER)}
+          </span>
           <Link
             href={ANALYSIS_PATH}
-            className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="btn-glass rounded-full px-3 py-1 text-[0.8125rem] font-semibold text-muted-foreground hover:text-foreground"
           >
             <span aria-hidden>← </span>Retour
           </Link>
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-foreground/10" aria-hidden>
-          <div
-            className="h-full rounded-full bg-linear-to-r from-brand-soft to-brand transition-[width] duration-500"
-            style={{ width: `${(STEP_NUMBER / LAST_STEP) * 100}%` }}
-          />
+        <div className="q-segments" aria-hidden>
+          <span data-state="done" />
         </div>
         <h1 className="page-title">
           Crée ton <em>compte</em>
@@ -79,7 +77,7 @@ export default async function AccountStepPage() {
             : "Tes réponses sont gardées. Ton compte te sert à retrouver tes offres, tes lettres et le suivi de tes candidatures."}
         </p>
       </header>
-      <div className="grid gap-4">
+      <div className="panel fade-up grid gap-4 rounded-[1.75rem] border bg-card p-5 sm:p-7">
         {!isSupabaseConfigured() ? (
           <Alert variant="destructive">
             <AlertDescription>

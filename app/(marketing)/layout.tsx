@@ -11,8 +11,8 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <div className="app-washes" aria-hidden />
       <div className="app-grain" aria-hidden />
       {/* Same header as the landing page: swept links and the shiny call to action. */}
-      <header className="border-b border-[var(--pastel-line)]">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-4 sm:px-6">
+      <header className="sticky top-0 z-40 px-3 pt-3">
+        <div className="glass-bar mx-auto flex h-[3.75rem] w-full max-w-6xl items-center gap-x-6 pr-2.5 pl-5">
           <BrandLink />
           <nav
             aria-label="Navigation"
@@ -28,7 +28,9 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
             <span className="hidden sm:inline-flex">
               <Link
                 href="/onboarding/1"
-                className={buttonVariants({ variant: "shiny", size: "sm" })}
+                className={
+                  buttonVariants({ variant: "default", size: "lg" }) + " h-10 px-5 text-sm"
+                }
               >
                 Trouver mon stage/alternance
               </Link>

@@ -4,7 +4,7 @@ import { APP_NAME } from "@/lib/brand";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-[var(--pastel-line)]">
+    <footer className="mt-10 border-t border-white/60">
       <div className="mx-auto grid w-full max-w-5xl gap-3 px-6 py-8 text-sm text-muted-foreground sm:flex sm:items-start sm:justify-between">
         <div className="grid gap-1">
           <p className="text-base font-bold tracking-[-0.045em] text-foreground">{APP_NAME}</p>

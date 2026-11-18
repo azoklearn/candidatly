@@ -87,7 +87,7 @@ export function CredentialsForm({
           <p className="text-sm text-muted-foreground">8 caractères minimum.</p>
         ) : null}
       </div>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" size="lg" variant={isSignUp ? "shiny" : "default"} disabled={pending}>
         {pending ? "Un instant…" : isSignUp ? "Créer mon compte" : "Se connecter"}
       </Button>
     </form>

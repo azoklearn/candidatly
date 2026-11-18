@@ -78,12 +78,9 @@ export function PlanProof({ preview }: { preview: ReactNode }) {
             <li
               key={commitment.title}
               style={{ "--i": index } as CSSProperties}
-              className="panel rise grid content-start gap-2 rounded-2xl border bg-card p-4"
+              className="panel rise grid content-start gap-2 rounded-3xl border bg-card p-5"
             >
-              <span
-                aria-hidden
-                className="grid size-8 place-items-center rounded-xl bg-brand-soft text-sm text-foreground"
-              >
+              <span aria-hidden className="gem size-9 rounded-xl text-sm text-foreground">
                 {commitment.icon}
               </span>
               <h3 className="font-semibold tracking-[-0.02em]">{commitment.title}</h3>

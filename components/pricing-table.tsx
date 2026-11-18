@@ -31,22 +31,24 @@ export function PricingTable({
               key={plan.id}
               style={{ "--i": index } as CSSProperties}
               className={cn(
-                "panel rise relative grid content-start gap-5 rounded-3xl border bg-card p-6",
-                featured && "border-foreground shadow-[6px_6px_0_var(--ink)] lg:-mt-3",
+                "panel rise relative grid content-start gap-5 rounded-[1.75rem] border bg-card p-7",
+                featured && "plan-featured lg:-mt-4 lg:pb-9",
               )}
             >
               {featured ? (
-                <span className="absolute -top-3 left-6 rounded-full bg-foreground px-3 py-1 text-xs font-semibold text-background">
+                <span className="plan-badge absolute -top-3.5 left-7 rounded-full px-3.5 py-1.5 text-xs font-semibold">
                   ✦ {badge.label}
                 </span>
               ) : null}
               <div className="grid gap-1">
-                <h2 className="text-xl font-bold tracking-[-0.03em]">{plan.name}</h2>
+                <h2 className="font-heading text-2xl font-semibold tracking-[-0.04em]">
+                  {plan.name}
+                </h2>
                 <p className="text-sm text-muted-foreground">{plan.tagline}</p>
               </div>
               <div className="grid gap-1 tabular-nums">
                 <p className="flex flex-wrap items-baseline gap-x-2">
-                  <span className="text-4xl font-bold tracking-[-0.05em]">
+                  <span className="font-heading text-5xl font-semibold tracking-[-0.055em]">
                     {formatEuros(view.mainCents)}
                   </span>
                   <span className="text-sm text-muted-foreground">{view.unit}</span>

@@ -79,10 +79,7 @@ function Pills({
         <label
           key={option.value}
           style={{ "--i": index } as CSSProperties}
-          className={cn(
-            "q-card q-in flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2 text-sm",
-            "hover:bg-muted/60 has-checked:border-foreground has-checked:bg-foreground has-checked:text-background",
-          )}
+          className="q-card q-in chip flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-4 py-2 text-sm"
         >
           <input
             type="radio"
@@ -214,7 +211,7 @@ export function ScanRecap({
 
   return (
     <ActionForm action={action} className="grid gap-6">
-      <div className="panel grid gap-4 rounded-2xl border bg-card p-4 sm:p-5">
+      <div className="panel grid gap-5 rounded-[1.75rem] border bg-card p-5 sm:p-7">
         <Row title="Tu cherches">
           <Pills name="target_contract" options={CONTRACTS} defaultValue={contract} />
           <FieldError id="contract-error" message={state.fieldErrors?.target_contract} />
@@ -245,9 +242,9 @@ export function ScanRecap({
               return (
                 <li key={job.code}>
                   <label
+                    data-on={isChecked ? "true" : undefined}
                     className={cn(
-                      "q-card flex min-h-11 cursor-pointer items-center rounded-full border px-4 py-2 text-sm hover:bg-muted/60",
-                      isChecked && "border-foreground bg-foreground text-background",
+                      "q-card chip flex min-h-11 cursor-pointer items-center rounded-full px-4 py-2 text-sm",
                       full && "cursor-not-allowed opacity-50",
                     )}
                   >
@@ -307,10 +304,8 @@ export function ScanRecap({
                     type="button"
                     style={{ "--i": index } as CSSProperties}
                     onClick={() => pickPlace({ city: preset.id }, preset.label)}
-                    className={cn(
-                      "q-card q-in min-h-11 rounded-xl border bg-card px-3 py-2 text-sm hover:border-foreground hover:bg-muted/40",
-                      city === preset.label && "border-foreground bg-primary/5",
-                    )}
+                    data-on={city === preset.label ? "true" : undefined}
+                    className="q-card q-in chip min-h-11 rounded-full px-3 py-2 text-sm"
                   >
                     {preset.label}
                   </button>
@@ -330,7 +325,7 @@ export function ScanRecap({
                   {searching ? "Recherche…" : "Tape au moins 3 lettres, puis choisis."}
                 </p>
                 {places.length > 0 ? (
-                  <ul className="grid gap-1 rounded-xl border p-1">
+                  <ul className="grid gap-1 rounded-2xl border bg-white/60 p-1.5">
                     {places.map((suggestion) => (
                       <li key={`${suggestion.label}-${suggestion.citycode}`}>
                         <button
@@ -344,7 +339,7 @@ export function ScanRecap({
                                 )
                               : undefined
                           }
-                          className="w-full rounded-lg px-2 py-1.5 text-left text-sm hover:bg-muted"
+                          className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-white/80"
                         >
                           <span className="font-medium">{suggestion.label}</span>
                           {suggestion.context ? (
@@ -378,10 +373,7 @@ export function ScanRecap({
                 type="button"
                 onClick={() => setRadius(option)}
                 aria-pressed={radius === option}
-                className={cn(
-                  "q-card min-h-11 rounded-full border px-4 py-2 text-sm hover:bg-muted/60",
-                  radius === option && "border-foreground bg-foreground text-background",
-                )}
+                className="q-card chip min-h-11 rounded-full px-4 py-2 text-sm"
               >
                 {option} km
               </button>

@@ -47,7 +47,7 @@ export default async function AnalysisPage() {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:py-10">
       <header className="mb-8 grid gap-4">
-        <span className="eyebrow">Résultat</span>
+        <span className="text-[0.8125rem] font-semibold text-muted-foreground">Résultat</span>
         <div className="q-segments" aria-hidden>
           {Array.from({ length: VISITOR_LAST_STEP }, (_, index) => (
             <span key={index} data-state="done" />

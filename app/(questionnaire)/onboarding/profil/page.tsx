@@ -71,7 +71,6 @@ export default async function ScanRecapPage() {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:py-10">
       <header className="fade-up mb-6 grid gap-3">
-        <span className="eyebrow">Une seule étape</span>
         <h1 className="page-title q-in">On a lu ton CV.</h1>
         <p className="text-sm text-muted-foreground">
           Vérifie ce qu’on a compris, corrige ce qui ne va pas, et on lance la recherche.
