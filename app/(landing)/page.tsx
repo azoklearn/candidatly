@@ -96,8 +96,7 @@ export default async function HomePage({
             </span>
           </h1>
           <p className="hero-copy enter" data-enter="2">
-            JobGPT lit ton CV, en tire ton métier, ton niveau et ta ville, puis garde les offres qui
-            collent. Pour un stage ou un job étudiant, on te montre les entreprises de ton domaine
+            JobGPT lit ton CV et te sort les offres et les entreprises qui collent à ton profil,
             près de chez toi.
           </p>
 
