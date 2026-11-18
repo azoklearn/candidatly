@@ -306,14 +306,6 @@ html:has(.lp) {
     opacity: 0;
   }
 }
-.lp .hero-copy {
-  max-width: 62ch;
-  margin-top: clamp(20px, 2.2vw, 28px);
-  color: var(--ink-soft);
-  font-size: clamp(1rem, 0.94rem + 0.3vw, 1.175rem);
-  line-height: 1.6;
-  text-wrap: balance;
-}
 
 /* The stage: lights, the slab that takes the CV, and what a CV gives us around it. */
 .lp .hero-stage {
@@ -321,7 +313,7 @@ html:has(.lp) {
   display: grid;
   place-items: center;
   width: 100%;
-  margin-top: clamp(64px, 6.4vw, 84px);
+  margin-top: clamp(72px, 7.6vw, 112px);
   padding: 8px 0 20px;
 }
 .lp .hero-glow {
@@ -481,9 +473,9 @@ html:has(.lp) {
 /* The handwritten note that points at the slab. */
 .lp .drop-cue {
   position: absolute;
-  left: calc(100% - 92px);
-  bottom: calc(100% - 26px);
-  width: 190px;
+  left: calc(100% - 76px);
+  bottom: calc(100% - 22px);
+  width: 150px;
   pointer-events: none;
 }
 .lp .drop-cue-arrow {
@@ -507,7 +499,7 @@ html:has(.lp) {
 }
 .lp .drop-cue-label {
   position: absolute;
-  right: -88px;
+  right: -78px;
   bottom: calc(100% - 16px);
   white-space: nowrap;
   font-family: var(--serif);
@@ -515,7 +507,7 @@ html:has(.lp) {
   font-variation-settings:
     "SOFT" 100,
     "WONK" 1;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1.05;
   color: var(--ink-soft);
   transform: rotate(-5deg);

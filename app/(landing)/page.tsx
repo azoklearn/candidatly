@@ -95,9 +95,6 @@ export default async function HomePage({
               <RotatingWord words={["alternance", "stage"]} />.
             </span>
           </h1>
-          <p className="hero-copy enter" data-enter="2">
-            JobGPT lit ton CV et te sort les offres qui collent à ton profil.
-          </p>
 
           <div className="hero-stage">
             <div className="hero-glow" aria-hidden="true" />
