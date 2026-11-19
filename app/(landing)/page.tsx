@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 
 import {
   ArrowRight,
@@ -29,11 +30,18 @@ export const metadata: Metadata = {
 };
 
 /**
- * The job boards students already scroll, named in a sentence that stays true (C117):
- * JobGPT takes no offer from them and is no partner of theirs, so they appear as plain
- * words in our own type, never as logos, and never under a "powered by".
+ * The job boards students already scroll, shown inside a sentence that stays true (C117):
+ * "Moins de temps à scroller sur". JobGPT takes no offer from LinkedIn, Indeed or HelloWork
+ * and is no partner of theirs, so their logos never stand alone and never sit under a
+ * "powered by". `height` is the drawn height in pixels; the files are in public/logos.
  */
-const SCROLLED_SITES = ["LinkedIn", "Indeed", "HelloWork", "France Travail"] as const;
+const SCROLLED_SITES = [
+  { name: "LinkedIn", src: "/logos/linkedin.svg", height: 27 },
+  { name: "Indeed", src: "/logos/indeed.svg", height: 30 },
+  { name: "HelloWork", src: "/logos/hellowork.svg", height: 21 },
+  { name: "France Travail", src: "/logos/france-travail.svg", height: 40 },
+] as const;
+const SCROLLED_NAMES = SCROLLED_SITES.map((site) => site.name);
 
 export default async function HomePage({
   searchParams,
@@ -165,8 +173,8 @@ export default async function HomePage({
 
         <section className="brands lp-container" aria-label="Les sites où tu cherches déjà">
           <p className="sr-only">
-            Moins de temps à scroller sur {SCROLLED_SITES.slice(0, -1).join(", ")} et{" "}
-            {SCROLLED_SITES.at(-1)}.
+            Moins de temps à scroller sur {SCROLLED_NAMES.slice(0, -1).join(", ")} et{" "}
+            {SCROLLED_NAMES.at(-1)}.
           </p>
           <div className="brands-band" aria-hidden="true">
             <span className="brands-label">Moins de temps à scroller sur</span>
@@ -174,7 +182,18 @@ export default async function HomePage({
               {/* Two identical halves: the track slides by one half, then starts again. */}
               <ul className="brands-track">
                 {[0, 1, 2, 3].flatMap((copy) =>
-                  SCROLLED_SITES.map((site) => <li key={`${copy}-${site}`}>{site}</li>),
+                  SCROLLED_SITES.map((site) => (
+                    <li key={`${copy}-${site.name}`}>
+                      {/* A plain image: next/image would refuse or rasterise an SVG logo. */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={site.src}
+                        alt=""
+                        loading="lazy"
+                        style={{ "--h": `${site.height}px` } as CSSProperties}
+                      />
+                    </li>
+                  )),
                 )}
               </ul>
             </div>
