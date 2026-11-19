@@ -806,47 +806,37 @@ html:has(.lp) {
 }
 
 /* ------------------------------------------- the sites they already scroll */
+/* No frame: one quiet line that says what the logos are, then the logos passing by. */
 .lp .brands {
   padding-bottom: clamp(8px, 2vw, 24px);
 }
 .lp .brands-band {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 68px;
-  padding: 0 8px 0 26px;
-  overflow: hidden;
-  border: 1px solid var(--glass-rim);
-  border-radius: 999px;
-  background-color: rgb(255 255 255 / 0.46);
-  background-image: var(--glass-sheen);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shadow);
+  display: grid;
+  gap: 18px;
 }
 .lp .brands-label {
-  flex-shrink: 0;
   color: var(--ink-soft);
   font-size: 15px;
   font-weight: 600;
-  white-space: nowrap;
+  text-align: center;
 }
-/* The names fade in and out at the edges of their window instead of being cut. */
+/* The logos fade in and out at the edges of their window instead of being cut. */
 .lp .brands-window {
-  flex: 1;
   min-width: 0;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }
 .lp .brands-track {
   display: flex;
+  align-items: center;
   width: max-content;
   animation: lp-brands 30s linear infinite;
 }
 .lp .brands-track li {
   display: flex;
   align-items: center;
+  padding: 0 clamp(26px, 4vw, 52px);
 }
 /* Each logo has its own drawn height (--h): a wordmark and a symbol do not weigh the same. */
 .lp .brands-track img {
@@ -854,15 +844,6 @@ html:has(.lp) {
   width: auto;
   max-width: none;
   height: var(--h, 28px);
-}
-.lp .brands-track li::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  margin: 0 38px;
-  border-radius: 50%;
-  background: var(--ember);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5);
 }
 @keyframes lp-brands {
   to {
@@ -1900,26 +1881,11 @@ html:has(.lp) {
   .lp .drop-cue {
     display: none;
   }
-  .lp .brands-band {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-    height: auto;
-    padding: 14px 0 16px;
-    border-radius: 26px;
-  }
   .lp .brands-label {
     font-size: 13.5px;
-    text-align: center;
   }
   .lp .brands-track img {
     height: calc(var(--h, 28px) * 0.86);
-  }
-  .lp .brands-track li::after {
-    margin: 0 26px;
-  }
-  .lp .brands-band {
-    min-height: 0;
   }
   .lp .hero-stage {
     margin-top: 40px;
