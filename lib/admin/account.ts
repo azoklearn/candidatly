@@ -30,7 +30,7 @@ export async function loadAdminAccount(userId: string) {
       db
         .from("profiles")
         .select(
-          "user_id, email, first_name, last_name, phone, school, degree_label, diploma_level, target_contract, domain_free_text, rome_codes, location_label, search_radius_km, contract_chosen_at, onboarding_completed, chosen_plan, chosen_billing, plan_chosen_at, billing_exempt, created_at, updated_at",
+          "user_id, email, first_name, last_name, phone, school, degree_label, diploma_level, target_contract, domain_free_text, rome_codes, location_label, search_radius_km, contract_chosen_at, situation, start_timing, weekly_applications, main_blocker, onboarding_completed, chosen_plan, chosen_billing, plan_chosen_at, billing_exempt, created_at, updated_at",
         )
         .eq("user_id", userId)
         .maybeSingle(),

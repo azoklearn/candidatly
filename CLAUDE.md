@@ -65,7 +65,7 @@ app/
   (auth)/                       login, signup, auth/callback (code OAuth ou PKCE), auth/confirm (token_hash), actions.ts
   (app)/layout.tsx              session obligatoire, vérifiée côté serveur
   api/scan-cv/                  lecture du CV déposé sur l'accueil, sans stockage du fichier (C95)
-  (questionnaire)/onboarding/   questionnaire ouvert aux visiteurs : [step]/ (5 questions en clics, puis compte et documents), analyse/ (écran d'analyse animé, C94) et compte/ (création du compte, C91 à C94)
+  (questionnaire)/onboarding/   questionnaire ouvert aux visiteurs : [step]/ (9 questions en clics : 5 pour la recherche, 4 pour le plan, C118), gain/ (écran de comparaison), analyse/ (écran d'analyse animé, C94), compte/ (création du compte, C91 à C94) et fin/
   (app)/(dashboard)/            onboarding terminé obligatoire : offers, applications, credits, account
   layout.tsx, not-found.tsx, globals.css
 proxy.ts                        rafraîchit la session Supabase et redirige les visiteurs non connectés
@@ -252,3 +252,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-11-17 : admin plus précise (C114) : heures à la minute (Paris), dernière connexion, réponses au questionnaire de chaque compte, fil d'activité (inscriptions, forfaits, candidatures, paiements).
 - 2026-11-18 : aspect premium en verre (C116). Ciel apricot, rose et iris fixe derrière la page, toutes les surfaces en verre translucide ; jetons et classes dans `app/globals.css` (`--glass-*`, `.glass`, `.glass-bar`, `.panel`, `.chip`, `.gem`, `.field`, `.btn-ink`, `.btn-glass`). Page d'accueil réécrite (barre en capsule, dalle de verre pour le CV, étapes illustrées, dernier bloc en verre fumé) ; questionnaire, analyse, compte, résultat, forfaits et espace connecté suivent. Flou d'arrière-plan réservé à ce qui flotte au-dessus du contenu.
 - 2026-11-19 : bandeau défilant sous le héros de l'accueil (C117) : « Moins de temps à scroller sur » suivi des logos LinkedIn, Indeed, HelloWork et France Travail (`public/logos`, Wikimedia Commons). La phrase reste toujours devant les logos, jamais de « powered by » : JobGPT ne prend aucune offre chez eux et n'a aucun accord. Risque de marque accepté par l'owner ; en cas de demande de retrait, revenir aux noms en texte.
+- 2026-11-19 : questionnaire plus long avec un plan personnel (C118) : questions 6 à 9 (situation, date de début, candidatures par semaine, blocage), écran `/onboarding/gain` « à la main / avec JobGPT », analyse « On génère ton plan », carte « Ton plan » sur `/forfait` (`lib/onboarding/plan.ts`). Inspiré du parcours d'un concurrent, sans reprendre ses statistiques ni ses avis : aucun chiffre ni avis tant que JobGPT n'a pas les siens.

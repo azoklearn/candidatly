@@ -11,8 +11,10 @@ import {
   LAST_STEP,
   nextAfterScan,
   nextOnboardingPath,
+  nextQuestionPath,
   parseStep,
   RECAP_PATH,
+  SEARCH_LAST_STEP,
   VISITOR_LAST_STEP,
   type OnboardingSnapshot,
 } from "@/lib/onboarding/state";
@@ -27,13 +29,18 @@ const empty: OnboardingSnapshot = {
     diploma_level: null,
     location_lat: null,
     location_lng: null,
+    situation: null,
+    start_timing: null,
+    weekly_applications: null,
+    main_blocker: null,
     onboarding_completed: false,
   },
   hasCv: false,
   hasLetter: false,
 };
 
-const answered: OnboardingSnapshot = {
+/** What the search needs: the five first questions, or one CV. */
+const searchable: OnboardingSnapshot = {
   ...empty,
   profile: {
     ...empty.profile,
@@ -43,6 +50,18 @@ const answered: OnboardingSnapshot = {
     diploma_level: "bac+3",
     location_lat: 45.76,
     location_lng: 4.84,
+  },
+};
+
+/** Everything a visitor answers before the account: the search and the plan (C118). */
+const answered: OnboardingSnapshot = {
+  ...searchable,
+  profile: {
+    ...searchable.profile,
+    situation: "has_school",
+    start_timing: "2027-09",
+    weekly_applications: "low",
+    main_blocker: "answers",
   },
 };
 
@@ -71,8 +90,24 @@ describe("onboarding progress", () => {
       ...level,
       profile: { ...level.profile, location_lat: 45.76, location_lng: 4.84 },
     };
-    // Everything a visitor can answer: the account comes next.
-    expect(firstIncompleteStep(located)).toBe(ACCOUNT_STEP);
+    // The search is ready; the four questions of the plan follow, one at a time (C118).
+    expect(firstIncompleteStep(located)).toBe(SEARCH_LAST_STEP + 1);
+    expect(nextQuestionPath(located)).toBe("/onboarding/6");
+    const situated = { ...located, profile: { ...located.profile, situation: "exploring" } };
+    expect(nextQuestionPath(situated)).toBe("/onboarding/7");
+    const dated = { ...situated, profile: { ...situated.profile, start_timing: "asap" } };
+    expect(nextQuestionPath(dated)).toBe("/onboarding/8");
+    const paced = { ...dated, profile: { ...dated.profile, weekly_applications: "high" } };
+    expect(nextQuestionPath(paced)).toBe("/onboarding/9");
+    // Everything a visitor can answer: the analysis runs, then the account comes.
+    expect(firstIncompleteStep(answered)).toBe(ACCOUNT_STEP);
+    expect(nextQuestionPath(answered)).toBe(ANALYSIS_PATH);
+  });
+
+  it("sends a CV read on the landing page to the questions of the plan", () => {
+    // The CV answered the five first questions at once.
+    expect(nextQuestionPath(searchable)).toBe("/onboarding/6");
+    expect(VISITOR_LAST_STEP).toBe(9);
   });
 
   it("ends with the account: no CV, no letter (C111)", () => {
@@ -101,6 +136,8 @@ describe("onboarding progress", () => {
   it("lets users revisit earlier steps but not skip ahead", () => {
     expect(isStepAccessible(1, answered)).toBe(true);
     expect(isStepAccessible(5, answered)).toBe(true);
+    expect(isStepAccessible(9, answered)).toBe(true);
+    expect(isStepAccessible(7, searchable)).toBe(false);
     expect(isStepAccessible(ACCOUNT_STEP, answered)).toBe(true);
     expect(isStepAccessible(0, answered)).toBe(false);
   });

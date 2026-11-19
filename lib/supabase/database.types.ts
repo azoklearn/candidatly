@@ -676,6 +676,7 @@ export type Database = {
           location_label: string | null
           location_lat: number | null
           location_lng: number | null
+          main_blocker: string | null
           onboarding_completed: boolean
           phone: string | null
           plan_chosen_at: string | null
@@ -683,9 +684,12 @@ export type Database = {
           rome_version: number | null
           school: string | null
           search_radius_km: number
+          situation: string | null
+          start_timing: string | null
           target_contract: Database["public"]["Enums"]["profiles_target_contract"]
           updated_at: string
           user_id: string
+          weekly_applications: string | null
         }
         Insert: {
           availability_date?: string | null
@@ -708,6 +712,7 @@ export type Database = {
           location_label?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          main_blocker?: string | null
           onboarding_completed?: boolean
           phone?: string | null
           plan_chosen_at?: string | null
@@ -715,9 +720,12 @@ export type Database = {
           rome_version?: number | null
           school?: string | null
           search_radius_km?: number
+          situation?: string | null
+          start_timing?: string | null
           target_contract?: Database["public"]["Enums"]["profiles_target_contract"]
           updated_at?: string
           user_id: string
+          weekly_applications?: string | null
         }
         Update: {
           availability_date?: string | null
@@ -740,6 +748,7 @@ export type Database = {
           location_label?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          main_blocker?: string | null
           onboarding_completed?: boolean
           phone?: string | null
           plan_chosen_at?: string | null
@@ -747,9 +756,12 @@ export type Database = {
           rome_version?: number | null
           school?: string | null
           search_radius_km?: number
+          situation?: string | null
+          start_timing?: string | null
           target_contract?: Database["public"]["Enums"]["profiles_target_contract"]
           updated_at?: string
           user_id?: string
+          weekly_applications?: string | null
         }
         Relationships: []
       }

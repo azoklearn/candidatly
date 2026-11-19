@@ -6,6 +6,7 @@ import { currentUserId } from "@/lib/auth/session";
 import { DEFAULT_RADIUS_KM } from "@/lib/onboarding/cities";
 import { findDomainByLabel, type JobDomain } from "@/lib/onboarding/domains";
 import { draftSnapshot, type OnboardingDraft } from "@/lib/onboarding/draft";
+import { startMonths } from "@/lib/onboarding/plan";
 import { readDraft } from "@/lib/onboarding/draft-cookie";
 import {
   ACCOUNT_STEP,
@@ -13,7 +14,6 @@ import {
   firstIncompleteStep,
   isStepAccessible,
   parseStep,
-  FINISH_PATH,
   VISITOR_LAST_STEP,
 } from "@/lib/onboarding/state";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -25,7 +25,9 @@ import { DomainStep } from "../_components/domain-step";
 import { IdentityStep } from "../_components/identity-step";
 import { JobStep, type JobOption } from "../_components/job-step";
 import { LevelStep } from "../_components/level-step";
+import { BlockerStep, RhythmStep, SituationStep } from "../_components/plan-steps";
 import { ScanNote } from "../_components/scan-note";
+import { StartStep } from "../_components/start-step";
 import { StepHeader } from "../_components/step-header";
 import { loadOnboarding } from "../data";
 
@@ -94,6 +96,10 @@ async function VisitorStep({ step, draft }: { step: number; draft: OnboardingDra
           initialRadius={draft.search_radius_km ?? DEFAULT_RADIUS_KM}
         />
       ) : null}
+      {step === 6 ? <SituationStep chosen={draft.situation ?? null} /> : null}
+      {step === 7 ? <StartStep months={startMonths()} chosen={draft.start_timing ?? null} /> : null}
+      {step === 8 ? <RhythmStep chosen={draft.weekly_applications ?? null} /> : null}
+      {step === 9 ? <BlockerStep chosen={draft.main_blocker ?? null} /> : null}
     </Shell>
   );
 }
@@ -103,10 +109,7 @@ export default async function OnboardingStepPage({
 }: {
   params: Promise<{ step: string }>;
 }) {
-  const raw = (await params).step;
-  // The former CV step (C111): links and tabs left open on it lead to the end instead.
-  if (raw === "7") redirect(FINISH_PATH);
-  const step = parseStep(raw);
+  const step = parseStep((await params).step);
   if (step === null) notFound();
   const supabase = await createClient();
   const userId = await currentUserId(supabase);
@@ -142,6 +145,10 @@ export default async function OnboardingStepPage({
           initialRadius={data.profile.search_radius_km}
         />
       ) : null}
+      {step === 6 ? <SituationStep chosen={data.profile.situation} /> : null}
+      {step === 7 ? <StartStep months={startMonths()} chosen={data.profile.start_timing} /> : null}
+      {step === 8 ? <RhythmStep chosen={data.profile.weekly_applications} /> : null}
+      {step === 9 ? <BlockerStep chosen={data.profile.main_blocker} /> : null}
       {step === ACCOUNT_STEP ? (
         <IdentityStep firstName={data.profile.first_name} lastName={data.profile.last_name} />
       ) : null}

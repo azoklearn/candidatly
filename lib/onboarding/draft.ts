@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+import {
+  BLOCKER_VALUES,
+  RHYTHM_VALUES,
+  SITUATION_VALUES,
+  START_TIMING_PATTERN,
+} from "@/lib/onboarding/plan";
 import type { OnboardingProfile, OnboardingSnapshot } from "@/lib/onboarding/state";
 import type { TablesUpdate } from "@/lib/supabase/database.types";
 
@@ -32,6 +38,11 @@ export const DraftSchema = z
     location_lng: z.number(),
     insee_code: z.string().max(5).nullable(),
     search_radius_km: z.number().int(),
+    // The four answers that shape the plan (docs/QUESTIONS.md C118).
+    situation: z.enum(SITUATION_VALUES),
+    start_timing: z.string().regex(START_TIMING_PATTERN),
+    weekly_applications: z.enum(RHYTHM_VALUES),
+    main_blocker: z.enum(BLOCKER_VALUES),
     // What the analysis found, shown on the account screen (docs/QUESTIONS.md C94).
     found_offers: z.number().int().min(0),
     found_companies: z.number().int().min(0),
@@ -80,6 +91,10 @@ export function draftSnapshot(draft: OnboardingDraft): OnboardingSnapshot {
     diploma_level: draft.diploma_level ?? null,
     location_lat: draft.location_lat ?? null,
     location_lng: draft.location_lng ?? null,
+    situation: draft.situation ?? null,
+    start_timing: draft.start_timing ?? null,
+    weekly_applications: draft.weekly_applications ?? null,
+    main_blocker: draft.main_blocker ?? null,
     onboarding_completed: false,
   };
   return { profile, hasCv: false, hasLetter: false };
@@ -104,6 +119,10 @@ const PROFILE_FIELDS = [
   "location_lng",
   "insee_code",
   "search_radius_km",
+  "situation",
+  "start_timing",
+  "weekly_applications",
+  "main_blocker",
 ] as const satisfies readonly (keyof OnboardingDraft)[];
 
 /** What to write on the profile once the account exists: only the answers that were given. */

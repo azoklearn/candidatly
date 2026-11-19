@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CvHandoff } from "@/app/(questionnaire)/onboarding/_components/cv-handoff";
+import { PlanCard } from "@/components/plan-card";
 import { ResultStack } from "@/components/result-stack";
 import { buttonVariants } from "@/components/ui/button";
 import { requireUserId } from "@/lib/auth/session";
 import { loadAccess } from "@/lib/billing/access";
 import { DatabaseError } from "@/lib/errors";
 import { companiesOnly } from "@/lib/offers/contract-mode";
+import { buildPlan } from "@/lib/onboarding/plan";
 import { pulseSentence, searchPulse } from "@/lib/offers/pulse";
 import { searchSummary } from "@/lib/offers/search-summary";
 import { countHiringCompanies } from "@/lib/plan-choice";
@@ -18,8 +20,8 @@ export const metadata: Metadata = { title: "Ta recherche" };
 
 /**
  * Shown right after the questionnaire: what the search found, in words and without a figure,
- * and one button to the plans (owner, 7 November 2026, C104, C105). The plans themselves live
- * on /forfait/choisir.
+ * the student's plan built from their answers (C118), and one button to the plans (owner,
+ * 7 November 2026, C104, C105). The plans themselves live on /forfait/choisir.
  */
 export default async function SearchResultPage() {
   const supabase = await createClient();
@@ -42,7 +44,7 @@ export default async function SearchResultPage() {
     supabase
       .from("profiles")
       .select(
-        "rome_codes, location_lat, location_lng, search_radius_km, diploma_level, target_contract",
+        "rome_codes, location_lat, location_lng, search_radius_km, diploma_level, target_contract, situation, start_timing, weekly_applications, main_blocker",
       )
       .eq("user_id", userId)
       .maybeSingle(),
@@ -56,11 +58,19 @@ export default async function SearchResultPage() {
   const domainOnly = companiesOnly(profile.data?.target_contract);
   const summary = searchSummary(offers.count ?? 0, companies, { companiesOnly: domainOnly });
   const pulse = domainOnly ? null : pulseSentence(searchPulse(dates.data.map((row) => row.offer)));
+  // Built from the student's own answers; absent for accounts older than the plan (C118).
+  const plan = buildPlan({
+    situation: profile.data?.situation ?? null,
+    startTiming: profile.data?.start_timing ?? null,
+    rhythm: profile.data?.weekly_applications ?? null,
+    blocker: profile.data?.main_blocker ?? null,
+    companiesOnly: domainOnly,
+  });
   const current = access.paywall ? access.subscription : null;
   const currentName = PLANS.find((plan) => plan.id === current?.plan)?.name;
 
   return (
-    <header className="grid min-h-[62svh] content-center justify-items-center gap-4 text-center">
+    <header className="grid min-h-[62svh] content-center justify-items-center gap-4 pb-6 text-center">
       {/* The CV dropped on the landing page joins the account here (C111). */}
       <CvHandoff userId={userId} quiet />
       <ResultStack />
@@ -75,6 +85,11 @@ export default async function SearchResultPage() {
           <span className="pulse-dot" aria-hidden />
           {pulse}
         </p>
+      ) : null}
+      {plan ? (
+        <div className="mt-3 grid w-full justify-items-center">
+          <PlanCard plan={plan} />
+        </div>
       ) : null}
       {current ? (
         <>

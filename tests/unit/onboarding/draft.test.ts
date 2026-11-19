@@ -53,8 +53,21 @@ describe("questionnaire draft", () => {
   it("follows the same progress rules as a profile", () => {
     expect(firstIncompleteStep(draftSnapshot({}))).toBe(1);
     expect(firstIncompleteStep(draftSnapshot({ ...answered, rome_codes: [] }))).toBe(3);
+    // The search is answered; the four questions of the plan remain (C118).
+    expect(firstIncompleteStep(draftSnapshot(answered))).toBe(6);
+    const planned = {
+      ...answered,
+      situation: "has_school",
+      start_timing: "2027-09",
+      weekly_applications: "medium",
+      main_blocker: "time",
+    } as const;
+    expect(parseDraft(serializeDraft(planned))).toEqual(planned);
     // Everything a visitor can answer is answered: the account comes next.
-    expect(firstIncompleteStep(draftSnapshot(answered))).toBe(VISITOR_LAST_STEP + 1);
+    expect(firstIncompleteStep(draftSnapshot(planned))).toBe(VISITOR_LAST_STEP + 1);
+    // An answer that is not one of the choices empties the cookie, like any tampering.
+    expect(parseDraft(JSON.stringify({ start_timing: "2027-13" }))).toEqual({});
+    expect(parseDraft(JSON.stringify({ main_blocker: "nope" }))).toEqual({});
   });
 
   it("writes only the answers that were given onto the profile", () => {

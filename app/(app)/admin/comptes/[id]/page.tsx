@@ -13,6 +13,7 @@ import {
   STUDY_LEVEL_LABELS,
 } from "@/lib/format";
 import { ACTIVE_STATUSES } from "@/lib/billing/subscriptions";
+import { planAnswerLabels } from "@/lib/onboarding/plan";
 import { PLANS } from "@/lib/pricing";
 
 import {
@@ -50,6 +51,12 @@ export default async function AdminAccountPage({ params }: { params: Promise<{ i
   if (!account) notFound();
   const { profile } = account;
   const name = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "Sans nom";
+  const answers = planAnswerLabels({
+    situation: profile.situation,
+    startTiming: profile.start_timing,
+    rhythm: profile.weekly_applications,
+    blocker: profile.main_blocker,
+  });
   const matchTotal = Object.values(account.matchStatuses).reduce((a, b) => a + b, 0);
   const sent = account.applications.filter((row) => row.sent_at !== null).length;
   const active = account.subscriptions.find((row) => ACTIVE_STATUSES.has(row.status));
@@ -107,6 +114,10 @@ export default async function AdminAccountPage({ params }: { params: Promise<{ i
             ["Niveau", profile.diploma_level ? STUDY_LEVEL_LABELS[profile.diploma_level] : null],
             ["Ville", profile.location_label],
             ["Rayon", formatDistance(profile.search_radius_km)],
+            ["Situation", answers.situation],
+            ["Veut commencer", answers.start],
+            ["Candidatures envoyées", answers.rhythm],
+            ["Ce qui le bloque", answers.blocker],
             ["École", profile.school],
             ["Formation", profile.degree_label],
             [

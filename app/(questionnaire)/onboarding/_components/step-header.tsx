@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { LAST_STEP, stepTitle, VISITOR_LAST_STEP } from "@/lib/onboarding/state";
+import { LAST_STEP, stepHint, stepTitle, VISITOR_LAST_STEP } from "@/lib/onboarding/state";
 
-/** Five questions, then the account and the documents: the count shown says so. */
+/** Nine questions, then the account: the count shown says so. */
 export function stepLabel(step: number): string {
   if (step <= VISITOR_LAST_STEP) return `Question ${step} sur ${VISITOR_LAST_STEP}`;
   if (step === LAST_STEP) return "Dernière étape";
@@ -35,7 +35,12 @@ export function StepHeader({ step }: { step: number }) {
           />
         ))}
       </div>
-      <h1 className="page-title q-in">{stepTitle(step)}</h1>
+      <div className="q-in grid gap-2">
+        <h1 className="page-title">{stepTitle(step)}</h1>
+        {stepHint(step) ? (
+          <p className="text-[0.9375rem] text-muted-foreground">{stepHint(step)}</p>
+        ) : null}
+      </div>
     </header>
   );
 }

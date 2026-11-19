@@ -27,6 +27,11 @@ export default function PrivacyPage() {
           Recherche : métiers visés, ville ou adresse et coordonnées correspondantes, rayon de
           recherche.
         </li>
+        <li>
+          Plan : votre situation, le mois où vous souhaitez commencer, le nombre de candidatures que
+          vous envoyez par semaine et ce qui vous bloque le plus, tels que vous les indiquez dans le
+          questionnaire. Ces réponses servent seulement à construire votre plan.
+        </li>
         <li>Documents : votre CV et votre lettre de motivation, fichiers et texte extrait.</li>
         <li>
           Candidatures : lettres adaptées, statuts, dates, notes et historique des changements de

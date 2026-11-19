@@ -26,9 +26,16 @@ import { logger } from "@/lib/logger";
 import { allowAction, RATE_LIMITED_MESSAGE } from "@/lib/rate-limit";
 import { DEFAULT_RADIUS_KM, findPresetCity, RADIUS_OPTIONS } from "@/lib/onboarding/cities";
 import { findDomain } from "@/lib/onboarding/domains";
-import { draftProfileValuesForAnalysis } from "@/lib/onboarding/draft";
+import { draftProfileValuesForAnalysis, draftSnapshot } from "@/lib/onboarding/draft";
 import { readDraft, saveDraft } from "@/lib/onboarding/draft-cookie";
-import { ANALYSIS_PATH, FINISH_PATH } from "@/lib/onboarding/state";
+import {
+  BLOCKER_VALUES,
+  isOfferedStart,
+  RHYTHM_VALUES,
+  SITUATION_VALUES,
+  START_TIMING_PATTERN,
+} from "@/lib/onboarding/plan";
+import { ANALYSIS_PATH, FINISH_PATH, GAIN_PATH, nextQuestionPath } from "@/lib/onboarding/state";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database, TablesInsert } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
@@ -403,9 +410,8 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
   const values = outcome.values;
 
   if (!userId) {
-    await saveDraft(values);
-    // The analysis comes right after the questions, the account after it (C94).
-    redirect(ANALYSIS_PATH);
+    // The questions of the plan come next (C118); the analysis follows the last one (C94).
+    redirect(nextQuestionPath(draftSnapshot(await saveDraft(values))));
   }
   const { error } = await supabase.from("profiles").update(values).eq("user_id", userId);
   if (error) {
@@ -417,6 +423,56 @@ export async function saveLocation(_previous: FormState, formData: FormData): Pr
     revalidatePath("/account");
     return { saved: true };
   }
+  redirect(nextQuestionPath((await loadOnboarding(supabase, userId)).snapshot));
+}
+
+type PlanAnswer = {
+  situation?: (typeof SITUATION_VALUES)[number];
+  start_timing?: string;
+  weekly_applications?: (typeof RHYTHM_VALUES)[number];
+  main_blocker?: (typeof BLOCKER_VALUES)[number];
+};
+
+/** One answer of the plan, on the profile or in the visitor's cookie (C118). */
+async function storePlanAnswer(formData: FormData, values: PlanAnswer): Promise<void> {
+  const { supabase, userId } = await onboardingContext(formData);
+  if (userId) {
+    const { error } = await supabase.from("profiles").update(values).eq("user_id", userId);
+    if (error) log.error("plan_answer_update_failed", { code: error.code });
+  } else {
+    await saveDraft(values);
+  }
+}
+
+/** Step 6: where the student stands. */
+export async function saveSituation(formData: FormData): Promise<void> {
+  const parsed = z.enum(SITUATION_VALUES).safeParse(read(formData, "value"));
+  if (!parsed.success) redirect("/onboarding/6");
+  await storePlanAnswer(formData, { situation: parsed.data });
+  redirect("/onboarding/7");
+}
+
+/** Step 7: the month they want to start, as soon as possible, or not known yet. */
+export async function saveStart(formData: FormData): Promise<void> {
+  const value = read(formData, "value");
+  if (!START_TIMING_PATTERN.test(value) || !isOfferedStart(value)) redirect("/onboarding/7");
+  await storePlanAnswer(formData, { start_timing: value });
+  redirect("/onboarding/8");
+}
+
+/** Step 8: how much they apply today; the next screen shows what we take off their hands. */
+export async function saveRhythm(formData: FormData): Promise<void> {
+  const parsed = z.enum(RHYTHM_VALUES).safeParse(read(formData, "value"));
+  if (!parsed.success) redirect("/onboarding/8");
+  await storePlanAnswer(formData, { weekly_applications: parsed.data });
+  redirect(GAIN_PATH);
+}
+
+/** Step 9, the last question: what blocks them most. The search starts right after. */
+export async function saveBlocker(formData: FormData): Promise<void> {
+  const parsed = z.enum(BLOCKER_VALUES).safeParse(read(formData, "value"));
+  if (!parsed.success) redirect("/onboarding/9");
+  await storePlanAnswer(formData, { main_blocker: parsed.data });
   redirect(ANALYSIS_PATH);
 }
 
@@ -474,17 +530,17 @@ export async function saveScanProfile(
     rome_version: Math.max(...known.data.map((row) => row.rome_version)),
     ...place,
   };
+  log.info("scan_profile_saved", { domain: domain.id, jobs: codes.length });
   if (userId) {
     const { error } = await supabase.from("profiles").update(values).eq("user_id", userId);
     if (error) {
       log.error("scan_profile_update_failed", { code: error.code });
       return { error: GENERIC_ERROR };
     }
-  } else {
-    await saveDraft(values);
+    redirect(nextQuestionPath((await loadOnboarding(supabase, userId)).snapshot));
   }
-  log.info("scan_profile_saved", { domain: domain.id, jobs: codes.length });
-  redirect(ANALYSIS_PATH);
+  // The CV answered what to search; the questions of the plan come next (C118).
+  redirect(nextQuestionPath(draftSnapshot(await saveDraft(values))));
 }
 
 type Kind = "cv" | "cover_letter_base";

@@ -78,6 +78,11 @@ export default async function globalSetup() {
         location_lng: 2.3522,
         insee_code: "75056",
         search_radius_km: 30,
+        // The four answers of the plan shown with the result (C118).
+        situation: "has_school",
+        start_timing: "asap",
+        weekly_applications: "low",
+        main_blocker: "answers",
         onboarding_completed: true,
       })
       .eq("user_id", id);

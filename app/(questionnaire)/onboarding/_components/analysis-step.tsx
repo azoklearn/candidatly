@@ -23,7 +23,7 @@ const LINES = [
   "On scanne les offres publiées",
   "On repère les entreprises qui recrutent",
   "On calcule tes correspondances",
-  "On prépare ta sélection",
+  "On construit ton plan",
 ] as const;
 
 const LINE_MS = 850;
@@ -123,11 +123,11 @@ export function AnalysisStep({ next, cta }: { next: string; cta: string }) {
       <h1 className="page-title">
         {succeeded ? (
           <span className="swap">
-            Ta {found ? "sélection" : "recherche"} est <em>{found ? "prête" : "lancée"}</em>
+            {found ? "Ton plan" : "Ta recherche"} est <em>{found ? "prêt" : "lancée"}</em>
           </span>
         ) : (
           <>
-            On analyse <em>ton profil</em>
+            On génère <em>ton plan</em>
           </>
         )}
       </h1>
@@ -142,7 +142,7 @@ export function AnalysisStep({ next, cta }: { next: string; cta: string }) {
           aria-valuenow={succeeded ? 100 : percent}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label="Analyse de ton profil"
+          aria-label="Génération de ton plan"
         >
           {succeeded ? (
             <>

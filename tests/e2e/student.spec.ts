@@ -61,6 +61,11 @@ test("a student prepares, sends and tracks an application, then exports their da
   await expect(page.getByRole("heading", { level: 1 })).not.toContainText(/\d/);
   // The freshness comes from the student's own matches, never invented.
   await expect(page.getByText(/de ta sélection a été publiée ces 7 derniers jours/)).toBeVisible();
+  // The plan comes from the student's own answers: a goal, a rhythm, where we start (C118).
+  const plan = page.getByRole("region", { name: "Ton plan" });
+  await expect(plan.getByText("Trouver un contrat le plus vite possible")).toBeVisible();
+  await expect(plan.getByText("Commence par 5 candidatures par semaine")).toBeVisible();
+  await expect(plan.getByText("On commence par ta lettre")).toBeVisible();
   // Nothing else on this page: the plans live behind the button.
   await expect(page.getByText("Recommandé")).toHaveCount(0);
   await page.getByRole("link", { name: "Découvrir les offres" }).click();
