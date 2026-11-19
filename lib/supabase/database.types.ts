@@ -54,6 +54,7 @@ export type Database = {
           next_follow_up_at: string | null
           notes: string | null
           offer_id: string | null
+          prepared_at_night: boolean
           regeneration_count: number
           sent_at: string | null
           sent_via: Database["public"]["Enums"]["applications_sent_via"] | null
@@ -80,6 +81,7 @@ export type Database = {
           next_follow_up_at?: string | null
           notes?: string | null
           offer_id?: string | null
+          prepared_at_night?: boolean
           regeneration_count?: number
           sent_at?: string | null
           sent_via?: Database["public"]["Enums"]["applications_sent_via"] | null
@@ -106,6 +108,7 @@ export type Database = {
           next_follow_up_at?: string | null
           notes?: string | null
           offer_id?: string | null
+          prepared_at_night?: boolean
           regeneration_count?: number
           sent_at?: string | null
           sent_via?: Database["public"]["Enums"]["applications_sent_via"] | null
@@ -702,6 +705,7 @@ export type Database = {
           location_lat: number | null
           location_lng: number | null
           main_blocker: string | null
+          night_prep_enabled: boolean
           onboarding_completed: boolean
           phone: string | null
           plan_chosen_at: string | null
@@ -739,6 +743,7 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           main_blocker?: string | null
+          night_prep_enabled?: boolean
           onboarding_completed?: boolean
           phone?: string | null
           plan_chosen_at?: string | null
@@ -776,6 +781,7 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           main_blocker?: string | null
+          night_prep_enabled?: boolean
           onboarding_completed?: boolean
           phone?: string | null
           plan_chosen_at?: string | null
@@ -1108,6 +1114,7 @@ export type Database = {
       }
       daily_maintenance: { Args: never; Returns: Json }
       grant_signup_bonus: { Args: never; Returns: number }
+      invoke_night_prep: { Args: never; Returns: string }
       invoke_offer_sync: { Args: never; Returns: string }
       pending_company_sirets: {
         Args: { p_limit?: number }

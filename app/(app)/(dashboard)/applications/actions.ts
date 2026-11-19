@@ -14,12 +14,11 @@ import { loadCompanyForOffer } from "@/lib/enrichment/company-for-offer";
 import { DatabaseError } from "@/lib/errors";
 import { cityFromAddress } from "@/lib/format";
 import { LETTER_GENERATOR, adaptLetter } from "@/lib/letters/adapt";
+import { letterForOffer } from "@/lib/letters/for-offer";
 import type { StoredLetterDiff } from "@/lib/letters/stored";
 import { logger } from "@/lib/logger";
 import { FOLLOW_UP_DELAY_MS } from "@/lib/letters/follow-up";
 import { allowAction } from "@/lib/rate-limit";
-import { toPlainText } from "@/lib/text/html";
-import { JobOfferReadSchema } from "@/lib/providers/api-alternance";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database, Json, Tables } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
@@ -52,28 +51,7 @@ async function buildLetter(
   const company = await loadCompanyForOffer(offer);
   const registryName =
     company.status === "found" ? (company.company.brand_name ?? company.company.legal_name) : null;
-  const job = JobOfferReadSchema.safeParse(offer.raw);
-  const result = adaptLetter({
-    baseLetter: base,
-    cvText: cv,
-    offer: {
-      title: offer.title,
-      // The recruiter's spelling reads better than the registry's capitals; delegated offers
-      // name the school, not the employer.
-      companyName: offer.is_delegated ? null : (offer.company_name ?? registryName),
-      city: cityFromAddress(offer.location_label),
-      skills: job.success ? job.data.offer.desired_skills : [],
-      description: toPlainText(offer.description),
-    },
-  });
-  return {
-    generator: LETTER_GENERATOR,
-    base_letter: base,
-    generated_letter: result.letter,
-    changes: result.changes,
-    confidence: result.confidence,
-    missing_info: result.missing_info,
-  };
+  return letterForOffer({ baseLetter: base, cvText: cv, offer, registryName });
 }
 
 type SpontaneousTarget = {
@@ -450,6 +428,20 @@ export async function markFollowUpDone(applicationId: string): Promise<void> {
   if (error) log.error("follow_up_update_failed", { code: error.code });
   else await logEvent(userId, "follow_up_sent", { application_id: applicationId });
   revalidateApplication(applicationId);
+}
+
+/** Switches the night preparation on or off for the student (C123). */
+export async function setNightPrep(enabled: boolean): Promise<void> {
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  // Same condition as the letter itself: no setting for a plan that cannot use it.
+  if (enabled && !canPrepareLetters(await requirePaidAccess(supabase, userId))) return;
+  const { error } = await supabase
+    .from("profiles")
+    .update({ night_prep_enabled: enabled === true })
+    .eq("user_id", userId);
+  if (error) log.error("night_prep_setting_failed", { code: error.code });
+  revalidatePath("/applications");
 }
 
 export type NotesFormState = { error?: string; saved?: boolean };

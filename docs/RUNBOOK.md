@@ -49,6 +49,14 @@ Lancer une synchronisation à la main, en local avec `npm run dev` et la valeur 
 curl -X POST http://localhost:3000/api/cron/sync-offers -H "Authorization: Bearer <CRON_SECRET>"
 ```
 
+## Préparation de nuit des candidatures
+
+Depuis le 19 novembre 2026 (C123), Supabase Cron appelle chaque nuit à 03 h 30 UTC (04 h 30 à Paris en hiver, 05 h 30 en été) la route protégée `/api/cron/night-prep`, avec les mêmes secrets Vault que la synchronisation des offres (`candidatly_site_url`, `candidatly_cron_secret`). Rien à configurer en plus.
+
+Pour chaque étudiant qui a activé « Préparation de nuit » sur la page Candidatures, et dont le forfait inclut la lettre, elle prépare la lettre de ses 3 meilleures nouvelles offres (score d'au moins 60, hors écoles, organismes de formation et agences, sans candidature existante), et s'arrête quand 6 lettres préparées attendent déjà. Elle n'envoie rien et n'appelle aucune API externe.
+
+Contrôle : `select * from cron.job where jobname = 'candidatly-night-prep';` pour la planification, et les lignes `night_prep_done` dans les logs Vercel (`users`, `prepared`, `skipped`). Lancer à la main : `select public.invoke_night_prep();` dans l'éditeur SQL. Arrêter : `select cron.unschedule('candidatly-night-prep');`.
+
 ## Paiements Mollie
 
 Depuis le 12 novembre 2026 (C109), les nouveaux paiements passent par Mollie dès que `MOLLIE_API_KEY` est définie ; sans elle, Whop reste en service. Les abonnements déjà vendus sur Whop continuent de fonctionner : ne retirez ni `WHOP_API_KEY` ni `WHOP_WEBHOOK_SECRET` tant qu'il en reste d'actifs.

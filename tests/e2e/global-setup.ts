@@ -91,7 +91,7 @@ export default async function globalSetup() {
   if (schoolOffer.error) throw schoolOffer.error;
 
   const users = {} as E2EState["users"];
-  for (const role of ["student", "leaver"] as const) {
+  for (const role of ["student", "leaver", "night"] as const) {
     const email = `e2e-${role}-${run}@example.com`;
     const created = await db.auth.admin.createUser({ email, email_confirm: true });
     if (created.error) throw created.error;
@@ -116,6 +116,8 @@ export default async function globalSetup() {
         start_timing: "asap",
         weekly_applications: "low",
         main_blocker: "answers",
+        // One student asked for letters prepared during the night (C123).
+        night_prep_enabled: role === "night",
         onboarding_completed: true,
       })
       .eq("user_id", id);

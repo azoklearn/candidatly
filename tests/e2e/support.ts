@@ -12,7 +12,14 @@ export const ADMIN_EMAIL = "e2e-admin@example.com";
 type TestUser = { id: string; email: string; login: string };
 export type E2EState = {
   offerId: string;
-  users: { student: TestUser; leaver: TestUser; admin: TestUser; outsider: TestUser };
+  users: {
+    student: TestUser;
+    leaver: TestUser;
+    /** Switched the night preparation on (C123). */
+    night: TestUser;
+    admin: TestUser;
+    outsider: TestUser;
+  };
   signup: { email: string; password: string };
 };
 
