@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { CvDropzone } from "@/components/cv-dropzone";
+import { DemoVideo } from "@/components/demo-video";
 import { DropCue } from "@/components/drop-cue";
 import { RotatingWord } from "@/components/rotating-word";
 import { TrackedLink } from "@/components/tracked-link";
@@ -42,6 +43,13 @@ const SCROLLED_SITES = [
   { name: "France Travail", src: "/logos/france-travail.svg", height: 40 },
 ] as const;
 const SCROLLED_NAMES = SCROLLED_SITES.map((site) => site.name);
+
+/** The owner's demo film, hosted on his Cloudinary account (C119): 39 seconds, 16:9. */
+const DEMO_VIDEO =
+  "https://res.cloudinary.com/klc0oxsz/video/upload/v1795056674/demo-gptjob-final.mp4";
+/** A frame of the same film, twelve seconds in, shown until it plays. */
+const DEMO_POSTER =
+  "https://res.cloudinary.com/klc0oxsz/video/upload/so_12,w_1280,q_auto,f_jpg/v1795056674/demo-gptjob-final.jpg";
 
 export default async function HomePage({
   searchParams,
@@ -198,6 +206,23 @@ export default async function HomePage({
               <Check aria-hidden="true" /> Tu valides chaque envoi
             </li>
           </ul>
+        </section>
+
+        <section className="demo lp-container" id="demo">
+          <div className="section-head">
+            <h2>
+              JobGPT,
+              <br />
+              <em>en 39 secondes.</em>
+            </h2>
+            <p>Du CV déposé à la lettre prête : regarde comment ça se passe.</p>
+          </div>
+          <div className="demo-stage">
+            <div className="demo-glow" aria-hidden="true" />
+            <div className="demo-frame">
+              <DemoVideo src={DEMO_VIDEO} poster={DEMO_POSTER} />
+            </div>
+          </div>
         </section>
 
         <section className="how lp-container" id="comment-ca-marche">
