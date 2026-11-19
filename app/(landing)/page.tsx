@@ -28,6 +28,13 @@ export const metadata: Metadata = {
     "JobGPT traque les offres d’alternance qui collent à ton profil, te dit lesquelles valent le coup et prépare ta lettre pour chacune.",
 };
 
+/**
+ * The job boards students already scroll, named in a sentence that stays true (C117):
+ * JobGPT takes no offer from them and is no partner of theirs, so they appear as plain
+ * words in our own type, never as logos, and never under a "powered by".
+ */
+const SCROLLED_SITES = ["LinkedIn", "Indeed", "HelloWork", "France Travail"] as const;
+
 export default async function HomePage({
   searchParams,
 }: {
@@ -154,6 +161,24 @@ export default async function HomePage({
               <Check aria-hidden="true" /> Tu valides chaque envoi
             </li>
           </ul>
+        </section>
+
+        <section className="brands lp-container" aria-label="Les sites où tu cherches déjà">
+          <p className="sr-only">
+            Moins de temps à scroller sur {SCROLLED_SITES.slice(0, -1).join(", ")} et{" "}
+            {SCROLLED_SITES.at(-1)}.
+          </p>
+          <div className="brands-band" aria-hidden="true">
+            <span className="brands-label">Moins de temps à scroller sur</span>
+            <div className="brands-window">
+              {/* Two identical halves: the track slides by one half, then starts again. */}
+              <ul className="brands-track">
+                {[0, 1, 2, 3].flatMap((copy) =>
+                  SCROLLED_SITES.map((site) => <li key={`${copy}-${site}`}>{site}</li>),
+                )}
+              </ul>
+            </div>
+          </div>
         </section>
 
         <section className="how lp-container" id="comment-ca-marche">

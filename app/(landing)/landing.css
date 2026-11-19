@@ -805,6 +805,69 @@ html:has(.lp) {
   }
 }
 
+/* ------------------------------------------- the sites they already scroll */
+.lp .brands {
+  padding-bottom: clamp(8px, 2vw, 24px);
+}
+.lp .brands-band {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 68px;
+  padding: 0 8px 0 26px;
+  overflow: hidden;
+  border: 1px solid var(--glass-rim);
+  border-radius: 999px;
+  background-color: rgb(255 255 255 / 0.46);
+  background-image: var(--glass-sheen);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+}
+.lp .brands-label {
+  flex-shrink: 0;
+  color: var(--ink-soft);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* The names fade in and out at the edges of their window instead of being cut. */
+.lp .brands-window {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+.lp .brands-track {
+  display: flex;
+  width: max-content;
+  animation: lp-brands 30s linear infinite;
+}
+.lp .brands-track li {
+  display: flex;
+  align-items: center;
+  font-family: var(--display);
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+.lp .brands-track li::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin: 0 30px;
+  border-radius: 50%;
+  background: var(--ember);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5);
+}
+@keyframes lp-brands {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
 /* ------------------------------------------------------- section headings */
 .lp .how,
 .lp .feed,
@@ -1835,6 +1898,24 @@ html:has(.lp) {
   .lp .drop-cue {
     display: none;
   }
+  .lp .brands-band {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    height: auto;
+    padding: 14px 0 16px;
+    border-radius: 26px;
+  }
+  .lp .brands-label {
+    font-size: 13.5px;
+    text-align: center;
+  }
+  .lp .brands-track li {
+    font-size: 20px;
+  }
+  .lp .brands-track li::after {
+    margin: 0 20px;
+  }
   .lp .hero-stage {
     margin-top: 40px;
   }
@@ -1941,6 +2022,7 @@ html:has(.lp) {
     scroll-behavior: auto;
   }
   .lp .lp-sky i,
+  .lp .brands-track,
   .lp .enter,
   .lp .hero-chips li,
   .lp .drop-cue-line,
