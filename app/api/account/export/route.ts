@@ -25,7 +25,7 @@ export async function GET() {
       supabase
         .from("applications")
         .select(
-          "status, cover_letter_text, sent_at, sent_via, next_follow_up_at, notes, created_at, updated_at, offer:offers(title, company_name, location_label)",
+          "status, cover_letter_text, sent_at, sent_via, next_follow_up_at, notes, created_at, updated_at, company_name, company_address, target_title, offer:offers(title, company_name, location_label)",
         )
         .eq("user_id", userId),
       supabase

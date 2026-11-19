@@ -161,9 +161,16 @@ export default async function AdminAccountPage({ params }: { params: Promise<{ i
           head={["Offre", "Statut", "Envoyée", "Relance prévue", "Créée"]}
           rows={account.applications.map((row) => [
             <span key="offer" className="grid">
-              <span className="font-medium">{row.offer?.title ?? "Offre retirée"}</span>
+              <span className="font-medium">
+                {row.offer?.title ?? (row.company_name ? "Candidature spontanée" : "Offre retirée")}
+              </span>
               <span className="text-xs text-muted-foreground">
-                {[row.offer?.company_name, row.offer?.location_label].filter(Boolean).join(" · ")}
+                {(row.offer
+                  ? [row.offer.company_name, row.offer.location_label]
+                  : [row.company_name, row.company_address]
+                )
+                  .filter(Boolean)
+                  .join(" · ")}
               </span>
             </span>,
             APPLICATION_STATUS_LABELS[row.status] ?? row.status,

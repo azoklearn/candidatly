@@ -37,6 +37,12 @@ export type Database = {
       }
       applications: {
         Row: {
+          company_address: string | null
+          company_apply_url: string | null
+          company_key: string | null
+          company_name: string | null
+          company_phone: string | null
+          company_siret: string | null
           cover_letter_diff: Json | null
           cover_letter_text: string | null
           created_at: string
@@ -47,15 +53,22 @@ export type Database = {
           match_id: string | null
           next_follow_up_at: string | null
           notes: string | null
-          offer_id: string
+          offer_id: string | null
           regeneration_count: number
           sent_at: string | null
           sent_via: Database["public"]["Enums"]["applications_sent_via"] | null
           status: Database["public"]["Enums"]["applications_status"]
+          target_title: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          company_address?: string | null
+          company_apply_url?: string | null
+          company_key?: string | null
+          company_name?: string | null
+          company_phone?: string | null
+          company_siret?: string | null
           cover_letter_diff?: Json | null
           cover_letter_text?: string | null
           created_at?: string
@@ -66,15 +79,22 @@ export type Database = {
           match_id?: string | null
           next_follow_up_at?: string | null
           notes?: string | null
-          offer_id: string
+          offer_id?: string | null
           regeneration_count?: number
           sent_at?: string | null
           sent_via?: Database["public"]["Enums"]["applications_sent_via"] | null
           status?: Database["public"]["Enums"]["applications_status"]
+          target_title?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          company_address?: string | null
+          company_apply_url?: string | null
+          company_key?: string | null
+          company_name?: string | null
+          company_phone?: string | null
+          company_siret?: string | null
           cover_letter_diff?: Json | null
           cover_letter_text?: string | null
           created_at?: string
@@ -85,11 +105,12 @@ export type Database = {
           match_id?: string | null
           next_follow_up_at?: string | null
           notes?: string | null
-          offer_id?: string
+          offer_id?: string | null
           regeneration_count?: number
           sent_at?: string | null
           sent_via?: Database["public"]["Enums"]["applications_sent_via"] | null
           status?: Database["public"]["Enums"]["applications_status"]
+          target_title?: string | null
           updated_at?: string
           user_id?: string
         }

@@ -81,6 +81,24 @@ test("a student prepares, sends and tracks an application, then exports their da
   await page.goto("/offers");
   await expect(page.getByText("Candidature envoyée")).toBeVisible();
 
+  // A company of the selection that published no offer: its page says that being listed
+  // promises nothing, and prepares an unsolicited application (C121).
+  await page
+    .getByRole("listitem")
+    .filter({ hasText: "Atelier numérique 2 (test E2E)" })
+    .getByRole("link", { name: "Fiche et candidature" })
+    .click();
+  await expect(page).toHaveURL(/\/companies\/[0-9a-f-]{36}$/);
+  await expect(page.getByText(/Être listée ne garantit pas qu’un poste est ouvert/)).toBeVisible();
+  await page.getByRole("button", { name: "Préparer ma candidature spontanée" }).click();
+  await expect(page).toHaveURL(/\/applications\/[0-9a-f-]{36}$/);
+  await expect(page.getByText(/Candidature spontanée · Atelier numérique 2/)).toBeVisible();
+  // The trade of the profile fills [poste]; nothing is invented about the company.
+  await expect(page.locator("mark").first()).toBeVisible();
+  await expect(page.getByText(/Vous envoyez vous-même votre candidature spontanée/)).toBeVisible();
+  await page.goto("/applications");
+  await expect(page.getByRole("link", { name: "Candidature spontanée" })).toBeVisible();
+
   // The page shown after the questionnaire: the result in words, then one button (C105).
   await page.goto("/forfait");
   // No figure before the plan is active (C104).
@@ -120,8 +138,12 @@ test("a student prepares, sends and tracks an application, then exports their da
   expect(data.profile.chosen_plan).toBe("plus");
   // Each plan has its own billing: 3 mois renews every three months (C113).
   expect(data.profile.chosen_billing).toBe("quarterly");
-  expect(data.applications).toHaveLength(1);
-  expect(data.applications[0].status).toBe("replied_positive");
+  // The application to the offer, and the unsolicited one to the company (C121).
+  expect(data.applications).toHaveLength(2);
+  const statuses = data.applications.map((item: { status: string }) => item.status).sort();
+  expect(statuses).toEqual(["draft", "replied_positive"]);
+  const spontaneous = data.applications.find((item: { offer: unknown }) => item.offer === null);
+  expect(spontaneous.company_name).toBe("Atelier numérique 2 (test E2E)");
 });
 
 test("a student looking for an internship gets the companies of their domain (C106)", async ({

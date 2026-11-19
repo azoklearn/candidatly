@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { EVENTS } from "@/lib/analytics";
 import { trackServerEvent } from "@/lib/analytics-server";
+import { companyKey, contractWords, tradeForLetter } from "@/lib/applications/spontaneous";
 import { requireUserId } from "@/lib/auth/session";
 import { canPrepareLetters, requirePaidAccess } from "@/lib/billing/access";
 import { loadCompanyForOffer } from "@/lib/enrichment/company-for-offer";
@@ -73,6 +74,131 @@ async function buildLetter(
     confidence: result.confidence,
     missing_info: result.missing_info,
   };
+}
+
+type SpontaneousTarget = {
+  company_name: string | null;
+  company_address: string | null;
+  target_title: string | null;
+};
+
+/**
+ * The same adaptation for a company that published no offer (C121): its name, its city
+ * and the trade the student aims at. Null without a base letter.
+ */
+async function buildSpontaneousLetter(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  target: SpontaneousTarget,
+): Promise<StoredLetterDiff | null> {
+  const [documents, profile] = await Promise.all([
+    supabase
+      .from("documents")
+      .select("kind, extracted_text")
+      .eq("user_id", userId)
+      .eq("is_current", true),
+    supabase.from("profiles").select("target_contract").eq("user_id", userId).maybeSingle(),
+  ]);
+  if (documents.error) throw new DatabaseError("documents.select", documents.error);
+  const base = documents.data.find((d) => d.kind === "cover_letter_base")?.extracted_text;
+  if (!base) return null;
+  const result = adaptLetter({
+    baseLetter: base,
+    cvText: documents.data.find((d) => d.kind === "cv")?.extracted_text ?? "",
+    offer: {
+      title: target.target_title ?? "",
+      companyName: target.company_name,
+      city: cityFromAddress(target.company_address),
+      skills: [],
+      description: null,
+    },
+    spontaneous: { contractWords: contractWords(profile.data?.target_contract) },
+  });
+  return {
+    generator: LETTER_GENERATOR,
+    base_letter: base,
+    generated_letter: result.letter,
+    changes: result.changes,
+    confidence: result.confidence,
+    missing_info: result.missing_info,
+  };
+}
+
+/**
+ * An unsolicited application to a company of the student's search (C121): the letter is
+ * adapted to the company and the application joins the tracking. The student sends it.
+ */
+export async function prepareSpontaneousApplication(hiringCompanyId: string): Promise<void> {
+  if (!z.uuid().safeParse(hiringCompanyId).success) notFound();
+  const back = `/companies/${hiringCompanyId}`;
+  const supabase = await createClient();
+  const userId = await requireUserId(supabase);
+  if (!canPrepareLetters(await requirePaidAccess(supabase, userId))) redirect(back);
+  const [{ data: company }, { data: profile }] = await Promise.all([
+    supabase
+      .from("hiring_companies")
+      .select("name, siret, address, apply_url, phone")
+      .eq("id", hiringCompanyId)
+      .maybeSingle(),
+    supabase.from("profiles").select("rome_codes").eq("user_id", userId).maybeSingle(),
+  ]);
+  if (!company) notFound();
+  const key = companyKey(company);
+  if (!key) redirect(back);
+  const find = () =>
+    supabase
+      .from("applications")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("company_key", key)
+      .maybeSingle();
+  const existing = await find();
+  if (existing.data) redirect(`/applications/${existing.data.id}`);
+  if (!(await allowAction(supabase, "prepare_application"))) redirect(back);
+
+  // The trade named in the letter: the first one of the student's search.
+  const firstCode = profile?.rome_codes[0];
+  const trade = firstCode
+    ? await supabase.from("rome_codes").select("label").eq("code", firstCode).maybeSingle()
+    : null;
+  const target = {
+    company_name: company.name,
+    company_address: company.address,
+    target_title: tradeForLetter(trade?.data?.label),
+  };
+  const letter = await buildSpontaneousLetter(supabase, userId, target);
+  if (!letter) {
+    log.warn("prepare_without_base_letter");
+    redirect(back);
+  }
+  const inserted = await createAdminClient()
+    .from("applications")
+    .insert({
+      user_id: userId,
+      offer_id: null,
+      company_key: key,
+      ...target,
+      company_siret: company.siret,
+      company_apply_url: company.apply_url,
+      company_phone: company.phone,
+      cover_letter_text: letter.generated_letter,
+      cover_letter_diff: letter as Json,
+      generation_model: LETTER_GENERATOR,
+      status: "draft",
+    })
+    .select("id")
+    .single();
+  if (inserted.error) {
+    if (inserted.error.code === "23505") {
+      const again = await find();
+      if (again.data) redirect(`/applications/${again.data.id}`);
+    }
+    log.error("application_insert_failed", { code: inserted.error.code });
+    throw new Error("application_insert_failed");
+  }
+  log.info("spontaneous_application_prepared", { changes: letter.changes.length });
+  await trackServerEvent(EVENTS.applicationPrepared);
+  redirect(`/applications/${inserted.data.id}`);
 }
 
 export async function prepareApplication(offerId: string): Promise<void> {
@@ -171,13 +297,17 @@ export async function regenerateLetter(applicationId: string): Promise<void> {
   const userId = await requireUserId(supabase);
   const { data: application } = await supabase
     .from("applications")
-    .select("id, status, regeneration_count, offer:offers(*)")
+    .select(
+      "id, status, regeneration_count, company_key, company_name, company_address, target_title, offer:offers(*)",
+    )
     .eq("id", applicationId)
     .eq("user_id", userId)
     .maybeSingle();
-  if (!application?.offer) notFound();
+  if (!application || (!application.offer && !application.company_key)) notFound();
   if (application.status === "draft" && application.regeneration_count < MAX_REGENERATIONS) {
-    const letter = await buildLetter(supabase, userId, application.offer);
+    const letter = application.offer
+      ? await buildLetter(supabase, userId, application.offer)
+      : await buildSpontaneousLetter(supabase, userId, application);
     if (letter) {
       const { error } = await createAdminClient()
         .from("applications")
@@ -245,7 +375,8 @@ export async function markApplicationSent(applicationId: string): Promise<void> 
       .update({
         status: "sent",
         sent_at: new Date(now).toISOString(),
-        sent_via: "partner_site",
+        // An unsolicited application is sent by the student's own means (C121).
+        sent_via: application.offer_id ? "partner_site" : "mail_client",
         next_follow_up_at: new Date(now + FOLLOW_UP_DELAY_MS).toISOString(),
       })
       .eq("id", applicationId)
@@ -254,17 +385,19 @@ export async function markApplicationSent(applicationId: string): Promise<void> 
     if (error) {
       log.error("application_send_failed", { code: error.code });
     } else {
-      await admin
-        .from("matches")
-        .update({ status: "applied" })
-        .eq("user_id", userId)
-        .eq("offer_id", application.offer_id);
+      if (application.offer_id) {
+        await admin
+          .from("matches")
+          .update({ status: "applied" })
+          .eq("user_id", userId)
+          .eq("offer_id", application.offer_id);
+      }
       await logEvent(userId, "application_status", {
         application_id: applicationId,
         status: "sent",
         by: "student",
       });
-      log.info("application_sent", { via: "partner_site" });
+      log.info("application_sent", { spontaneous: !application.offer_id });
       await trackServerEvent(EVENTS.applicationSent);
     }
   }

@@ -35,7 +35,9 @@ export default async function ApplicationsPage() {
   await requirePaidAccess(supabase, userId);
   const { data, error } = await supabase
     .from("applications")
-    .select("id, status, updated_at, sent_at, next_follow_up_at, offer:offers(title, company_name)")
+    .select(
+      "id, status, updated_at, sent_at, next_follow_up_at, company_name, offer:offers(title, company_name)",
+    )
     .eq("user_id", userId)
     .order("updated_at", { ascending: false });
   if (error) throw new DatabaseError("applications.select", error);
@@ -51,7 +53,7 @@ export default async function ApplicationsPage() {
         <p className="text-sm text-muted-foreground">
           {due > 0
             ? `${due} relance${due > 1 ? "s" : ""} conseillée${due > 1 ? "s" : ""} : ouvrez la candidature pour copier le message.`
-            : "Préparez une lettre depuis une offre, candidatez sur le site de l’offre, puis suivez les réponses ici."}
+            : "Préparez une lettre depuis une offre ou pour une entreprise de votre sélection, envoyez-la, puis suivez les réponses ici."}
         </p>
       </div>
       {data.length === 0 ? (
@@ -88,11 +90,12 @@ export default async function ApplicationsPage() {
                         href={`/applications/${application.id}`}
                         className="font-semibold tracking-[-0.02em] hover:text-brand"
                       >
-                        {application.offer?.title ?? "Offre"}
+                        {application.offer?.title ??
+                          (application.company_name ? "Candidature spontanée" : "Offre")}
                       </Link>
                       <p className="text-sm text-muted-foreground">
                         {[
-                          application.offer?.company_name,
+                          application.offer?.company_name ?? application.company_name,
                           application.sent_at
                             ? `envoyée le ${formatDate(application.sent_at)}`
                             : `modifiée le ${formatDate(application.updated_at)}`,

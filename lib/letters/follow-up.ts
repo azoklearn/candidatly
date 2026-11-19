@@ -23,19 +23,27 @@ export function followUpMessage(input: {
   companyName: string | null;
   sentAt: string | null;
   studentName: string | null;
+  /** An unsolicited application (C121): no offer, `title` may be empty. */
+  spontaneous?: { contractWords: string };
 }): string {
   const title = cleanOfferTitle(input.title) || input.title;
   const date = formatDate(input.sentAt);
   const where = input.companyName ? ` chez ${input.companyName}` : "";
+  const what = input.spontaneous
+    ? `une candidature spontanée ${input.spontaneous.contractWords}${title ? ` pour un poste de ${title}` : ""}${where}`
+    : `ma candidature en alternance pour le poste de ${title}${where}`;
   const opening = date
-    ? `Le ${date}, je vous ai adressé ma candidature en alternance pour le poste de ${title}${where}.`
-    : `Je vous ai récemment adressé ma candidature en alternance pour le poste de ${title}${where}.`;
+    ? `Le ${date}, je vous ai adressé ${what}.`
+    : `Je vous ai récemment adressé ${what}.`;
+  const subject = input.spontaneous
+    ? "Relance de ma candidature spontanée"
+    : `Relance de ma candidature au poste de ${title}`;
   return [
-    `Objet : Relance de ma candidature au poste de ${title}`,
+    `Objet : ${subject}`,
     "",
     "Madame, Monsieur,",
     "",
-    `${opening} Ce poste m'intéresse toujours et je me permets de revenir vers vous pour savoir si ma candidature a pu être étudiée.`,
+    `${opening} ${input.spontaneous ? "Rejoindre votre équipe" : "Ce poste"} m'intéresse toujours et je me permets de revenir vers vous pour savoir si ma candidature a pu être étudiée.`,
     "",
     "Je reste disponible pour un entretien à votre convenance et vous remercie par avance de votre retour.",
     "",

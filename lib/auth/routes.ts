@@ -4,6 +4,7 @@
 export const PROTECTED_PREFIXES = [
   "/offers",
   "/applications",
+  "/companies",
   "/credits",
   "/account",
   "/forfait",

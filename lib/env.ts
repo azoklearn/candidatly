@@ -212,6 +212,14 @@ export function billingProvider(): BillingProvider | null {
   }
 }
 
+/**
+ * COMPANY_LOOKUP_DISABLED=1 switches off the calls to the company register: end-to-end
+ * tests open company pages and must not call an external API.
+ */
+export function isCompanyLookupDisabled(): boolean {
+  return process.env.COMPANY_LOOKUP_DISABLED === "1";
+}
+
 /** The paywall is on once a payment provider is configured. */
 export function isBillingConfigured(): boolean {
   return billingProvider() !== null;

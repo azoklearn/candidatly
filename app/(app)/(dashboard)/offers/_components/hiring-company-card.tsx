@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import { Tag } from "@/components/tag";
@@ -39,7 +40,12 @@ export function HiringCompanyCard({
           {company.name.slice(0, 1).toUpperCase()}
         </span>
         <div className="grid min-w-0 gap-0.5">
-          <p className="leading-snug font-semibold tracking-[-0.02em]">{company.name}</p>
+          <Link
+            href={`/companies/${company.id}`}
+            className="leading-snug font-semibold tracking-[-0.02em] hover:text-brand"
+          >
+            {company.name}
+          </Link>
           {place.length > 0 ? (
             <p className="text-sm text-muted-foreground">{place.join(" · ")}</p>
           ) : null}
@@ -53,6 +59,13 @@ export function HiringCompanyCard({
         {company.headcount ? <Tag>{company.headcount}</Tag> : null}
       </div>
       <div className="flex flex-wrap gap-2">
+        {/* The company page: who runs it, how to reach it, and a letter adapted to it (C121). */}
+        <Link
+          href={`/companies/${company.id}`}
+          className={buttonVariants({ variant: "default", size: "sm" })}
+        >
+          Fiche et candidature
+        </Link>
         {domainOnly && company.directoryUrl ? (
           <a
             href={company.directoryUrl}

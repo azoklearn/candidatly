@@ -36,6 +36,12 @@ export type AdaptLetterInput = {
     description: string | null;
   };
   cvText: string;
+  /**
+   * An unsolicited application (C121): there is no offer, the "title" is the trade the
+   * student aims at, and the subject says so. `contractWords` reads after "Candidature
+   * spontanée", for example "en alternance".
+   */
+  spontaneous?: { contractWords: string };
 };
 
 type Slot = "company" | "title" | "city";
@@ -185,15 +191,28 @@ export function adaptLetter(input: AdaptLetterInput): CoverLetterResult {
   let companyDone = false;
   let titleDone = false;
 
+  const spontaneous = input.spontaneous ?? null;
+  const reasons: Record<Slot, string> = spontaneous
+    ? { ...REASONS, title: "Métier que vous visez, repris de votre profil." }
+    : REASONS;
   const subject = /^(objet\s*:\s*)(.+)$/im.exec(base);
-  if (subject && title) {
+  if (subject && (title || spontaneous)) {
     const start = subject.index + (subject[1] ?? "").length;
     const end = start + (subject[2] ?? "").length;
-    const replacement = `Candidature en alternance au poste de ${title}`;
+    const replacement = spontaneous
+      ? `Candidature spontanée ${spontaneous.contractWords}${title ? ` au poste de ${title}` : ""}`
+      : `Candidature en alternance au poste de ${title}`;
     if (base.slice(start, end).trim() !== replacement) {
-      spans.push({ start, end, replacement, reason: "Objet aligné sur l'intitulé de l'offre." });
+      spans.push({
+        start,
+        end,
+        replacement,
+        reason: spontaneous
+          ? "Objet d'une candidature spontanée."
+          : "Objet aligné sur l'intitulé de l'offre.",
+      });
     }
-    titleDone = true;
+    if (title) titleDone = true;
   }
 
   for (const match of base.matchAll(PLACEHOLDER)) {
@@ -206,7 +225,7 @@ export function adaptLetter(input: AdaptLetterInput): CoverLetterResult {
       missing.add(`Passage à compléter dans votre lettre : ${match[0]}`);
       continue;
     }
-    spans.push({ start, end, replacement: value, reason: REASONS[slot] });
+    spans.push({ start, end, replacement: value, reason: reasons[slot] });
     if (slot === "company") companyDone = true;
     if (slot === "title") titleDone = true;
   }
@@ -223,14 +242,16 @@ export function adaptLetter(input: AdaptLetterInput): CoverLetterResult {
       companyDone = true;
     }
   }
-  if (!company) missing.add("L'offre ne précise pas le nom de l'employeur.");
+  if (!company && !spontaneous) missing.add("L'offre ne précise pas le nom de l'employeur.");
 
   let skillsDone = false;
   const skills = sharedSkills(input.offer.skills, input.cvText, 3, input.offer.description ?? "");
   const target = skills.length > 0 ? insertionPoint(base) : null;
   if (skills.length === 0) {
     missing.add(
-      "Aucune compétence de votre CV n'est citée dans l'offre : ajoutez une phrase personnelle sur les missions.",
+      spontaneous
+        ? "Cette entreprise n'a pas publié d'offre : ajoutez une phrase sur ce qui vous attire chez elle."
+        : "Aucune compétence de votre CV n'est citée dans l'offre : ajoutez une phrase personnelle sur les missions.",
     );
   } else if (target) {
     const inner = spans.filter((span) => span.start >= target.start && span.end <= target.end);

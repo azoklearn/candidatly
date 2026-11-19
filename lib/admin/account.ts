@@ -59,7 +59,7 @@ export async function loadAdminAccount(userId: string) {
       db
         .from("applications")
         .select(
-          "status, sent_at, sent_via, next_follow_up_at, regeneration_count, created_at, offer:offers(title, company_name, location_label)",
+          "status, sent_at, sent_via, next_follow_up_at, regeneration_count, created_at, company_name, company_address, offer:offers(title, company_name, location_label)",
         )
         .eq("user_id", userId)
         .order("created_at", { ascending: false })

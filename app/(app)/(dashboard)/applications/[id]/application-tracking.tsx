@@ -85,6 +85,8 @@ export function ApplicationTracking({
   applyUrl,
   followUp,
   notes,
+  spontaneous = false,
+  phone = null,
 }: {
   applicationId: string;
   status: string;
@@ -92,6 +94,9 @@ export function ApplicationTracking({
   applyUrl: string | null;
   followUp: string | null;
   notes: string | null;
+  /** An unsolicited application: no offer, the student reaches the company directly. */
+  spontaneous?: boolean;
+  phone?: string | null;
 }) {
   if (status === "draft" || status === "ready") {
     return (
@@ -99,13 +104,19 @@ export function ApplicationTracking({
         <CardHeader>
           <CardTitle>Envoyer votre candidature</CardTitle>
           <CardDescription>
-            Vous candidatez sur le site de l’offre, avec votre lettre prête.
+            {spontaneous
+              ? "Vous envoyez vous-même votre candidature spontanée, avec votre lettre prête."
+              : "Vous candidatez sur le site de l’offre, avec votre lettre prête."}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 text-sm">
           <ol className="list-decimal space-y-2 pl-5 text-muted-foreground">
             <li>Copiez votre lettre avec le bouton « Copier la lettre ».</li>
-            <li>Ouvrez l’offre sur son site, collez votre lettre et joignez votre CV.</li>
+            <li>
+              {spontaneous
+                ? "Envoyez-la à l’entreprise avec votre CV : par son formulaire, par email ou en la déposant sur place."
+                : "Ouvrez l’offre sur son site, collez votre lettre et joignez votre CV."}
+            </li>
             <li>
               Revenez confirmer l’envoi : nous suivons votre candidature et vous proposons une
               relance au bout de 5 jours.
@@ -118,14 +129,26 @@ export function ApplicationTracking({
               properties={{ emplacement: "candidature" }}
               className={buttonVariants({ variant: "outline" })}
             >
-              Candidater sur le site de l’offre
+              {spontaneous
+                ? "Ouvrir le formulaire de candidature spontanée"
+                : "Candidater sur le site de l’offre"}
             </TrackedLink>
+          ) : spontaneous ? (
+            <p className="text-muted-foreground">
+              {phone
+                ? `Aucun formulaire connu pour cette entreprise. Son téléphone : ${phone}.`
+                : "Aucun formulaire connu pour cette entreprise : passez par son site ou déposez votre candidature sur place."}
+            </p>
           ) : (
             <p className="text-muted-foreground">L’offre n’indique pas de lien de candidature.</p>
           )}
           <ConfirmForm
             action={markApplicationSent.bind(null, applicationId)}
-            message="Confirmez-vous avoir envoyé votre candidature sur le site de l’offre ?"
+            message={
+              spontaneous
+                ? "Confirmez-vous avoir envoyé votre candidature spontanée à l’entreprise ?"
+                : "Confirmez-vous avoir envoyé votre candidature sur le site de l’offre ?"
+            }
           >
             <SubmitButton className="w-full" pendingLabel="Enregistrement…">
               J’ai envoyé ma candidature

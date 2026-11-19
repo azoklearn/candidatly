@@ -34,6 +34,8 @@ export type RecentApplicationRow = {
   status: string;
   sent_at: string | null;
   created_at: string;
+  /** Set for an unsolicited application, which has no offer (C121). */
+  company_name: string | null;
   offer: { title: string; company_name: string | null } | null;
 };
 
@@ -114,7 +116,9 @@ export async function loadAdminData(): Promise<AdminData> {
       .limit(EVENT_LIMIT),
     supabase
       .from("applications")
-      .select("user_id, status, sent_at, created_at, offer:offers(title, company_name)")
+      .select(
+        "user_id, status, sent_at, created_at, company_name, offer:offers(title, company_name)",
+      )
       .order("created_at", { ascending: false })
       .limit(40),
   ]);

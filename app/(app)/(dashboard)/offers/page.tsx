@@ -128,7 +128,8 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
           </h1>
           <p className="max-w-prose text-sm text-muted-foreground">
             Les entreprises de vos métiers près de chez vous, les plus proches d’abord.
-            Proposez-leur votre profil pour un {contract}.
+            Proposez-leur votre profil pour un {contract}. Être listée ne garantit pas qu’un poste
+            est ouvert.
           </p>
         </div>
         {domainCompanies.length > 0 ? (
@@ -318,8 +319,8 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
               Entreprises à fort potentiel d’embauche <em>près de chez vous</em>
             </h2>
             <p className="max-w-prose text-sm text-muted-foreground">
-              Elles recrutent des alternants dans vos métiers. Proposez-leur votre profil avec une
-              candidature spontanée.
+              Elles embauchent souvent des alternants dans vos métiers. Être listée ne garantit pas
+              qu’un poste est ouvert : proposez-leur votre profil avec une candidature spontanée.
             </p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2 sm:items-start">

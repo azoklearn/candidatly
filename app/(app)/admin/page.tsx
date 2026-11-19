@@ -273,8 +273,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
               {emailOf.get(row.user_id) ?? "—"}
             </Link>,
             <span key="offer" className="grid">
-              <span className="font-medium">{row.offer?.title ?? "Offre retirée"}</span>
-              <span className="text-xs text-muted-foreground">{row.offer?.company_name ?? ""}</span>
+              <span className="font-medium">
+                {row.offer?.title ?? (row.company_name ? "Candidature spontanée" : "Offre retirée")}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {row.offer?.company_name ?? row.company_name ?? ""}
+              </span>
             </span>,
             APPLICATION_STATUS_LABELS[row.status] ?? row.status,
             <When key="at" at={row.created_at} />,

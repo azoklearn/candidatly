@@ -1,3 +1,4 @@
+import { isCompanyLookupDisabled } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { extractPostalCode, JobOfferReadSchema } from "@/lib/providers/api-alternance";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -43,6 +44,7 @@ export async function loadCompanyForOffer(
   if (offer.is_delegated) return { status: "delegated" };
   const target = companyTargetFromOffer(offer);
   if (!target || !companyLookupKey(target)) return { status: "unknown" };
+  if (isCompanyLookupDisabled()) return { status: "unavailable" };
   const db = createAdminClient();
   try {
     const outcome = await enrichCompany(target, { db, now: options.now ?? new Date() });

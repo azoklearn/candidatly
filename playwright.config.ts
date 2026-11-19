@@ -27,7 +27,7 @@ export default defineConfig({
     timeout: 300_000,
     // No paywall and no call to Whop during the tests (lib/env.ts, isBillingConfigured).
     // The admin dashboard opens for the seeded admin account only.
-    env: { BILLING_DISABLED: "1", ADMIN_EMAILS: ADMIN_EMAIL },
+    env: { BILLING_DISABLED: "1", COMPANY_LOOKUP_DISABLED: "1", ADMIN_EMAILS: ADMIN_EMAIL },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });
