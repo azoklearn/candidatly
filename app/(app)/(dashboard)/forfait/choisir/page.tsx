@@ -31,17 +31,21 @@ export default async function ChoosePlanPage({ searchParams }: { searchParams: S
   const [offers, preview, profile, counts, access] = await Promise.all([
     supabase
       .from("matches")
-      .select("id, offer:offers!inner(removed_at)", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .neq("status", "dismissed")
-      .is("offer.removed_at", null),
-    // Only coarse columns: the title and the employer never leave the server (C88).
-    supabase
-      .from("matches")
-      .select("score, offer:offers!inner(location_label, contract_types, published_at, removed_at)")
+      .select("id, offer:offers!inner(removed_at, noise_kind)", { count: "exact", head: true })
       .eq("user_id", userId)
       .neq("status", "dismissed")
       .is("offer.removed_at", null)
+      .is("offer.noise_kind", null),
+    // Only coarse columns: the title and the employer never leave the server (C88).
+    supabase
+      .from("matches")
+      .select(
+        "score, offer:offers!inner(location_label, contract_types, published_at, removed_at, noise_kind)",
+      )
+      .eq("user_id", userId)
+      .neq("status", "dismissed")
+      .is("offer.removed_at", null)
+      .is("offer.noise_kind", null)
       .order("score", { ascending: false })
       .limit(4),
     supabase

@@ -4,6 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 
 export const STATE_FILE = "tests/e2e/.state.json";
 export const OFFER_TITLE = "Développeur web en alternance (test E2E)";
+/** An offer managed by a school: hidden by default by the noise filter (C120). */
+export const SCHOOL_OFFER_TITLE = "Assistant de gestion via une école (test E2E)";
 /** Same address as ADMIN_EMAILS in playwright.config.ts. */
 export const ADMIN_EMAIL = "e2e-admin@example.com";
 

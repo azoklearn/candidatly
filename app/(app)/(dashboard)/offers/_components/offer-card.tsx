@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Tag } from "@/components/tag";
 import { cityFromAddress, contractLabel, formatDistance, formatRelativeDays } from "@/lib/format";
+import { isNoiseKind, NOISE_LABELS } from "@/lib/offers/noise";
 
 import { setMatchStatus } from "../actions";
 
@@ -19,6 +20,7 @@ export type OfferCardData = {
     location_label: string | null;
     published_at: string | null;
     is_delegated: boolean;
+    noise_kind: string | null;
     contract_types: string[];
   };
   hasCompanyCard: boolean;
@@ -57,7 +59,7 @@ export function OfferCard({ data, index = 0 }: { data: OfferCardData; index?: nu
       <div className="flex flex-wrap gap-2">
         <Tag>{contractLabel(offer.contract_types)}</Tag>
         {data.hasCompanyCard ? <Tag>Fiche entreprise disponible</Tag> : null}
-        {offer.is_delegated ? <Tag>Offre gérée par une école</Tag> : null}
+        {isNoiseKind(offer.noise_kind) ? <Tag>{NOISE_LABELS[offer.noise_kind]}</Tag> : null}
         {saved ? <Tag>Enregistrée</Tag> : null}
         {data.status === "applied" ? <Tag>Candidature envoyée</Tag> : null}
       </div>

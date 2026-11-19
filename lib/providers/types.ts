@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import type { NoiseKind } from "@/lib/offers/noise";
 import type { Enums, Json } from "@/lib/supabase/database.types";
 
 /**
@@ -40,6 +41,8 @@ export type NormalizedOffer = {
   companyWebsite: string | null;
   /** True when a school manages the offer: company fields then describe the school. */
   isDelegated: boolean;
+  /** School, training body or staffing agency, hidden by default in the list (C120). */
+  noiseKind: NoiseKind | null;
   locationLabel: string | null;
   postalCode: string | null;
   lat: number | null;

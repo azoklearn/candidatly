@@ -15,6 +15,7 @@ export function toOfferRow(offer: NormalizedOffer, seenAt: Date): TablesInsert<"
     company_siret: offer.companySiret,
     company_website: offer.companyWebsite,
     is_delegated: offer.isDelegated,
+    noise_kind: offer.noiseKind,
     location_label: offer.locationLabel,
     postal_code: offer.postalCode,
     lat: offer.lat,

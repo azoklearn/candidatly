@@ -308,6 +308,95 @@
   .field:focus-visible {
     background-color: #fff;
   }
+  /* Swipe view of the offers (C120): one slab of glass at a time, the next one under it. */
+  .swipe-stage {
+    position: relative;
+    display: grid;
+    min-height: 26rem;
+    margin-inline: auto;
+    width: min(26rem, 100%);
+  }
+  .swipe-card {
+    position: relative;
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1.4rem;
+    border-radius: 1.9rem;
+    background-color: rgb(255 255 255 / 0.82);
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    transition:
+      transform 240ms var(--ease-out-strong),
+      opacity 240ms ease;
+    will-change: transform;
+  }
+  .swipe-card[data-dragging="true"] {
+    cursor: grabbing;
+    transition: none;
+  }
+  .swipe-card-under {
+    transform: translate3d(0, 12px, 0) scale(0.955);
+    opacity: 0.6;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .swipe-stamp {
+    position: absolute;
+    top: 1.1rem;
+    z-index: 2;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 600;
+    pointer-events: none;
+  }
+  .swipe-stamp-keep {
+    left: 1.1rem;
+    background: var(--ember);
+    color: #fff;
+    transform: rotate(-8deg);
+  }
+  .swipe-stamp-drop {
+    right: 1.1rem;
+    background: var(--ink);
+    color: #fff6ee;
+    transform: rotate(8deg);
+  }
+  .swipe-chip {
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(120 76 48 / 0.09);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .swipe-chip-fit {
+    background: linear-gradient(180deg, #ffe2d0, #ffcdb0);
+  }
+  .swipe-button {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+  }
+  .swipe-button svg {
+    width: 1.6rem;
+    height: 1.6rem;
+    stroke-width: 2.6;
+  }
+  .swipe-button-small {
+    width: 2.9rem;
+    height: 2.9rem;
+  }
+  .swipe-button-small svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
   /* A choice among a few: a chip of clear glass, smoked once chosen. */
   .chip {
     border: 1px solid var(--glass-rim);
@@ -1383,6 +1472,9 @@
   .seg-thumb,
   .faq::details-content,
   .faq summary::after {
+    transition: none;
+  }
+  .swipe-card {
     transition: none;
   }
   .card-lift:hover,

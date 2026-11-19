@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { adminClient, loadState, OFFER_TITLE } from "./support";
+import { adminClient, loadState, OFFER_TITLE, SCHOOL_OFFER_TITLE } from "./support";
 
 test("a student prepares, sends and tracks an application, then exports their data", async ({
   page,
@@ -26,7 +26,34 @@ test("a student prepares, sends and tracks an application, then exports their da
     "tel:+33123456789",
   );
 
+  // The offer managed by a school is hidden until the student asks for it (C120).
+  await expect(page.getByText(SCHOOL_OFFER_TITLE)).toHaveCount(0);
+  await expect(page.getByText(/1 offre masquée/)).toBeVisible();
+  await page.getByRole("button", { name: "Les afficher" }).click();
+  const school = page.getByRole("listitem").filter({ hasText: SCHOOL_OFFER_TITLE });
+  await expect(school.getByText("Offre gérée par une école")).toBeVisible();
+  await page.getByRole("button", { name: "Les masquer" }).click();
+  await expect(page.getByText(SCHOOL_OFFER_TITLE)).toHaveCount(0);
+
+  // The same offers one at a time: keep it with a button, as a swipe to the right would.
+  await page.getByRole("link", { name: "Une par une" }).click();
+  await expect(page).toHaveURL(/mode=swipe/);
+  await expect(page.getByRole("heading", { level: 2, name: OFFER_TITLE })).toBeVisible();
+  await expect(page.getByText("Votre métier", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Garder cette offre" }).click();
+  await expect(page.getByText("1 offre gardée sur 1")).toBeVisible();
+  await page.getByRole("link", { name: "Liste", exact: true }).click();
+  await expect(
+    page.getByRole("listitem").filter({ hasText: OFFER_TITLE }).getByText("Enregistrée"),
+  ).toBeVisible();
+
   await page.getByRole("link", { name: OFFER_TITLE }).click();
+  // What fits, what is missing, and advice: rules on the reasons of the score (C120).
+  await expect(page.getByText("Analyse du match")).toBeVisible();
+  await expect(page.getByText("Le métier est l’un de ceux que vous visez.")).toBeVisible();
+  await expect(
+    page.getByText("L’offre ne dit pas quel niveau de diplôme elle vise."),
+  ).toBeVisible();
   await expect(
     page.getByText("L’offre ne donne ni SIRET ni nom d’employeur exploitable."),
   ).toBeVisible();

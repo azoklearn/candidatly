@@ -26,20 +26,24 @@ export const metadata: Metadata = { title: "Ta recherche" };
 export default async function SearchResultPage() {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
+  // Schools, training bodies and agencies are left out, as in the list by default (C120):
+  // the headline only speaks of offers the student will see when the page opens.
   const [offers, dates, profile, access] = await Promise.all([
     supabase
       .from("matches")
-      .select("id, offer:offers!inner(removed_at)", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .neq("status", "dismissed")
-      .is("offer.removed_at", null),
-    // Publication dates only, to say how alive the selection is without inventing anything.
-    supabase
-      .from("matches")
-      .select("offer:offers!inner(published_at, removed_at)")
+      .select("id, offer:offers!inner(removed_at, noise_kind)", { count: "exact", head: true })
       .eq("user_id", userId)
       .neq("status", "dismissed")
       .is("offer.removed_at", null)
+      .is("offer.noise_kind", null),
+    // Publication dates only, to say how alive the selection is without inventing anything.
+    supabase
+      .from("matches")
+      .select("offer:offers!inner(published_at, removed_at, noise_kind)")
+      .eq("user_id", userId)
+      .neq("status", "dismissed")
+      .is("offer.removed_at", null)
+      .is("offer.noise_kind", null)
       .limit(300),
     supabase
       .from("profiles")

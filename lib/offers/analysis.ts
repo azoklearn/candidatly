@@ -52,6 +52,9 @@ export async function analyseSearch(options: {
     .from("offers")
     .select("rome_codes, lat, lng, diploma_level, published_at, title, description")
     .is("removed_at", null)
+    // Schools, training bodies and agencies are hidden by default in the list (C120):
+    // the analysis does not announce offers the student will not see.
+    .is("noise_kind", null)
     .gte("lat", box.minLat)
     .lte("lat", box.maxLat)
     .gte("lng", box.minLng)

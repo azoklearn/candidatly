@@ -20,6 +20,7 @@ export default async function globalTeardown() {
     await db.auth.admin.deleteUser(user.id);
   }
   await db.from("offers").delete().eq("id", state.offerId);
+  await db.from("offers").delete().like("external_id", "e2e:%:school");
   await db.from("hiring_companies").delete().like("external_id", "e2e:%");
   unlinkSync(STATE_FILE);
 }

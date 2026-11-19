@@ -3,7 +3,14 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 import { toSearchKey } from "../../lib/offers/search-keys";
 
-import { ADMIN_EMAIL, adminClient, OFFER_TITLE, STATE_FILE, type E2EState } from "./support";
+import {
+  ADMIN_EMAIL,
+  adminClient,
+  OFFER_TITLE,
+  SCHOOL_OFFER_TITLE,
+  STATE_FILE,
+  type E2EState,
+} from "./support";
 
 /** Search of the seeded students, for the hiring companies shown next to their offers. */
 const STUDENT_SEARCH = {
@@ -56,6 +63,32 @@ export default async function globalSetup() {
     .select("id")
     .single();
   if (offer.error) throw offer.error;
+  // A second offer, managed by a school: the list hides it until the student asks (C120).
+  const schoolOffer = await db
+    .from("offers")
+    .insert({
+      source: "api_alternance",
+      external_id: `e2e:${run}:school`,
+      title: SCHOOL_OFFER_TITLE,
+      description: "Offre proposée par une école partenaire.",
+      company_name: "École de commerce (test E2E)",
+      is_delegated: true,
+      noise_kind: "school",
+      apply_channel: "external_url",
+      apply_target: "https://example.org/ecole",
+      location_label: "10 RUE DE RIVOLI 75004 PARIS",
+      postal_code: "75004",
+      lat: 48.8559,
+      lng: 2.3589,
+      rome_codes: ["M1855"],
+      contract_types: ["apprentissage"],
+      published_at: now,
+      last_seen_at: now,
+      raw: {},
+    })
+    .select("id")
+    .single();
+  if (schoolOffer.error) throw schoolOffer.error;
 
   const users = {} as E2EState["users"];
   for (const role of ["student", "leaver"] as const) {
@@ -128,6 +161,19 @@ export default async function globalSetup() {
       },
     });
     if (match.error) throw match.error;
+    const schoolMatch = await db.from("matches").insert({
+      user_id: id,
+      offer_id: schoolOffer.data.id,
+      score: 61,
+      score_reasons: {
+        rome: "related",
+        distanceKm: 0.5,
+        diploma: "unspecified",
+        freshnessDays: 0,
+        keywords: [],
+      },
+    });
+    if (schoolMatch.error) throw schoolMatch.error;
     const link = await db.auth.admin.generateLink({ type: "magiclink", email });
     if (link.error) throw link.error;
     users[role] = {

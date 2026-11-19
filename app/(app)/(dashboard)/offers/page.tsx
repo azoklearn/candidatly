@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PendingOverlay } from "@/components/pending-overlay";
+import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
 import { requireUserId } from "@/lib/auth/session";
 import { requirePaidAccess } from "@/lib/billing/access";
 import { DatabaseError } from "@/lib/errors";
+import { cityFromAddress, contractLabel, formatDistance, formatRelativeDays } from "@/lib/format";
+import { analyseMatch } from "@/lib/matching/analysis";
 import { readScoreReasons } from "@/lib/matching/reasons";
 import { applyOfferFilters, parseOfferFilters } from "@/lib/offers/filters";
 import { companiesOnly } from "@/lib/offers/contract-mode";
@@ -14,12 +17,15 @@ import {
   MAX_SHOWN_COMPANIES_ONLY,
   loadHiringCompanies,
 } from "@/lib/offers/hiring-companies";
+import { isNoiseKind } from "@/lib/offers/noise";
+import { toTargetDiplomaLevel } from "@/lib/providers/api-alternance";
 import { createClient } from "@/lib/supabase/server";
 
-import { refreshMyOffers } from "./actions";
+import { refreshMyOffers, setNoiseHidden } from "./actions";
 import { HiringCompanyCard } from "./_components/hiring-company-card";
 import { OfferCard, type OfferCardData } from "./_components/offer-card";
 import { OfferFilters } from "./_components/offer-filters";
+import { SwipeDeck, type SwipeCard } from "./_components/swipe-deck";
 
 export const metadata: Metadata = { title: "Offres" };
 
@@ -35,15 +41,17 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
     company: first(params.company).trim(),
     view: first(params.view),
   };
+  // The same offers, one at a time, to keep or set aside with the thumb (C120).
+  const swipe = first(params.mode) === "swipe";
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
   await requirePaidAccess(supabase, userId);
 
-  const [matches, profile] = await Promise.all([
+  const [matches, profile, cv] = await Promise.all([
     supabase
       .from("matches")
       .select(
-        "id, score, score_reasons, status, offer:offers!inner(id, title, company_name, company_siret, location_label, published_at, is_delegated, contract_types, removed_at)",
+        "id, score, score_reasons, status, offer:offers!inner(id, title, company_name, company_siret, location_label, published_at, is_delegated, noise_kind, diploma_level, contract_types, removed_at)",
       )
       .eq("user_id", userId)
       .neq("status", "dismissed")
@@ -53,9 +61,16 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
     supabase
       .from("profiles")
       .select(
-        "rome_codes, location_lat, location_lng, search_radius_km, diploma_level, target_contract",
+        "rome_codes, location_lat, location_lng, search_radius_km, diploma_level, target_contract, hide_noise",
       )
       .eq("user_id", userId)
+      .maybeSingle(),
+    supabase
+      .from("documents")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("kind", "cv")
+      .eq("is_current", true)
       .maybeSingle(),
   ]);
   if (matches.error) throw new DatabaseError("matches.select", matches.error);
@@ -80,7 +95,7 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
       hasCompanyCard: m.offer.company_siret !== null && withCard.has(m.offer.company_siret),
     };
   });
-  const cards = applyOfferFilters(
+  const filtered = applyOfferFilters(
     all,
     parseOfferFilters({
       km: filters.maxKm,
@@ -89,6 +104,13 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
       view: filters.view,
     }),
   );
+  // Schools, training bodies and agencies are hidden unless the student asked for them
+  // (C120). An offer already kept or applied to is never taken away.
+  const hideNoise = profile.data?.hide_noise ?? true;
+  const isNoise = (card: OfferCardData) =>
+    isNoiseKind(card.offer.noise_kind) && card.status === "new";
+  const hiddenCount = hideNoise ? filtered.filter(isNoise).length : 0;
+  const cards = hideNoise ? filtered.filter((card) => !isNoise(card)) : filtered;
   // An internship or a student job: the companies of the student's trades are the page (C106).
   if (profile.data && companiesOnly(profile.data.target_contract)) {
     const contract = profile.data.target_contract === "job_etudiant" ? "job étudiant" : "stage";
@@ -134,7 +156,46 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
     );
   }
 
-  const total = matches.data.length;
+  const total = hideNoise ? all.filter((card) => !isNoise(card)).length : all.length;
+  const everything = all.length;
+  const profileLevel = Number(toTargetDiplomaLevel(profile.data?.diploma_level)) || null;
+  const swipeCards: SwipeCard[] = swipe
+    ? cards
+        .filter((card) => card.status === "new")
+        .map((card) => {
+          const match = matches.data.find((item) => item.id === card.matchId);
+          const reasons = readScoreReasons(match?.score_reasons);
+          const analysis = reasons
+            ? analyseMatch({
+                reasons,
+                radiusKm: profile.data?.search_radius_km ?? null,
+                profileLevel,
+                offerLevel: match?.offer.diploma_level ?? null,
+                desiredSkills: [],
+                hasCv: cv.data !== null,
+                cvText: null,
+                noiseKind: card.offer.noise_kind,
+              })
+            : null;
+          return {
+            matchId: card.matchId,
+            offerId: card.offer.id,
+            title: card.offer.title,
+            company: card.offer.company_name,
+            details: [
+              cityFromAddress(card.offer.location_label),
+              card.distanceKm === null ? null : formatDistance(card.distanceKm),
+              formatRelativeDays(card.offer.published_at),
+            ]
+              .filter(Boolean)
+              .join(" · "),
+            contract: contractLabel(card.offer.contract_types),
+            score: card.score,
+            fits: (analysis?.fits ?? []).slice(0, 4).map((point) => point.short),
+            gaps: (analysis?.gaps ?? []).slice(0, 3).map((point) => point.short),
+          };
+        })
+    : [];
   // While published offers are scarce, companies that hire apprentices in the student's
   // trades complete the page (docs/QUESTIONS.md C80).
   const hiringCompanies =
@@ -176,8 +237,46 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
         </form>
       </div>
 
-      {total > 0 ? <OfferFilters values={filters} /> : null}
-      {total > 0 && cards.length === 0 ? (
+      {everything > 0 ? (
+        <nav
+          aria-label="Affichage des offres"
+          className="flex w-fit gap-1 rounded-full p-1 glass-bar"
+        >
+          <Link
+            href="/offers"
+            aria-current={swipe ? undefined : "page"}
+            className="rounded-full px-4 py-1.5 text-sm font-semibold text-muted-foreground aria-[current=page]:bg-foreground aria-[current=page]:text-background"
+          >
+            Liste
+          </Link>
+          <Link
+            href="/offers?mode=swipe"
+            aria-current={swipe ? "page" : undefined}
+            className="rounded-full px-4 py-1.5 text-sm font-semibold text-muted-foreground aria-[current=page]:bg-foreground aria-[current=page]:text-background"
+          >
+            Une par une
+          </Link>
+        </nav>
+      ) : null}
+
+      {total > 0 && !swipe ? <OfferFilters values={filters} /> : null}
+      {hiddenCount > 0 || (!hideNoise && all.some((card) => isNoiseKind(card.offer.noise_kind))) ? (
+        <form
+          action={setNoiseHidden.bind(null, !hideNoise)}
+          className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground"
+        >
+          <p>
+            {hideNoise
+              ? `${hiddenCount} ${hiddenCount > 1 ? "offres masquées" : "offre masquée"} : écoles, organismes de formation et agences d’intérim ou de recrutement.`
+              : "Les offres d’écoles, d’organismes de formation et d’agences sont affichées."}
+          </p>
+          <SubmitButton variant="outline" size="sm" pendingLabel="Un instant…">
+            {hideNoise ? "Les afficher" : "Les masquer"}
+          </SubmitButton>
+        </form>
+      ) : null}
+      {swipe && everything > 0 ? <SwipeDeck cards={swipeCards} /> : null}
+      {!swipe && total > 0 && cards.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           Ces filtres sont un peu stricts : élargissez la distance ou la date, ou{" "}
           <Link href="/offers" className="font-medium text-brand underline underline-offset-4">
@@ -186,7 +285,7 @@ export default async function OffersPage({ searchParams }: { searchParams: Searc
           .
         </p>
       ) : null}
-      {cards.length > 0 ? (
+      {!swipe && cards.length > 0 ? (
         <ul className="grid gap-3">
           {cards.map((card, index) => (
             <OfferCard key={card.matchId} data={card} index={index} />

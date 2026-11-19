@@ -5,6 +5,7 @@ import { getApiAlternanceEnv } from "@/lib/env";
 import { ExternalApiError, ValidationError, toValidationIssues } from "@/lib/errors";
 import { fetchJson, type FetchLike } from "@/lib/http/fetch-json";
 import { logger as defaultLogger, type Logger } from "@/lib/logger";
+import { classifyNoise } from "@/lib/offers/noise";
 import type { Json } from "@/lib/supabase/database.types";
 
 import {
@@ -169,6 +170,14 @@ export function normalizeJobOffer(job: JobOfferRead, raw: Json): NormalizedOffer
     companySiret: cleanSiret(job.workplace.siret),
     companyWebsite: cleanHttpUrl(job.workplace.website),
     isDelegated: job.is_delegated,
+    noiseKind: classifyNoise({
+      isDelegated: job.is_delegated,
+      nafCode: job.workplace.domain.naf?.code,
+      companyName:
+        emptyToNull(job.workplace.name) ??
+        emptyToNull(job.workplace.legal_name) ??
+        emptyToNull(job.workplace.brand),
+    }),
     locationLabel: emptyToNull(job.workplace.location.address),
     postalCode: extractPostalCode(job.workplace.location.address),
     lat: hasValidPoint ? lat : null,

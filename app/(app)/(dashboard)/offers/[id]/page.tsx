@@ -19,11 +19,11 @@ import {
   cityFromAddress,
   contractLabel,
   formatDate,
-  formatDistance,
 } from "@/lib/format";
+import { analyseMatch } from "@/lib/matching/analysis";
 import { readScoreReasons } from "@/lib/matching/reasons";
 import { hasDirectContact, offerContact } from "@/lib/offers/contact";
-import { JobOfferReadSchema } from "@/lib/providers/api-alternance";
+import { JobOfferReadSchema, toTargetDiplomaLevel } from "@/lib/providers/api-alternance";
 import { createClient } from "@/lib/supabase/server";
 import { toPlainText } from "@/lib/text/html";
 
@@ -31,17 +31,42 @@ import { prepareApplication } from "../../applications/actions";
 
 export const metadata: Metadata = { title: "Offre" };
 
-const ROME_REASONS = {
-  exact: "Correspond à un métier de votre profil",
-  related: "Métier proche de votre profil",
-  none: "",
-};
-const DIPLOMA_REASONS = {
-  exact: "Niveau de diplôme identique",
-  adjacent: "Niveau de diplôme voisin",
-  mismatch: "Niveau de diplôme différent",
-  unspecified: "Niveau de diplôme non précisé",
-};
+const MATCH_MARKS = { fit: "✓", gap: "!", tip: "→" } as const;
+
+/** One block of the match analysis; nothing is rendered when it has no line. */
+function MatchList({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: string[];
+  tone: keyof typeof MATCH_MARKS;
+}) {
+  if (items.length === 0) return null;
+  return (
+    <div className="grid gap-1.5">
+      <h3 className="font-semibold">{title}</h3>
+      <ul className="grid gap-1.5 text-muted-foreground">
+        {items.map((item) => (
+          <li key={item} className="flex items-start gap-2">
+            <span
+              aria-hidden
+              className={
+                tone === "fit"
+                  ? "plan-badge mt-0.5 grid size-4 shrink-0 place-items-center rounded-full text-[0.6rem] font-bold"
+                  : "mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-foreground/10 text-[0.65rem] font-bold text-foreground"
+              }
+            >
+              {MATCH_MARKS[tone]}
+            </span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 function SkillList({ title, items }: { title: string; items: string[] }) {
   if (items.length === 0) return null;
@@ -66,7 +91,13 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
 
   const { data: offer } = await supabase.from("offers").select("*").eq("id", id).maybeSingle();
   if (!offer) notFound();
-  const [{ data: match }, { data: application }, { data: baseLetter }] = await Promise.all([
+  const [
+    { data: match },
+    { data: application },
+    { data: baseLetter },
+    { data: cv },
+    { data: profile },
+  ] = await Promise.all([
     supabase
       .from("matches")
       .select("score, score_reasons")
@@ -87,10 +118,35 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
       .eq("kind", "cover_letter_base")
       .eq("is_current", true)
       .maybeSingle(),
+    // The CV text tells which skills asked by the offer the CV does not mention (C120).
+    supabase
+      .from("documents")
+      .select("extracted_text")
+      .eq("user_id", userId)
+      .eq("kind", "cv")
+      .eq("is_current", true)
+      .maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("diploma_level, search_radius_km")
+      .eq("user_id", userId)
+      .maybeSingle(),
   ]);
   const parsed = JobOfferReadSchema.safeParse(offer.raw);
   const job = parsed.success ? parsed.data : null;
   const reasons = readScoreReasons(match?.score_reasons);
+  const analysis = reasons
+    ? analyseMatch({
+        reasons,
+        radiusKm: profile?.search_radius_km ?? null,
+        profileLevel: Number(toTargetDiplomaLevel(profile?.diploma_level)) || null,
+        offerLevel: offer.diploma_level,
+        desiredSkills: job?.offer.desired_skills ?? [],
+        hasCv: cv !== null,
+        cvText: cv?.extracted_text ?? null,
+        noiseKind: offer.noise_kind,
+      })
+    : null;
   const facts = [
     ["Contrat", contractLabel(offer.contract_types)],
     ["Niveau visé", offer.diploma_level ? DIPLOMA_LABELS[offer.diploma_level] : null],
@@ -276,23 +332,26 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
               ) : null}
             </CardContent>
           </Card>
-          {reasons ? (
+          {analysis ? (
             <Card>
               <CardHeader>
-                <CardTitle>Pourquoi cette offre</CardTitle>
+                <CardTitle>Analyse du match</CardTitle>
                 <CardDescription>
                   Correspondance de {Math.round(Number(match?.score ?? 0))} % avec votre profil.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                  {ROME_REASONS[reasons.rome] ? <li>{ROME_REASONS[reasons.rome]}</li> : null}
-                  <li>À {formatDistance(reasons.distanceKm)} de votre adresse</li>
-                  <li>{DIPLOMA_REASONS[reasons.diploma]}</li>
-                  {reasons.keywords.length > 0 ? (
-                    <li>Mots de votre CV présents : {reasons.keywords.join(", ")}</li>
-                  ) : null}
-                </ul>
+              <CardContent className="grid gap-4 text-sm">
+                <MatchList
+                  title="Ce qui colle"
+                  items={analysis.fits.map((p) => p.text)}
+                  tone="fit"
+                />
+                <MatchList
+                  title="Ce qui manque ou reste à vérifier"
+                  items={analysis.gaps.map((p) => p.text)}
+                  tone="gap"
+                />
+                <MatchList title="Nos conseils" items={analysis.tips} tone="tip" />
               </CardContent>
             </Card>
           ) : null}

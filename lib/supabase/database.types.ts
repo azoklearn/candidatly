@@ -587,6 +587,7 @@ export type Database = {
           lat: number | null
           lng: number | null
           location_label: string | null
+          noise_kind: string | null
           postal_code: string | null
           published_at: string | null
           raw: Json
@@ -615,6 +616,7 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           location_label?: string | null
+          noise_kind?: string | null
           postal_code?: string | null
           published_at?: string | null
           raw: Json
@@ -643,6 +645,7 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           location_label?: string | null
+          noise_kind?: string | null
           postal_code?: string | null
           published_at?: string | null
           raw?: Json
@@ -670,6 +673,7 @@ export type Database = {
           domain_free_text: string | null
           email: string | null
           first_name: string | null
+          hide_noise: boolean
           id: string
           insee_code: string | null
           last_name: string | null
@@ -706,6 +710,7 @@ export type Database = {
           domain_free_text?: string | null
           email?: string | null
           first_name?: string | null
+          hide_noise?: boolean
           id?: string
           insee_code?: string | null
           last_name?: string | null
@@ -742,6 +747,7 @@ export type Database = {
           domain_free_text?: string | null
           email?: string | null
           first_name?: string | null
+          hide_noise?: boolean
           id?: string
           insee_code?: string | null
           last_name?: string | null
