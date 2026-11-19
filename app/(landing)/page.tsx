@@ -208,15 +208,11 @@ export default async function HomePage({
           </ul>
         </section>
 
-        <section className="demo lp-container" id="demo">
-          <div className="section-head">
-            <h2>
-              JobGPT,
-              <br />
-              <em>en 39 secondes.</em>
-            </h2>
-            <p>Du CV déposé à la lettre prête : regarde comment ça se passe.</p>
-          </div>
+        <section
+          className="demo lp-container"
+          id="demo"
+          aria-label="Démonstration de JobGPT en vidéo"
+        >
           <div className="demo-stage">
             <div className="demo-glow" aria-hidden="true" />
             <div className="demo-frame">
