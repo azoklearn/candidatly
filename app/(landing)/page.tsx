@@ -111,6 +111,35 @@ export default async function HomePage({
             </span>
           </h1>
 
+          <div className="brands enter" data-enter="2">
+            <p className="sr-only">
+              Moins de temps à scroller sur {SCROLLED_NAMES.slice(0, -1).join(", ")} et{" "}
+              {SCROLLED_NAMES.at(-1)}.
+            </p>
+            <div className="brands-band" aria-hidden="true">
+              <span className="brands-label">Moins de temps à scroller sur</span>
+              <div className="brands-window">
+                {/* Two identical halves: the track slides by one half, then starts again. */}
+                <ul className="brands-track">
+                  {[0, 1, 2, 3].flatMap((copy) =>
+                    SCROLLED_SITES.map((site) => (
+                      <li key={`${copy}-${site.name}`}>
+                        {/* A plain image: next/image would refuse or rasterise an SVG logo. */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={site.src}
+                          alt=""
+                          loading="lazy"
+                          style={{ "--h": `${site.height}px` } as CSSProperties}
+                        />
+                      </li>
+                    )),
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div className="hero-stage">
             <div className="hero-glow" aria-hidden="true" />
             {/* What a CV gives us, shown as an example around the slab that takes it. */}
@@ -169,35 +198,6 @@ export default async function HomePage({
               <Check aria-hidden="true" /> Tu valides chaque envoi
             </li>
           </ul>
-        </section>
-
-        <section className="brands lp-container" aria-label="Les sites où tu cherches déjà">
-          <p className="sr-only">
-            Moins de temps à scroller sur {SCROLLED_NAMES.slice(0, -1).join(", ")} et{" "}
-            {SCROLLED_NAMES.at(-1)}.
-          </p>
-          <div className="brands-band" aria-hidden="true">
-            <span className="brands-label">Moins de temps à scroller sur</span>
-            <div className="brands-window">
-              {/* Two identical halves: the track slides by one half, then starts again. */}
-              <ul className="brands-track">
-                {[0, 1, 2, 3].flatMap((copy) =>
-                  SCROLLED_SITES.map((site) => (
-                    <li key={`${copy}-${site.name}`}>
-                      {/* A plain image: next/image would refuse or rasterise an SVG logo. */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={site.src}
-                        alt=""
-                        loading="lazy"
-                        style={{ "--h": `${site.height}px` } as CSSProperties}
-                      />
-                    </li>
-                  )),
-                )}
-              </ul>
-            </div>
-          </div>
         </section>
 
         <section className="how lp-container" id="comment-ca-marche">

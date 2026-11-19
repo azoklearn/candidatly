@@ -330,7 +330,7 @@ html:has(.lp) {
   display: grid;
   place-items: center;
   width: 100%;
-  margin-top: clamp(72px, 7.6vw, 112px);
+  margin-top: clamp(64px, 6.6vw, 96px);
   padding: 8px 0 20px;
 }
 .lp .hero-glow {
@@ -808,11 +808,12 @@ html:has(.lp) {
 /* ------------------------------------------- the sites they already scroll */
 /* No frame: one quiet line that says what the logos are, then the logos passing by. */
 .lp .brands {
-  padding-bottom: clamp(8px, 2vw, 24px);
+  width: min(780px, 100%);
+  margin-top: clamp(24px, 3vw, 36px);
 }
 .lp .brands-band {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 .lp .brands-label {
   color: var(--ink-soft);
