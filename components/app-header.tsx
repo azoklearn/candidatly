@@ -7,7 +7,7 @@ export function AppHeader({ firstName }: { firstName: string | null }) {
   return (
     <header className="sticky top-0 z-40 px-3 pt-3">
       <div className="glass-bar mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 !rounded-[1.75rem] px-5 py-3 sm:!rounded-full">
-        <BrandLink href="/offers" />
+        <BrandLink href="/dashboard" />
         <NavLinks />
         <div className="ml-auto flex items-center gap-3 text-[0.8125rem]">
           {firstName ? (

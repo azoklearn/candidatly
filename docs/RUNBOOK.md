@@ -55,7 +55,7 @@ Depuis le 19 novembre 2026 (C123), Supabase Cron appelle chaque nuit à 03 h 30 
 
 Pour chaque étudiant qui a activé « Préparation de nuit » sur la page Candidatures, et dont le forfait inclut la lettre, elle prépare la lettre de ses 3 meilleures nouvelles offres (score d'au moins 60, hors écoles, organismes de formation et agences, sans candidature existante), et s'arrête quand 6 lettres préparées attendent déjà. Elle n'envoie rien et n'appelle aucune API externe.
 
-Contrôle : `select * from cron.job where jobname = 'candidatly-night-prep';` pour la planification, et les lignes `night_prep_done` dans les logs Vercel (`users`, `prepared`, `skipped`). Lancer à la main : `select public.invoke_night_prep();` dans l'éditeur SQL. Arrêter : `select cron.unschedule('candidatly-night-prep');`.
+Contrôle : `select * from cron.job where jobname = 'candidatly-night-prep';` pour la planification, et les lignes `night_prep_done` dans les logs Vercel (`users`, `prepared`, `skipped`). Lancer à la main : `select public.invoke_night_prep();` dans l'éditeur SQL. Arrêter : `select cron.unschedule('candidatly-night-prep');`. Limiter un passage à un compte : appeler la route avec le corps `{"only": "<user id>"}` ; c'est ce que font les tests de bout en bout, pour ne jamais préparer de lettres sur de vrais comptes.
 
 ## Paiements Mollie
 

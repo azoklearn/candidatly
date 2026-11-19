@@ -18,7 +18,7 @@ describe("safeNextPath", () => {
       null,
       undefined,
     ]) {
-      expect(safeNextPath(value)).toBe("/offers");
+      expect(safeNextPath(value)).toBe("/dashboard");
     }
   });
 

@@ -9,7 +9,7 @@ const GIVE_UP_AFTER_MS = 90_000;
 
 /**
  * Reloads the page data while the payment confirmation is on its way: the server page sends
- * the student to their offers as soon as the membership is stored.
+ * the student to their dashboard as soon as the membership is stored.
  */
 export function PaymentWatcher() {
   const router = useRouter();
@@ -33,7 +33,7 @@ export function PaymentWatcher() {
     <p role="status" className="max-w-md text-center text-sm text-muted-foreground">
       La confirmation du paiement prend plus de temps que prévu. Si votre paiement est passé, votre
       forfait s’activera dans quelques minutes :{" "}
-      <Link href="/offers" className="font-medium text-brand underline underline-offset-4">
+      <Link href="/dashboard" className="font-medium text-brand underline underline-offset-4">
         réessayer
       </Link>
       .

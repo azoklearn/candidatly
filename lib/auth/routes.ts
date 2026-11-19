@@ -2,6 +2,7 @@
 
 // The questionnaire is open to visitors (docs/QUESTIONS.md C91): it is not listed here.
 export const PROTECTED_PREFIXES = [
+  "/dashboard",
   "/offers",
   "/applications",
   "/companies",
@@ -11,7 +12,8 @@ export const PROTECTED_PREFIXES = [
   "/admin",
 ] as const;
 export const AUTH_PAGES = ["/login", "/signup"] as const;
-export const DEFAULT_AFTER_LOGIN = "/offers";
+/** Home of the signed-in area: the dashboard (C124). Unpaid accounts are sent on to /forfait. */
+export const DEFAULT_AFTER_LOGIN = "/dashboard";
 
 export function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(

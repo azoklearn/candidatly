@@ -9,12 +9,12 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Paiement" };
 
-/** Return page of the checkout (Mollie or Whop): waits for the webhook, then opens the offers (C83). */
+/** Return page of the checkout (Mollie or Whop): waits for the webhook, then opens the dashboard (C83, C124). */
 export default async function CheckoutReturnPage() {
   const supabase = await createClient();
   const userId = await requireUserId(supabase);
   const access = await loadAccess(supabase, userId);
-  if (access.allowed) redirect("/offers");
+  if (access.allowed) redirect("/dashboard");
 
   return (
     <div className="grid justify-items-center gap-2">
@@ -26,7 +26,7 @@ export default async function CheckoutReturnPage() {
         }
         messages={[
           "On attend la confirmation de votre paiement…",
-          "On ouvre vos offres…",
+          "On prépare votre tableau de bord…",
           "Encore un instant…",
         ]}
       />

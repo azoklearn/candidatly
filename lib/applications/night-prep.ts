@@ -59,18 +59,21 @@ export async function runNightPrep(options: {
   db: Db;
   now?: Date;
   logger?: Logger;
+  /** Restricts the run to one account: a replay, or a test that must not touch the others. */
+  onlyUserId?: string;
 }): Promise<NightPrepSummary> {
   const { db } = options;
   const log = (options.logger ?? defaultLogger).child({ area: "night_prep" });
   const startedAt = (options.now ?? new Date()).getTime();
   const summary: NightPrepSummary = { users: 0, prepared: 0, skipped: 0 };
 
-  const students = await db
+  let query = db
     .from("profiles")
     .select("user_id")
     .eq("night_prep_enabled", true)
-    .eq("onboarding_completed", true)
-    .limit(MAX_USERS);
+    .eq("onboarding_completed", true);
+  if (options.onlyUserId) query = query.eq("user_id", options.onlyUserId);
+  const students = await query.limit(MAX_USERS);
   if (students.error) throw new DatabaseError("profiles.select", students.error);
 
   for (const { user_id: userId } of students.data) {

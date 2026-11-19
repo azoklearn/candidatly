@@ -66,7 +66,7 @@ app/
   (app)/layout.tsx              session obligatoire, vérifiée côté serveur
   api/scan-cv/                  lecture du CV déposé sur l'accueil, sans stockage du fichier (C95)
   (questionnaire)/onboarding/   questionnaire ouvert aux visiteurs : [step]/ (9 questions en clics : 5 pour la recherche, 4 pour le plan, C118), gain/ (écran de comparaison), analyse/ (écran d'analyse animé, C94), compte/ (création du compte, C91 à C94) et fin/
-  (app)/(dashboard)/            onboarding terminé obligatoire : offers, applications, credits, account
+  (app)/(dashboard)/            onboarding terminé obligatoire : dashboard (accueil de l'espace payant, C124), offers, applications, credits, account
   layout.tsx, not-found.tsx, globals.css
 proxy.ts                        rafraîchit la session Supabase et redirige les visiteurs non connectés
 components/                     app-header, coming-soon ; components/ui : shadcn/ui
@@ -259,3 +259,4 @@ Modèles Anthropic : `claude-sonnet-5` (contexte 1M, sortie max 128K, 2 $ / 10 $
 - 2026-11-19 : lot B (C121). Page `/companies/[id]` pour les entreprises sans offre publiée (dirigeants du registre, contact, mention « être listée ne garantit pas qu'un poste est ouvert ») et candidature spontanée : lettre adaptée par règles, ajoutée au suivi, envoyée par l'étudiant. `applications.offer_id` devient facultatif (`company_key`, `company_*`, `target_title`). `COMPANY_LOOKUP_DISABLED=1` pour les tests de bout en bout.
 - 2026-11-19 : lot C (C122). Simulateur public `/outils/salaire-alternance` (grille légale et Smic du 1er juin 2026 dans `lib/tools/apprentice-pay.ts`, à mettre à jour à chaque revalorisation), guides `/guides`, pages `/alternance/[domaine]` et `/alternance/ville/[ville]`, `sitemap.xml`, `robots.txt`. Aucun nombre d'offres ni comparatif de concurrents sur ces pages.
 - 2026-11-19 : lot D (C123). Préparation de nuit : réglage sur la page Candidatures (`profiles.night_prep_enabled`), tâche planifiée `candidatly-night-prep` sur `/api/cron/night-prep`, lettres en brouillon étiquetées « Préparée cette nuit » (`applications.prepared_at_night`), 3 par nuit au plus, rien d'envoyé. La feuille de route sans IA ni nouvelle API (C120 à C123) est livrée.
+- 2026-11-19 : tableau de bord de l'espace payant (C124). `/dashboard` (« Accueil ») est la page d'arrivée après le paiement, la connexion et un clic sur le logo : chiffres de l'étudiant, « À faire maintenant », rappel de la recherche, meilleures offres, entreprises sans offre publiée, et toutes les fonctions avec leur état (`lib/dashboard/summary.ts`). Lecture seule. Les tests de bout en bout limitent désormais la préparation de nuit au compte de test (corps `{"only": "<id>"}`) : un passage complet touche les vrais comptes du projet lié.

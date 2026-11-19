@@ -13,19 +13,36 @@ test("letters are prepared at night for the students who asked for it", async ({
   const { users } = loadState();
   // The route only answers the scheduler.
   expect((await request.post("/api/cron/night-prep")).status()).toBe(401);
-  const run = await request.post("/api/cron/night-prep", {
+  // Narrowed to the test student: the linked project also holds real accounts, and a test
+  // run must never prepare letters for them.
+  const night = {
     headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
-  });
+    data: { only: users.night.id },
+  };
+  const run = await request.post("/api/cron/night-prep", night);
   expect(run.status()).toBe(200);
-  expect((await run.json()).prepared).toBeGreaterThanOrEqual(1);
+  expect(await run.json()).toMatchObject({ users: 1, prepared: 1 });
   // A second night adds nothing for an offer that already has its letter.
-  const again = await request.post("/api/cron/night-prep", {
-    headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
-  });
-  expect((await again.json()).prepared).toBe(0);
+  const again = await request.post("/api/cron/night-prep", night);
+  expect(await again.json()).toMatchObject({ users: 1, prepared: 0 });
+  // An account that is not an id is refused rather than widened to everybody.
+  expect(
+    (await request.post("/api/cron/night-prep", { ...night, data: { only: "x" } })).status(),
+  ).toBe(400);
 
   await page.goto(users.night.login);
-  await page.goto("/applications");
+  // The dashboard puts the letters of the night at the top of what to do (C124).
+  await page.goto("/dashboard");
+  const todo = page.getByRole("region", { name: "À faire maintenant" });
+  await expect(todo.getByText("1 lettre préparée cette nuit")).toBeVisible();
+  await expect(
+    page
+      .getByRole("listitem")
+      .filter({ hasText: "Chaque nuit, la lettre est préparée" })
+      .getByText("Activée"),
+  ).toBeVisible();
+  await todo.getByRole("link", { name: /Relire/ }).click();
+  await expect(page).toHaveURL(/\/applications$/);
   await expect(page.getByText("Préparation de nuit activée")).toBeVisible();
   await expect(page.getByText("1 lettre préparée vous attend")).toBeVisible();
   const prepared = page.getByRole("listitem").filter({ hasText: OFFER_TITLE });

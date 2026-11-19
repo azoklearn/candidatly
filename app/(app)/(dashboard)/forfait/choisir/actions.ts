@@ -49,10 +49,10 @@ export async function choosePlan(formData: FormData): Promise<void> {
   await trackServerEvent(EVENTS.planChosen, { forfait: plan, facturation: billing });
 
   const provider = billingProvider();
-  if (!provider) redirect("/offers");
+  if (!provider) redirect("/dashboard");
   const access = await loadAccess(supabase, userId);
   // A second checkout would bill twice: a plan is changed by stopping the current one first.
-  if (access.subscription || access.exempt) redirect("/offers");
+  if (access.subscription || access.exempt) redirect("/dashboard");
   if (!(await allowAction(supabase, "start_checkout"))) redirect(UNAVAILABLE);
 
   const origin = (await headers()).get("origin");

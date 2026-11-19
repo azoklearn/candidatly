@@ -8,6 +8,37 @@ test("a student prepares, sends and tracks an application, then exports their da
   const { users } = loadState();
   await page.goto(users.student.login);
   await expect(page).toHaveURL(/\/offers$/);
+
+  // The dashboard, home of the paid area (C124): figures, next steps, every feature.
+  await page.getByRole("link", { name: "Accueil", exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Bonjour Camille" })).toBeVisible();
+  // The school offer is hidden in the list, so it is not counted here either.
+  await expect(page.getByRole("link", { name: /^1\s*Offre à découvrir/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /^0\s*Candidature à envoyer/ })).toBeVisible();
+  const best = page.getByRole("region", { name: "Vos meilleures offres" });
+  await expect(best.getByText(OFFER_TITLE)).toBeVisible();
+  await expect(page.getByText(SCHOOL_OFFER_TITLE)).toHaveCount(0);
+  const search = page.getByRole("region", { name: "Votre recherche" });
+  await expect(search.getByText("Paris · 30 km autour")).toBeVisible();
+  await expect(search.getByText("Bac+3")).toBeVisible();
+  const todo = page.getByRole("region", { name: "À faire maintenant" });
+  await expect(todo.getByText("1 offre à découvrir")).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Entreprises à contacter" })
+      .getByText(/test E2E/)
+      .first(),
+  ).toBeVisible();
+  const features = page.getByRole("region", { name: "Tout ce que vous pouvez faire" });
+  const night = features.getByRole("listitem").filter({ hasText: "Préparation de nuit" });
+  await expect(night.getByText("Désactivée")).toBeVisible();
+  await expect(
+    features.getByRole("listitem").filter({ hasText: "Filtre anti-bruit" }).getByText("Activé"),
+  ).toBeVisible();
+  await features.getByRole("link", { name: /Offres triées pour vous/ }).click();
+  await expect(page).toHaveURL(/\/offers$/);
+
   await expect(page.getByRole("heading", { name: "Vos offres" })).toBeVisible();
   // Few offers: companies that hire apprentices nearby complete the page (C80).
   await expect(
@@ -129,7 +160,8 @@ test("a student prepares, sends and tracks an application, then exports their da
   await expect(page.getByRole("heading", { name: /Ce qu’on tient, noir sur blanc/ })).toBeVisible();
   await expect(page.getByText("Je peux arrêter quand je veux ?")).toBeVisible();
   await page.getByRole("button", { name: "Choisir 3 mois" }).click();
-  await expect(page).toHaveURL(/\/offers$/);
+  // A chosen plan opens the dashboard, the home of the paid area (C124).
+  await expect(page).toHaveURL(/\/dashboard$/);
 
   const response = await page.request.get("/api/account/export");
   expect(response.status()).toBe(200);
