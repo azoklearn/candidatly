@@ -13,6 +13,12 @@ export function SiteFooter() {
           <Link href="/tarifs" className="nav-sweep hover:text-foreground">
             Tarifs
           </Link>
+          <Link href="/guides" className="nav-sweep hover:text-foreground">
+            Guides
+          </Link>
+          <Link href="/outils/salaire-alternance" className="nav-sweep hover:text-foreground">
+            Simulateur de salaire
+          </Link>
           <Link href="/mentions-legales" className="nav-sweep hover:text-foreground">
             Mentions légales
           </Link>

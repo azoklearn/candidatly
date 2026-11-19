@@ -31,6 +31,24 @@ test("the landing page and the legal pages are public", async ({ page }) => {
   await expect(page.getByText("soit 9,97 € par mois")).toBeVisible();
   await expect(page.getByText("un seul paiement, accès pour toujours")).toBeVisible();
   await expect(page.getByRole("radio")).toHaveCount(0);
+  // The public tools and guides (C122): the simulator follows the legal grid, in the browser.
+  await page.goto("/outils/salaire-alternance");
+  await expect(page.getByText("soit 43 % du Smic")).toBeVisible();
+  await page.getByRole("button", { name: "21 à 25 ans" }).click();
+  await page.getByRole("button", { name: "2e année" }).click();
+  await expect(page.getByText("soit 61 % du Smic")).toBeVisible();
+  await expect(page.getByText(/1\s138,88\s€/)).toBeVisible();
+  await page.getByRole("button", { name: "Professionnalisation" }).click();
+  await expect(page.getByText("soit 70 % du Smic")).toBeVisible();
+  await page.goto("/guides");
+  await page.getByRole("link", { name: /Trouver une alternance/ }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: /Trouver une alternance/ }),
+  ).toBeVisible();
+  await page.goto("/alternance/ville/lyon");
+  await expect(page.getByRole("heading", { level: 1, name: "Alternance à Lyon" })).toBeVisible();
+  // No figure about offers on a public page.
+  await expect(page.getByRole("main")).not.toContainText(/\d+ offres/);
   for (const [path, title] of [
     ["/mentions-legales", "Mentions légales"],
     ["/confidentialite", "Politique de confidentialité"],

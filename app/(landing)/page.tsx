@@ -547,6 +547,8 @@ export default async function HomePage({
           <Link href="/confidentialite">Confidentialité</Link>
           <Link href="/conditions">Conditions d’utilisation</Link>
           <Link href="/tarifs">Tarifs</Link>
+          <Link href="/guides">Guides</Link>
+          <Link href="/outils/salaire-alternance">Simulateur de salaire</Link>
         </div>
       </footer>
     </>

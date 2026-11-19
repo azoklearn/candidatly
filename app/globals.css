@@ -418,6 +418,13 @@
       0 10px 18px -10px rgb(60 24 6 / 0.6);
     color: #fff6ee;
   }
+  /* A chosen chip stays smoked under the pointer: the hover of .q-card would clear it. */
+  .q-card.chip[aria-pressed="true"]:hover,
+  .q-card.chip[data-on="true"]:hover,
+  .q-card.chip:has(input:checked):hover {
+    border-color: rgb(255 255 255 / 0.14);
+    background-color: var(--ink);
+  }
   .chip:has(input:focus-visible) {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
